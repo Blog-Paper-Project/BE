@@ -1,8 +1,9 @@
 const express = require('express');
-const port = 6000;
+const port = process.env.PORT;
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
+require('dotenv').config();
 
 module.exports = http;
 
@@ -26,6 +27,10 @@ app.use(morgan('dev'));
 
 app.use('/api/paper/', paper);
 
+app.get('/', (req, res, next) => {
+  res.send('Paper-Project');
+});
+
 app.use((req, res, next) => {
   res.sendStatus(404);
 });
@@ -36,5 +41,5 @@ app.use((err, req, res, next) => {
 });
 
 http.listen(port, () => {
-  console.log('🟢', port, '번 포트');
+  console.log('🟢', '서버연결');
 });
