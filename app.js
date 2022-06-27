@@ -8,15 +8,15 @@ module.exports = http;
 
 // require('./modules/socket');
 
-// const db = require('./models');
+const db = require('./models');
 
 const cors = require('cors');
 const morgan = require('morgan');
 
-// db.sequelize
-//   .sync()
-//   .then(() => console.log('🟢 db 연결 성공'))
-//   .catch(console.error);
+db.sequelize
+  .sync({ force: true })
+  .then(() => console.log('🟢 db 연결 성공'))
+  .catch(console.error);
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
