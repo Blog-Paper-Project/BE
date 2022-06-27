@@ -27,7 +27,7 @@ app.use(morgan('dev'));
 // app.use('/api', []);
 
 app.get('/', (req, res, next) => {
-  res.send('Hello');
+  res.send('Paper-Project');
 });
 
 app.use((req, res, next) => {
