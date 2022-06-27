@@ -26,6 +26,10 @@ app.use(morgan('dev'));
 
 // app.use('/api', []);
 
+app.get('/', (req, res, next) => {
+  res.send('Hello');
+});
+
 app.use((req, res, next) => {
   res.sendStatus(404);
 });
@@ -36,5 +40,5 @@ app.use((err, req, res, next) => {
 });
 
 http.listen(port, () => {
-  console.log('🟢', port, '번 포트');
+  console.log('🟢', '서버연결');
 });
