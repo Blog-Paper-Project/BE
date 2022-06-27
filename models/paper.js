@@ -32,7 +32,6 @@ module.exports = class Paper extends Sequelize.Model {
   static associate(db) {
     db.Paper.belongsTo(db.User);
     db.Paper.belongsToMany(db.User, {
-      foreignKey: 'paperId',
       through: 'likes',
       as: 'Likes',
     });
