@@ -14,6 +14,10 @@ module.exports = class Booking extends Sequelize.Model {
           type: Sequelize.DATE,
           allowNull: false,
         },
+        time: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
         accepted: {
           type: Sequelize.BOOLEAN,
           allowNull: false,
