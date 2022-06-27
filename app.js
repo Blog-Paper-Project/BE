@@ -1,9 +1,10 @@
 const express = require('express');
-const port = process.env.PORT;
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
 require('dotenv').config();
+
+const port = process.env.PORT;
 
 module.exports = http;
 
@@ -13,10 +14,10 @@ const db = require('./models');
 
 const cors = require('cors');
 const morgan = require('morgan');
-const paper = require('./dist/routes/paper');
+const paper = require('./dist/routes/paper.route');
 
 db.sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() => console.log('🟢 db 연결 성공'))
   .catch(console.error);
 
