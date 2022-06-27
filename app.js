@@ -3,7 +3,6 @@ const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
 require('dotenv').config();
-const port = process.env.PORT;
 
 const port = process.env.PORT;
 
