@@ -1,9 +1,9 @@
 const express = require('express');
-const port = process.env.PORT;
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
 require('dotenv').config();
+const port = process.env.PORT;
 
 module.exports = http;
 
