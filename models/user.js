@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const booking = require('./booking.js');
 
 module.exports = class User extends Sequelize.Model {
   static init(sequelize) {
@@ -65,6 +66,16 @@ module.exports = class User extends Sequelize.Model {
       foreignKey: 'followerId',
       as: 'Followers',
       through: 'subscriptions',
+    });
+    db.User.belongsToMany(db.User, {
+      foreignKey: 'hostId',
+      as: 'host',
+      through: booking,
+    });
+    db.User.belongsToMany(db.User, {
+      foreignKey: 'guestId',
+      as: 'guest',
+      through: booking,
     });
   }
 };
