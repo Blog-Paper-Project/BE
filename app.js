@@ -12,6 +12,7 @@ const db = require('./models');
 
 const cors = require('cors');
 const morgan = require('morgan');
+const paper = require('./dist/routes/paper');
 
 db.sequelize
   .sync({ force: true })
@@ -23,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
-// app.use('/api', []);
+app.use('/api/paper/', paper);
 
 app.use((req, res, next) => {
   res.sendStatus(404);
