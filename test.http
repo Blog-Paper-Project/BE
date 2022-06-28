@@ -1,0 +1,50 @@
+// 회원가입
+###
+POST http://127.0.0.1:8000/user/signup
+Content-Type: application/json
+
+{
+  "email": "test1234@naver.com",
+  "nickname": "공백크",
+  "password" : "12345678",
+  "confirmPassword" : "12345678"
+}
+
+// 로그인
+###
+POST http://127.0.0.1:8000/user/login
+Content-Type: application/json
+
+{
+  "email": "test1234@naver.com",
+  "password" : "12345678"
+}
+
+// 이메일중복검사
+###
+POST http://127.0.0.1:8000/user/idcheck/test1234@naver.com
+Content-Type: application/json
+
+
+// 아이디중복검사
+###
+POST http://127.0.0.1:8000/user/idcheck/공백크
+Content-Type: application/json
+
+
+// 마이프로필
+###
+GET  http://127.0.0.1:8000/user/myprofile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1NjM5MDE4OX0.F48EWvhrnsejx7LmiSQRTnB8-ww_HCzwU6PyZ7CX-F8
+Content-Type: application/json
+
+// 마이프로필 수정
+###
+PATCH  http://127.0.0.1:8000/user/myprofile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1NjM5MDE4OX0.F48EWvhrnsejx7LmiSQRTnB8-ww_HCzwU6PyZ7CX-F8
+Content-Type: application/json
+
+{
+  "nickname": "공백크1",
+  "introduction" : "기분나쁨"
+}
