@@ -3,13 +3,14 @@ const sequelize = require('sequelize');
 const signupmiddle = require('../middleware/joi-signup');
 const loginmiddle = require('../middleware/joi-login');
 const Authmiddle = require('../middleware/Auth');
+const nodemailer = require('nodemailer');
 const { upload, deleteImg } = require('../../dist/modules/multer');
 const { User } = require('../../models');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 const router = express.Router();
 const Bcrypt = require('bcrypt');
 const Op = sequelize.Op;
+require('dotenv').config();
 
 // 회원가입
 router.post('/signup', async (req, res, next) => {
@@ -144,6 +145,77 @@ router.patch(
   }
 );
 
-router.post('/user/emailauth', async (req, res, next) => {});
+// 이메일 인증
+router.post('/emailauth', Authmiddle, async (req, res, next) => {
+  const { user } = res.locals;
+  const { email } = req.body;
+  // 인증메일 (번호)
+  const emailAuth = Math.floor(Math.random() * 10000);
+  await User.update({ emailAuth }, { where: { userId: user.userId } });
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
+
+  let info = await transporter.sendMail({
+    from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
+    to: email,
+    subject: '[Paper] 인증번호가 도착했습니다.',
+    text: `${emailAuth}`,
+  });
+
+  res.status(200).json({
+    result: true,
+  });
+});
+
+// 이메일 인증 체크
+router.post('/check-emailauth', Authmiddle, async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    const { emailAuth } = req.body;
+    const text = await User.findOne({
+      where: { userId: user.userId },
+      attributes: ['emailAuth'],
+    });
+    if (Number(emailAuth) === text.emailAuth) {
+      res.status(200).send({
+        result: true,
+      });
+      return;
+    }
+    res.status(400).send({
+      result: false,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// 사용자 비밀번호 재설정
+router.patch('/change-password', Authmiddle, async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    const { password } = req.body;
+
+    const salt = await Bcrypt.genSalt();
+    const pwhash = await Bcrypt.hash(password, salt);
+
+    await User.update({ password: pwhash }, { where: { userId: user.userId } });
+    res.status(200).send({
+      result: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 
 module.exports = router;
