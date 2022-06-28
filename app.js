@@ -4,6 +4,7 @@ const Http = require('http');
 const http = Http.createServer(app);
 const UserRouter = require('./dist/router/user');
 require('dotenv').config();
+
 const port = process.env.PORT;
 
 module.exports = http;
@@ -14,6 +15,7 @@ const db = require('./models');
 
 const cors = require('cors');
 const morgan = require('morgan');
+const paper = require('./dist/routes/paper.route');
 
 db.sequelize
   .sync({ force: false })
@@ -25,7 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
-app.use('/', UserRouter);
+app.use('/user', UserRouter);
+
+app.use('/api/paper/', paper);
 
 app.get('/', (req, res, next) => {
   res.send('Paper-Project');
@@ -36,8 +40,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.sendStatus(500);
+  const { status, message } = err;
+
+  res.status(status || 500).json({ success: false, message });
 });
 
 http.listen(port, () => {
