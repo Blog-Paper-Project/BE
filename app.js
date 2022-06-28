@@ -3,7 +3,8 @@ const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
 const UserRouter = require('./dist/routes/user');
-const passportConfig = require('./dist/routes/kakao');
+const passportConfigkakao = require('./dist/routes/kakao');
+const passportConfignaver = require('./dist/routes/naver');
 const passport = require('passport');
 const expressSession = require('express-session');
 require('dotenv').config();
@@ -25,7 +26,8 @@ db.sequelize
   .then(() => console.log('🟢 db 연결 성공'))
   .catch(console.error);
 
-passportConfig();
+passportConfigkakao();
+passportConfignaver();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

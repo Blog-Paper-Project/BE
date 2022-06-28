@@ -58,6 +58,21 @@ router.get(
   }
 );
 
+// 네이버 로그인
+router.get('/login/naver', passport.authenticate('naver'));
+
+// 위에서 네이버 서버 로그인이 되면, 네이버 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+router.get(
+  '/login/naver/callback',
+  // 그리고 passport 로그인 전략에 의해 naverStrategy로 가서 카카오계정 정보와 DB를 비교해서 회원가입시키거나 로그인 처리하게 한다.
+  passport.authenticate('naver', {
+    failureRedirect: '/',
+  }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
 // 로그인
 router.post('/login', isNotLoggedIn, async (req, res, next) => {
   try {
@@ -74,7 +89,7 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
       return;
     }
     const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
-      expiresIn: 60 * 60 * 3, //60초 * 60 * 3 이므로, 3시간 유효한 토큰 발급
+      expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
     });
     res.status(200).send({
       result: true,
@@ -99,7 +114,6 @@ router.post('/idcheck/:id', isNotLoggedIn, async (req, res, next) => {
         },
       },
     });
-    console.log(idcheck);
     if (idcheck.length) {
       res.status(400).send({
         result: false,
