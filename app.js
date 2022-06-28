@@ -3,6 +3,9 @@ const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
 const UserRouter = require('./dist/routes/user');
+const passportConfig = require('./dist/routes/kakao');
+const passport = require('passport');
+const expressSession = require('express-session');
 require('dotenv').config();
 
 const port = process.env.PORT;
@@ -22,10 +25,22 @@ db.sequelize
   .then(() => console.log('🟢 db 연결 성공'))
   .catch(console.error);
 
+passportConfig();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(
+  expressSession({
+    resave: false,
+    saveUninitialized: false,
+    secret: 'secret',
+    cookie: { httpOnly: true, secure: false },
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/user', UserRouter);
 

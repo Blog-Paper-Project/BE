@@ -20,15 +20,20 @@ Content-Type: application/json
   "password" : "12345678"
 }
 
+// 카카오 로그인
+###
+GET http://15.164.50.132/user/login/kakao
+Content-Type: application/json
+
 // 이메일중복검사
 ###
-GET http://15.164.50.132/user/idcheck/test1234@naver.com
+POST http://15.164.50.132/user/idcheck/test1234@naver.com
 Content-Type: application/json
 
 
 // 아이디중복검사
 ###
-GET http://15.164.50.132/user/idcheck/공백크
+POST http://15.164.50.132/user/idcheck/공백크
 Content-Type: application/json
 
 
@@ -51,8 +56,8 @@ Content-Type: application/json
 
 // 이메일 인증
 ###
-POST http://127.0.0.1:8000/user/emailauth
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMDE1M30.CKlytExbkzxe2e5D3PuzY9YjOEyzHIkYz88cpLbPQDk
+POST http://15.164.50.132/user/emailauth
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMTQyMn0.J5nxSumJRgM1KfUOQgZMVQKsvurLfrjaGOI_JHxZV4Q
 Content-Type: application/json
 
 {
@@ -61,20 +66,20 @@ Content-Type: application/json
 
 // 이메일 인증 체크
 ###
-POST http://127.0.0.1:8000/user/check-emailauth
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMDE1M30.CKlytExbkzxe2e5D3PuzY9YjOEyzHIkYz88cpLbPQDk
+POST http://15.164.50.132/user/check-emailauth
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMTI1M30.qhrsCIde2RkCseU54D1SK9K9PNMkV3e6faf8yDJ1zfc
 Content-Type: application/json
 
 {
-  "emailAuth": "7864"
+  "emailAuth": "9238"
 }
 
 // 비밀번호 재설정 
 ###
-PATCH http://127.0.0.1:8000/user/change-password
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMDE1M30.CKlytExbkzxe2e5D3PuzY9YjOEyzHIkYz88cpLbPQDk
+PATCH http://15.164.50.132/user/change-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMTI1M30.qhrsCIde2RkCseU54D1SK9K9PNMkV3e6faf8yDJ1zfc
 Content-Type: application/json
 
 {
-  "password": "123456"
+  "password": "123789"
 }
