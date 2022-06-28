@@ -3,6 +3,7 @@ const sequelize = require('sequelize');
 const signupmiddle = require('../middleware/joi-signup');
 const loginmiddle = require('../middleware/joi-login');
 const Authmiddle = require('../middleware/Auth');
+const { upload, deleteImg } = require('../../dist/modules/multer');
 const { User } = require('../../models');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -112,26 +113,34 @@ router.get('/myprofile', Authmiddle, async (req, res, next) => {
 });
 
 // 마이프로필 수정
-router.patch('/myprofile', Authmiddle, async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    const profileImage = req.file;
-    const { nickname, introduction } = req.body;
-    await User.update(
-      { profileImage, nickname, introduction },
-      { where: { id: user.id } }
-    );
-    const profileimg = await User.findOne({
-      where: { id: user.id },
-      attributes: { exclude: ['password'] },
-    });
-    res.status(200).send({
-      profileimg,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
+router.patch(
+  '/myprofile',
+  Authmiddle,
+  upload.single('image'),
+  async (req, res, next) => {
+    try {
+      const { user } = res.locals;
+      const profileImage = req.file.key;
+      const { nickname, introduction } = req.body;
+
+      await deleteImg(user.profileImage);
+
+      await User.update(
+        { profileImage, nickname, introduction },
+        { where: { id: user.id } }
+      );
+      const profileimg = await User.findOne({
+        where: { id: user.id },
+        attributes: { exclude: ['password'] },
+      });
+      res.status(200).send({
+        profileimg,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   }
-});
+);
 
 module.exports = router;
