@@ -8,6 +8,7 @@ module.exports = class Paper extends Sequelize.Model {
           primaryKey: true,
           type: Sequelize.INTEGER,
           allowNull: false,
+          autoIncrement: true,
         },
         title: {
           type: Sequelize.STRING(140),
@@ -35,12 +36,13 @@ module.exports = class Paper extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.Paper.belongsTo(db.User, { foreignKey: 'userId' });
+    db.Paper.belongsTo(db.User, { as: 'Users', foreignKey: 'userId' });
     db.Paper.belongsToMany(db.User, {
+      foreignKey: 'postId',
       through: 'likes',
       as: 'Likes',
     });
-    db.Paper.hasMany(db.Comment);
-    db.Paper.hasMany(db.Tag);
+    db.Paper.hasMany(db.Comment, { foreignKey: 'postId' });
+    db.Paper.hasMany(db.Tag, { foreignKey: 'postId' });
   }
 };
