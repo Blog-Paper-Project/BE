@@ -150,7 +150,7 @@ router.patch(
         return next(createError(400, '게시글 수정 실패'));
       }
 
-      res.json({ result: true });
+      res.json({ result: true, title, contents });
     } catch (err) {
       next(err);
     }
