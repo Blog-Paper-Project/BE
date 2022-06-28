@@ -37,6 +37,8 @@
     "multer-s3": "^2.9.0",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.7.5",
+    "passport": "^0.6.0",
+    "passport-kakao": "^1.0.1",
     "sequelize": "^6.21.1",
     "sequelize-cli": "^6.4.1",
     "socket.io": "^4.5.1",
