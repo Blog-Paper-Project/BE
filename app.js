@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   const { status, message } = err;
 
-  res.status(status || 500).json({ success: false, message });
+  res.status(status || 500).json({ result: false, message });
 });
 
 http.listen(port, () => {
