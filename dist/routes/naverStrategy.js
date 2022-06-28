@@ -14,15 +14,14 @@ module.exports = () => {
         callbackURL: '/user/login/naver/callback', // 네이버로부터 인증결과를 받을 라우터 주소
       },
       async (accessToken, refreshRoken, response, done) => {
-        // 네[이버에서 인증 후 Token 과 profile을 보내준다.
+        // 네이버에서 인증 후 Token 과 profile을 보내준다.
 
         console.log('naver profile', response);
 
         try {
           const exUser = await User.findOne({
             // 기존의 User가 있는지 조회
-
-            where: { snsId: response.id, provider: 'naver' },
+            where: { snsId: profile.id, provider: 'naver' },
           });
 
           if (exUser) {
