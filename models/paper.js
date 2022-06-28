@@ -4,6 +4,11 @@ module.exports = class Paper extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
+        postId: {
+          primaryKey: true,
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
         title: {
           type: Sequelize.STRING(140),
           allowNull: false,
@@ -30,7 +35,7 @@ module.exports = class Paper extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.Paper.belongsTo(db.User);
+    db.Paper.belongsTo(db.User, { foreignKey: 'userId' });
     db.Paper.belongsToMany(db.User, {
       through: 'likes',
       as: 'Likes',
