@@ -1,9 +1,11 @@
 const express = require('express');
 const sequelize = require('sequelize');
+const { isNotLoggedIn } = require('../middleware/loging');
 const signupmiddle = require('../middleware/joi-signup');
 const loginmiddle = require('../middleware/joi-login');
 const Authmiddle = require('../middleware/Auth');
 const nodemailer = require('nodemailer');
+const passport = require('passport');
 const { upload, deleteImg } = require('../../dist/modules/multer');
 const { User } = require('../../models');
 const jwt = require('jsonwebtoken');
@@ -13,7 +15,7 @@ const Op = sequelize.Op;
 require('dotenv').config();
 
 // 회원가입
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', isNotLoggedIn, async (req, res, next) => {
   try {
     const { email, nickname, password, confirmPassword } =
       await signupmiddle.validateAsync(req.body);
@@ -42,8 +44,22 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
+// 카카오 로그인
+router.get('/login/kakao', passport.authenticate('kakao'));
+
+router.get(
+  '/login/kakao/callback',
+  passport.authenticate('kakao', {
+    failureRedirect: '/', // 콜백 함수 대신 로그인 실패 시 어디로 이동할 지 설정
+  }),
+  // 로그인 성공 시 어디로 이동할 지 다음 미들웨어에 설정
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
 // 로그인
-router.post('/login', async (req, res, next) => {
+router.post('/login', isNotLoggedIn, async (req, res, next) => {
   try {
     const { email, password } = await loginmiddle.validateAsync(req.body);
     const user = await User.findOne({
@@ -57,11 +73,13 @@ router.post('/login', async (req, res, next) => {
       });
       return;
     }
-    console.log(user.Id);
+    const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
+      expiresIn: 60 * 60 * 3, //60초 * 60 * 3 이므로, 3시간 유효한 토큰 발급
+    });
     res.status(200).send({
       result: true,
       nickname: user.nickname,
-      token: jwt.sign({ userId: user.userId }, process.env.SECRET_KEY),
+      token,
     });
   } catch (error) {
     console.log(error);
@@ -70,7 +88,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 // 이메일 || 닉네임 중복검사
-router.get('/idcheck/:id', async (req, res, next) => {
+router.post('/idcheck/:id', isNotLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const idcheck = await User.findAll({
