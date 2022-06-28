@@ -11,7 +11,7 @@ const Bcrypt = require('bcrypt');
 const Op = sequelize.Op;
 
 // 회원가입
-router.post('/user/signup', async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {
   try {
     const { email, nickname, password, confirmPassword } =
       await signupmiddle.validateAsync(req.body);
@@ -41,7 +41,7 @@ router.post('/user/signup', async (req, res, next) => {
 });
 
 // 로그인
-router.post('/user/login', async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = await loginmiddle.validateAsync(req.body);
     const user = await User.findOne({
@@ -68,7 +68,7 @@ router.post('/user/login', async (req, res, next) => {
 });
 
 // 이메일 || 닉네임 중복검사
-router.post('/user/idcheck/:id', async (req, res, next) => {
+router.post('/idcheck/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     const idcheck = await User.findAll({
@@ -95,7 +95,7 @@ router.post('/user/idcheck/:id', async (req, res, next) => {
 });
 
 // 마이프로필 조회
-router.get('/user/myprofile', Authmiddle, async (req, res, next) => {
+router.get('/myprofile', Authmiddle, async (req, res, next) => {
   try {
     const { user } = res.locals;
     const myprofile = await User.findOne({
@@ -112,7 +112,7 @@ router.get('/user/myprofile', Authmiddle, async (req, res, next) => {
 });
 
 // 마이프로필 수정
-router.patch('/user/myprofile', Authmiddle, async (req, res, next) => {
+router.patch('/myprofile', Authmiddle, async (req, res, next) => {
   try {
     const { user } = res.locals;
     const profileImage = req.file;
