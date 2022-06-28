@@ -27,6 +27,6 @@ module.exports = class Tag extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.Tag.belongsTo(db.Paper);
+    db.Tag.belongsTo(db.Paper, { as: 'Posts', foreignKey: 'postId' });
   }
 };
