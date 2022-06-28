@@ -4,6 +4,7 @@ const sequelize_1 = require("sequelize");
 const custom_error_1 = require("../modules/custom_error");
 const { Paper, User } = require('../../models');
 const auth = require('../middleware/Auth');
+const calcOneWeek = require('../modules/date');
 const router = express.Router();
 // 인기 게시글 조회 & 게시글 검색
 router.get('/', async (req, res, next) => {
@@ -20,11 +21,12 @@ router.get('/', async (req, res, next) => {
         let papers = await Paper.findAll({
             include: { model: User, as: 'Likes' },
         });
-        papers = papers // 좋아요 많은 게시글 순으로 정렬
+        papers = papers // 1주일 간 좋아요 많은 게시글 순으로 정렬
             .map((paper) => {
             const { postId, title, Likes } = paper;
-            const likes = Likes.filter((like) => like.createdAt < new Date() // 추천 반영 기간 설정 필요
-            ).length;
+            const likes = Likes.filter((like) => {
+                new Date(like.createdAt) > calcOneWeek(); // 추천 반영 기간 설정 필요
+            }).length;
             return { postId, title, likes };
         })
             .sort((a, b) => b['likes'] - a['likes'])
@@ -90,18 +92,18 @@ router.post('/', auth, async (req, res, next) => {
         if (!userId) {
             return next((0, custom_error_1.createError)(401, 'Unauthorized'));
         }
-        const result = await Paper.create({ title, contents, userId });
-        if (!result) {
-            return next((0, custom_error_1.createError)(400, 'Not Created'));
+        const paper = await Paper.create({ title, contents, userId });
+        if (!paper) {
+            return next((0, custom_error_1.createError)(400, 'Create Failed'));
         }
-        res.json({ result });
+        res.json({ paper });
     }
     catch (err) {
         next(err);
     }
 });
 // 상세페이지 수정
-router.patch('/:postId', async (req, res, next) => {
+router.patch('/:postId', auth, async (req, res, next) => {
     try {
         const { userId } = res.locals.user;
         const { title, contents } = req.body;
@@ -109,11 +111,29 @@ router.patch('/:postId', async (req, res, next) => {
         if (!userId) {
             return next((0, custom_error_1.createError)(401, 'Unauthorized'));
         }
-        const result = await Paper.update({ title, contents }, { where: { userId, postId } });
-        if (!result[0]) {
-            return next((0, custom_error_1.createError)(400, 'Not Updated'));
+        const paper = await Paper.update({ title, contents }, { where: { userId, postId } });
+        if (!paper[0]) {
+            return next((0, custom_error_1.createError)(400, 'Update Failed'));
         }
-        res.json({ result });
+        res.json({ result: true });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+// 상세페이지 삭제
+router.delete('/:postId', auth, async (req, res, next) => {
+    try {
+        const { userId } = res.locals.user;
+        const { postId } = req.params;
+        if (!userId) {
+            return next((0, custom_error_1.createError)(401, 'Unauthorized'));
+        }
+        const paper = await Paper.destroy({ where: { userId, postId } });
+        if (!paper) {
+            return next((0, custom_error_1.createError)(400, 'Delete Failed'));
+        }
+        res.json({ result: true });
     }
     catch (err) {
         next(err);
