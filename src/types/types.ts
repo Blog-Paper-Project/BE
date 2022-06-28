@@ -6,7 +6,7 @@ namespace Types {
     category: string[];
     createdAt: Date;
     updatedAt: Date;
-    UserId: number;
+    userId: number;
     Likes: {
       UserId: number;
       PaperId: number;
