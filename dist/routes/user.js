@@ -69,7 +69,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 // 이메일 || 닉네임 중복검사
-router.post('/idcheck/:id', async (req, res, next) => {
+router.get('/idcheck/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     const idcheck = await User.findAll({
@@ -80,6 +80,7 @@ router.post('/idcheck/:id', async (req, res, next) => {
         },
       },
     });
+    console.log(idcheck);
     if (idcheck.length) {
       res.status(400).send({
         result: false,
@@ -142,5 +143,7 @@ router.patch(
     }
   }
 );
+
+router.post('/user/emailauth', async (req, res, next) => {});
 
 module.exports = router;
