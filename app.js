@@ -18,7 +18,7 @@ const morgan = require('morgan');
 const paper = require('./dist/routes/paper.route');
 
 db.sequelize
-  .sync({ force: false })
+  .sync({ force: false, logging: false })
   .then(() => console.log('🟢 db 연결 성공'))
   .catch(console.error);
 
@@ -35,9 +35,9 @@ app.get('/', (req, res, next) => {
   res.send('Paper-Project');
 });
 
-app.use((req, res, next) => {
-  res.sendStatus(404);
-});
+// app.use((req, res, next) => {
+//   res.sendStatus(404);
+// });
 
 app.use((err, req, res, next) => {
   const { status, message } = err;
