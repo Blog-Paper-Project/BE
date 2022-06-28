@@ -3,15 +3,8 @@ const express = require("express");
 const sequelize_1 = require("sequelize");
 const custom_error_1 = require("../modules/custom_error");
 const { Paper, User } = require('../../models');
+const auth = require('../middleware/Auth');
 const router = express.Router();
-// 회원가입 테스트
-router.get('/test', async (req, res, next) => {
-    await User.create({ email: 'jun@naver.com', nickname: '김성준' });
-    const users = await User.findAll({
-        include: { model: Paper },
-    });
-    res.json({ users });
-});
 // 인기 게시글 조회 & 게시글 검색
 router.get('/', async (req, res, next) => {
     try {
@@ -90,16 +83,35 @@ router.get('/:userId/:postId', async (req, res, next) => {
     }
 });
 // 상세페이지 작성
-router.post('/', async (req, res, next) => {
+router.post('/', auth, async (req, res, next) => {
     try {
-        // const { userId } = res.locals.user
-        const { title, contents, userId } = req.body;
+        const { userId } = res.locals.user;
+        const { title, contents } = req.body;
         if (!userId) {
             return next((0, custom_error_1.createError)(401, 'Unauthorized'));
         }
         const result = await Paper.create({ title, contents, userId });
         if (!result) {
             return next((0, custom_error_1.createError)(400, 'Not Created'));
+        }
+        res.json({ result });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+// 상세페이지 수정
+router.patch('/:postId', async (req, res, next) => {
+    try {
+        const { userId } = res.locals.user;
+        const { title, contents } = req.body;
+        const { postId } = req.params;
+        if (!userId) {
+            return next((0, custom_error_1.createError)(401, 'Unauthorized'));
+        }
+        const result = await Paper.update({ title, contents }, { where: { userId, postId } });
+        if (!result[0]) {
+            return next((0, custom_error_1.createError)(400, 'Not Updated'));
         }
         res.json({ result });
     }

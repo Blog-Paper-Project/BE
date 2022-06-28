@@ -3,17 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { createError } from '../modules/custom_error';
 const { Paper, User } = require('../../models');
-
+const auth = require('../middleware/Auth');
 const router = express.Router();
-
-// 회원가입 테스트
-router.get('/test', async (req: Request, res: Response, next: NextFunction) => {
-  await User.create({ email: 'jun@naver.com', nickname: '김성준' });
-  const users = await User.findAll({
-    include: { model: Paper },
-  });
-  res.json({ users });
-});
 
 // 인기 게시글 조회 & 게시글 검색
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
@@ -114,25 +105,58 @@ router.get(
 );
 
 // 상세페이지 작성
-router.post('/', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // const { userId } = res.locals.user
-    const { title, contents, userId } = req.body;
+router.post(
+  '/',
+  auth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = res.locals.user;
+      const { title, contents } = req.body;
 
-    if (!userId) {
-      return next(createError(401, 'Unauthorized'));
+      if (!userId) {
+        return next(createError(401, 'Unauthorized'));
+      }
+
+      const result = await Paper.create({ title, contents, userId });
+
+      if (!result) {
+        return next(createError(400, 'Not Created'));
+      }
+
+      res.json({ result });
+    } catch (err) {
+      next(err);
     }
-
-    const result = await Paper.create({ title, contents, userId });
-
-    if (!result) {
-      return next(createError(400, 'Not Created'));
-    }
-
-    res.json({ result });
-  } catch (err) {
-    next(err);
   }
-});
+);
+
+// 상세페이지 수정
+router.patch(
+  '/:postId',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = res.locals.user;
+      const { title, contents } = req.body;
+      const { postId } = req.params;
+
+      if (!userId) {
+        return next(createError(401, 'Unauthorized'));
+      }
+
+      const result = await Paper.update(
+        { title, contents },
+        { where: { userId, postId } }
+      );
+
+      if (!result[0]) {
+        return next(createError(400, 'Not Updated'));
+      }
+
+      res.json({ result });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 export = router;
