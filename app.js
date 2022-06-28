@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
-const UserRouter = require('./dist/router/user');
+const UserRouter = require('./dist/routes/user');
 require('dotenv').config();
 
 const port = process.env.PORT;
