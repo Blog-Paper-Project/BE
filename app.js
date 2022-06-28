@@ -37,8 +37,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.sendStatus(500);
+  const { status, message } = err;
+
+  res.status(status || 500).json({ success: false, message });
 });
 
 http.listen(port, () => {
