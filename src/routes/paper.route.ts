@@ -1,6 +1,5 @@
 import * as express from 'express';
 import { Request, Response, NextFunction } from 'express';
-import { number } from 'joi';
 import { Op } from 'sequelize';
 import { createError } from '../modules/custom_error';
 const { Paper, User } = require('../../models');
@@ -10,7 +9,9 @@ const router = express.Router();
 // 회원가입 테스트
 router.get('/test', async (req: Request, res: Response, next: NextFunction) => {
   await User.create({ email: 'jun@naver.com', nickname: '김성준' });
-  const users = await User.findAll();
+  const users = await User.findAll({
+    include: { model: Paper },
+  });
   res.json({ users });
 });
 
@@ -35,7 +36,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 
     papers = papers // 좋아요 많은 게시글 순으로 정렬
       .map((paper: Types.Paper) => {
-        const { id: postId, title, Likes } = paper;
+        const { postId, title, Likes } = paper;
         const likes = Likes.filter(
           (like) => like.createdAt < new Date() // 추천 반영 기간 설정 필요
         ).length;
@@ -71,7 +72,7 @@ router.get(
         order: [['createdAt', 'DESC']],
       });
       const user = await User.findOne({
-        where: { id: userId },
+        where: { userId },
         attributes: ['nickname', 'profileImage', 'introduction', 'popularity'],
       });
 
@@ -94,9 +95,9 @@ router.get(
         return next(createError(400, 'Invalid Input'));
       }
 
-      const papers = await Paper.findOne({ where: { userId, id: postId } });
+      const papers = await Paper.findOne({ where: { userId, postId } });
       const user = await User.findOne({
-        where: { id: userId },
+        where: { userId },
         attributes: ['nickname', 'profileImage', 'introduction', 'popularity'],
       });
 
@@ -122,7 +123,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       return next(createError(401, 'Unauthorized'));
     }
 
-    const result = await Paper.create({ title, contents, UserId: userId });
+    const result = await Paper.create({ title, contents, userId });
 
     if (!result) {
       return next(createError(400, 'Not Created'));
