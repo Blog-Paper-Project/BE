@@ -16,7 +16,7 @@ module.exports = () => {
       async (accessToken, refreshRoken, response, done) => {
         // 네이버에서 인증 후 Token 과 profile을 보내준다.
 
-        console.log('naver profile', response);
+        console.log('naver profile', profile);
 
         try {
           const exUser = await User.findOne({
@@ -34,13 +34,13 @@ module.exports = () => {
             const newUser = await User.create({
               email: response.emails[0].value,
 
-              nickname: response.id,
+              nickname: profile.id,
 
-              snsId: response.id,
+              snsId: profile.id,
 
               provider: 'naver',
 
-              naver: response._json,
+              naver: profile._json,
             });
 
             done(null, newUser); // 사용자 생성 후 done함수 호출
