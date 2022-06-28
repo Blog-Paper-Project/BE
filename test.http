@@ -48,3 +48,33 @@ Content-Type: application/json
   "nickname": "공백크1",
   "introduction" : "기분나쁨"
 }
+
+// 이메일 인증
+###
+POST http://127.0.0.1:8000/user/emailauth
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMDE1M30.CKlytExbkzxe2e5D3PuzY9YjOEyzHIkYz88cpLbPQDk
+Content-Type: application/json
+
+{
+  "email": "mna800@naver.com"
+}
+
+// 이메일 인증 체크
+###
+POST http://127.0.0.1:8000/user/check-emailauth
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMDE1M30.CKlytExbkzxe2e5D3PuzY9YjOEyzHIkYz88cpLbPQDk
+Content-Type: application/json
+
+{
+  "emailAuth": "7864"
+}
+
+// 비밀번호 재설정 
+###
+PATCH http://127.0.0.1:8000/user/change-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQxMDE1M30.CKlytExbkzxe2e5D3PuzY9YjOEyzHIkYz88cpLbPQDk
+Content-Type: application/json
+
+{
+  "password": "123456"
+}

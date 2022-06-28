@@ -35,9 +35,9 @@ app.get('/', (req, res, next) => {
   res.send('Paper-Project');
 });
 
-// app.use((req, res, next) => {
-//   res.sendStatus(404);
-// });
+app.use((req, res, next) => {
+  res.sendStatus(404);
+});
 
 app.use((err, req, res, next) => {
   const { status, message } = err;
