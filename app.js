@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
+const UserRouter = require('./dist/router/user');
 require('dotenv').config();
 const port = process.env.PORT;
 
@@ -15,7 +16,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 db.sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() => console.log('🟢 db 연결 성공'))
   .catch(console.error);
 
@@ -24,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
-// app.use('/api', []);
+app.use('/', UserRouter);
 
 app.get('/', (req, res, next) => {
   res.send('Paper-Project');
