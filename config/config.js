@@ -2,24 +2,24 @@ require('dotenv').config();
 
 module.exports = {
   development: {
-    username: 'root',
+    username: process.env.SEQUELIZE_NAME,
     password: process.env.SEQUELIZE_PASSWORD,
-    database: 'paper',
-    host: 'database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com',
+    database: process.env.SEQUELIZE_DATABASE,
+    host: process.env.SEQUELIZE_HOST,
     dialect: 'mysql',
   },
   test: {
-    username: 'root',
+    username: process.env.SEQUELIZE_NAME,
     password: process.env.SEQUELIZE_PASSWORD,
-    database: 'paper_test',
-    host: 'database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com',
+    database: process.env.SEQUELIZE_DATABASE,
+    host: process.env.SEQUELIZE_HOST,
     dialect: 'mysql',
   },
   production: {
-    username: 'root',
+    username: process.env.SEQUELIZE_NAME,
     password: process.env.SEQUELIZE_PASSWORD,
-    database: 'paper_production',
-    host: 'database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com',
+    database: process.env.SEQUELIZE_DATABASE,
+    host: process.env.SEQUELIZE_HOST,
     dialect: 'mysql',
   },
 };
