@@ -56,11 +56,11 @@ router.post('/login', async (req, res, next) => {
       });
       return;
     }
-    console.log(user.id);
+    console.log(user.Id);
     res.status(200).send({
       result: true,
       nickname: user.nickname,
-      token: jwt.sign({ userId: user.userid }, process.env.SECRET_KEY),
+      token: jwt.sign({ userId: user.userId }, process.env.SECRET_KEY),
     });
   } catch (error) {
     console.log(error);
@@ -101,7 +101,7 @@ router.get('/myprofile', Authmiddle, async (req, res, next) => {
   try {
     const { user } = res.locals;
     const myprofile = await User.findOne({
-      where: { id: user.id },
+      where: { userId: user.userId },
       attributes: { exclude: ['password'] },
     });
     res.status(200).send({
@@ -128,10 +128,10 @@ router.patch(
 
       await User.update(
         { profileImage, nickname, introduction },
-        { where: { id: user.id } }
+        { where: { userId: user.userId } }
       );
       const profileimg = await User.findOne({
-        where: { id: user.id },
+        where: { userId: user.userId },
         attributes: { exclude: ['password'] },
       });
       res.status(200).send({
