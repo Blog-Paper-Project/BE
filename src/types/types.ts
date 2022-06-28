@@ -1,6 +1,6 @@
 namespace Types {
   export interface Paper {
-    id: number;
+    postId: number;
     title: string;
     contents: string;
     category: string[];
