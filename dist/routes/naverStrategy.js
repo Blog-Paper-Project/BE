@@ -13,7 +13,7 @@ module.exports = () => {
 
         callbackURL: '/user/login/naver/callback', // 네이버로부터 인증결과를 받을 라우터 주소
       },
-      async (accessToken, refreshRoken, response, done) => {
+      async (accessToken, refreshRoken, profile, done) => {
         // 네이버에서 인증 후 Token 과 profile을 보내준다.
 
         console.log('naver profile', profile);
@@ -32,7 +32,7 @@ module.exports = () => {
             // 기존의 User정보가 없다면 회원가입을 진행
 
             const newUser = await User.create({
-              email: response.emails[0].value,
+              email: profile.emails[0].value,
 
               nickname: profile.id,
 
