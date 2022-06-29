@@ -1,0 +1,26 @@
+name: C_DEV
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/ubuntu/BE
+            git config --global --add safe.directory /home/ubuntu/BE
+            git pull
+            npm update
+            npm install
+            pm2 restart app.js
