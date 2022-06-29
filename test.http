@@ -1,6 +1,6 @@
 // 회원가입
 ###
-POST http://15.164.50.132/user/signup
+POST http://127.0.0.1:8000/user/signup
 Content-Type: application/json
 
 {

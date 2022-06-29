@@ -45,7 +45,7 @@ router.post('/signup', isNotLoggedIn, async (req, res, next) => {
 });
 
 // 카카오 로그인
-router.get('/login/kakao', passport.authenticate('kakao'));
+router.get('/login/kakao', isNotLoggedIn, passport.authenticate('kakao'));
 
 router.get(
   '/login/kakao/callback',
@@ -59,7 +59,7 @@ router.get(
 );
 
 // 네이버 로그인
-router.get('/login/naver', passport.authenticate('naver'));
+router.get('/login/naver', isNotLoggedIn, passport.authenticate('naver'));
 
 // 위에서 네이버 서버 로그인이 되면, 네이버 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
 router.get(
