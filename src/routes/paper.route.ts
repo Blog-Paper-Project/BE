@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { createError } from '../modules/custom_error';
 import calcOneWeek from '../modules/date';
-const { Paper, User } = require('../../models');
+const { Paper, User, Comment } = require('../../models');
 const auth = require('../middleware/Auth');
 
 const router = express.Router();
@@ -53,7 +53,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 
 // 개인 페이지 조회
 router.get(
-  '/:userId',
+  '/users/:userId',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -75,7 +75,7 @@ router.get(
 
 // 상세 페이지 조회
 router.get(
-  '/:userId/:postId',
+  '/users/:userId/:postId',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId, postId } = req.params;
@@ -91,7 +91,7 @@ router.get(
       });
 
       if (!user || !papers) {
-        return next(createError(404, '데이터가 존재하지 않음'));
+        return next(createError(404, 'Not Found!'));
       }
 
       res.json({ papers, user });
@@ -102,30 +102,27 @@ router.get(
 );
 
 // 상세 페이지 작성
-router.post(
-  '/',
-  auth,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { userId } = res.locals.user;
-      const { title, contents } = req.body;
+router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // const { userId } = res.locals.user;
+    const userId = 1; // 임시로 로그인 인증 기능 제거
+    const { title, contents } = req.body;
 
-      if (!userId) {
-        return next(createError(401, '유저 인증 실패'));
-      }
-
-      const paper = await Paper.create({ title, contents, userId });
-
-      if (!paper) {
-        return next(createError(400, '게시글 생성 실패'));
-      }
-
-      res.json({ paper });
-    } catch (err) {
-      next(err);
+    if (!userId) {
+      return next(createError(401, '유저 인증 실패'));
     }
+
+    const paper = await Paper.create({ title, contents, userId });
+
+    if (!paper) {
+      return next(createError(400, '게시글 생성 실패'));
+    }
+
+    res.json({ paper });
+  } catch (err) {
+    next(err);
   }
-);
+});
 
 // 상세 페이지 수정
 router.patch(
@@ -173,7 +170,114 @@ router.delete(
       const paper = await Paper.destroy({ where: { userId, postId } });
 
       if (!paper) {
-        return next(createError(400, '게시글 삭제 실패'));
+        return next(createError(404, 'Not Found!'));
+      }
+
+      res.json({ result: true });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// 댓글 작성
+router.post(
+  '/:postId/comment',
+  auth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = res.locals.user;
+      const { postId } = req.params;
+      const { comment } = req.body;
+
+      if (!userId) {
+        return next(createError(401, '유저 인증 실패'));
+      } else if (!comment) {
+        return next(createError(400, '댓글 미작성'));
+      }
+
+      const paper = await Paper.findOne({ where: { postId } });
+
+      if (!paper) {
+        return next(createError(404, 'Not Found!'));
+      }
+
+      const newComment = await Comment.create({
+        comment,
+        userId,
+        postId: +postId,
+      });
+
+      res.json({ result: true, newComment });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// 댓글 수정
+router.patch(
+  '/:postId/comments/:commentId',
+  auth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = res.locals.user;
+      const { postId, commentId } = req.params;
+      const { comment } = req.body;
+
+      if (!userId) {
+        return next(createError(401, '유저 인증 실패'));
+      } else if (!comment) {
+        return next(createError(400, '댓글 미작성'));
+      }
+
+      const paper = await Paper.findOne({ where: { postId } });
+
+      if (!paper) {
+        return next(createError(404, 'Not Found!'));
+      }
+
+      const updatedComment = await Comment.update(
+        { comment },
+        { where: { userId, commentId: +commentId, postId: +postId } }
+      );
+
+      if (!updatedComment[0]) {
+        return next(createError(404, 'Not Found 혹은 변경사항 없음'));
+      }
+
+      res.json({ result: true, comment });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// 댓글 삭제
+router.delete(
+  '/:postId/comments/:commentId',
+  auth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = res.locals.user;
+      const { postId, commentId } = req.params;
+
+      if (!userId) {
+        return next(createError(401, '유저 인증 실패'));
+      }
+
+      const paper = await Paper.findOne({ where: { postId } });
+
+      if (!paper) {
+        return next(createError(404, 'Not Found!'));
+      }
+
+      const deletedComment = await Comment.destroy({
+        where: { userId, commentId: +commentId, postId: +postId },
+      });
+
+      if (!deletedComment) {
+        return next(createError(404, 'Not Found'));
       }
 
       res.json({ result: true });
@@ -199,7 +303,7 @@ router.post(
       const paper = await Paper.findOne({ where: { postId } });
 
       if (!paper) {
-        return next(createError(404, '데이터가 존재하지 않음'));
+        return next(createError(404, 'Not Found!'));
       } else if (userId === paper.userId) {
         return next(createError(400, '본인 게시글에 추천 불가'));
       }
@@ -215,6 +319,46 @@ router.post(
       await paper.addLikes(userId);
 
       res.json({ result: true, message: '좋아요 완료' });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// 구독 등록 및 취소
+router.post(
+  '/users/:userId/subscription',
+  auth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId: myId } = res.locals.user;
+      const { userId: writerId } = req.params;
+
+      if (!myId) {
+        return next(createError(401, '유저 인증 실패'));
+      } else if (!+myId || !+writerId) {
+        return next(createError(400, '유효하지 않은 입력값'));
+      } else if (+myId === +writerId) {
+        return next(createError(400, '본인 구독 불가'));
+      }
+
+      const user = await User.findOne({ where: { userId: writerId } });
+
+      if (!user) {
+        return next(createError(404, 'Not Found!'));
+      }
+
+      const subbed = await user.getFollowers({ where: { userId: myId } });
+
+      if (subbed.length) {
+        await user.removeFollowers(myId);
+
+        return res.json({ result: true, message: '구독 취소' });
+      }
+
+      await user.addFollowers(myId);
+
+      res.json({ result: true, message: '구독 완료' });
     } catch (err) {
       next(err);
     }
