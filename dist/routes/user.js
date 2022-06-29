@@ -44,34 +44,75 @@ router.post('/signup', isNotLoggedIn, async (req, res, next) => {
   }
 });
 
+// 회원탈퇴
+router.delete('/', Authmiddle, async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    console.log(user);
+    await User.destroy({
+      where: { userId: user.userId },
+    });
+    res.status(200).send({
+      result: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 // 카카오 로그인
 router.get('/login/kakao', isNotLoggedIn, passport.authenticate('kakao'));
 
-router.get(
-  '/login/kakao/callback',
-  passport.authenticate('kakao', {
-    failureRedirect: '/', // 콜백 함수 대신 로그인 실패 시 어디로 이동할 지 설정
-  }),
-  // 로그인 성공 시 어디로 이동할 지 다음 미들웨어에 설정
-  (req, res) => {
-    res.redirect('/');
-  }
-);
+const kakaoCallback = (req, res, next) => {
+  passport.authenticate(
+    'kakao',
+    { failureRedirect: '/' },
+    (err, user, info) => {
+      if (err) return next(err);
+      console.log('콜백~~~');
+      const userInfo = user;
+      const { userId } = user;
+      const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+
+      result = {
+        token,
+        userInfo,
+      };
+      console.log('카카오 콜백 함수 결과', result);
+      res.send({ user: result });
+    }
+  )(req, res, next);
+};
+
+router.get('/login/kakao/callback', kakaoCallback);
 
 // 네이버 로그인
 router.get('/login/naver', isNotLoggedIn, passport.authenticate('naver'));
 
 // 위에서 네이버 서버 로그인이 되면, 네이버 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
-router.get(
-  '/login/naver/callback',
-  // 그리고 passport 로그인 전략에 의해 naverStrategy로 가서 카카오계정 정보와 DB를 비교해서 회원가입시키거나 로그인 처리하게 한다.
-  passport.authenticate('naver', {
-    failureRedirect: '/',
-  }),
-  (req, res) => {
-    res.redirect('/');
-  }
-);
+const naverCallback = (req, res, next) => {
+  passport.authenticate(
+    'naver',
+    { failureRedirect: '/' },
+    (err, user, info) => {
+      if (err) return next(err);
+      console.log('콜백~~~');
+      const userInfo = user;
+      const { userId } = user;
+      const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+
+      result = {
+        token,
+        userInfo,
+      };
+      console.log('네이버 콜백 함수 결과', result);
+      res.send({ user: result });
+    }
+  )(req, res, next);
+};
+
+router.get('/login/naver/callback', naverCallback);
 
 //구글 로그인 버튼 클릭시 구글 페이지로 이동하는 역할
 router.get(
@@ -81,15 +122,28 @@ router.get(
 );
 
 //구글 로그인 후 자신의 웹사이트로 돌아오게될 주소 (콜백 url)
-router.get(
-  '/login/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: '/',
-  }),
-  function (req, res) {
-    res.redirect('/');
-  }
-);
+const googleCallback = (req, res, next) => {
+  passport.authenticate(
+    'google',
+    { failureRedirect: '/' },
+    (err, user, info) => {
+      if (err) return next(err);
+      console.log('콜백~~~');
+      const userInfo = user;
+      const { userId } = user;
+      const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+
+      result = {
+        token,
+        userInfo,
+      };
+      console.log('네이버 콜백 함수 결과', result);
+      res.send({ user: result });
+    }
+  )(req, res, next);
+};
+
+router.get('/login/google/callback', googleCallback);
 
 // 로그인
 router.post('/login', isNotLoggedIn, async (req, res, next) => {
