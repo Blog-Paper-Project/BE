@@ -21,7 +21,7 @@ const UserRouter = require('./dist/routes/user.route');
 const paperRouter = require('./dist/routes/paper.route');
 
 db.sequelize
-  .sync({ force: true, logging: false })
+  .sync({ force: false, logging: false })
   .then(() => console.log('🟢 db 연결 성공'))
   .catch(console.error);
 
