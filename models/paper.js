@@ -39,8 +39,8 @@ module.exports = class Paper extends Sequelize.Model {
     db.Paper.belongsTo(db.User, { as: 'Users', foreignKey: 'userId' });
     db.Paper.belongsToMany(db.User, {
       foreignKey: 'postId',
-      through: 'likes',
       as: 'Likes',
+      through: 'likes',
     });
     db.Paper.hasMany(db.Comment, { foreignKey: 'postId', onDelete: 'cascade' });
     db.Paper.hasMany(db.Tag, { foreignKey: 'postId' });
