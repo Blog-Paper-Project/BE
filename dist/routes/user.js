@@ -71,7 +71,7 @@ const kakaoCallback = (req, res, next) => {
     (err, user, info) => {
       if (err) return next(err);
       console.log('콜백~~~');
-      const userInfo = user;
+      const userInfo = user.nickname;
       const { userId } = user;
       const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
@@ -98,7 +98,7 @@ const naverCallback = (req, res, next) => {
     (err, user, info) => {
       if (err) return next(err);
       console.log('콜백~~~');
-      const userInfo = user;
+      const userInfo = user.email;
       const { userId } = user;
       const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
@@ -128,7 +128,7 @@ const googleCallback = (req, res, next) => {
     { failureRedirect: '/' },
     (err, user, info) => {
       if (err) return next(err);
-      const userInfo = user.email;
+      const userInfo = user.nickname;
       const { userId } = user;
       const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
