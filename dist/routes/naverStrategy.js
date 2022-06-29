@@ -13,7 +13,6 @@ module.exports = () => {
       },
       async (accessToken, refreshRoken, profile, done) => {
         // 네이버에서 인증 후 Token 과 profile을 보내준다.
-        console.log(accessToken, '야', refreshRoken);
         console.log('naver profile: ', profile);
         try {
           const exUser = await User.findOne({
