@@ -2,8 +2,6 @@ const express = require('express');
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
-const UserRouter = require('./dist/routes/user');
-const BookingRouter = require('./dist/routes/booking.route.js');
 const passportConfig = require('./dist/modules/social');
 const passport = require('passport');
 const expressSession = require('express-session');
@@ -19,7 +17,9 @@ const db = require('./models');
 
 const cors = require('cors');
 const morgan = require('morgan');
-const paper = require('./dist/routes/paper.route');
+const UserRouter = require('./dist/routes/user.route');
+const paperRouter = require('./dist/routes/paper.route');
+const BookingRouter = require('./dist/routes/booking.route');
 
 db.sequelize
   .sync({ force: false, logging: false })
@@ -44,9 +44,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/user', UserRouter);
-
-app.use('/api/paper/', paper);
+app.use('/api/paper/', paperRouter);
 app.use('/api/booking', BookingRouter);
+
 app.get('/', (req, res, next) => {
   res.send('Paper-Project');
 });

@@ -1,5 +1,5 @@
 import * as express from 'express';
-const auth = require('../middleware/Auth');
+const auth = require('../middleware/auth');
 import * as paperController from '../controllers/paper.controller';
 
 const router = express.Router();
