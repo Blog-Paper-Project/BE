@@ -8,6 +8,7 @@ module.exports = class Comment extends Sequelize.Model {
           primaryKey: true,
           type: Sequelize.INTEGER,
           allowNull: false,
+          autoIncrement: true,
         },
         comment: {
           type: Sequelize.TEXT,
@@ -30,6 +31,7 @@ module.exports = class Comment extends Sequelize.Model {
     db.Comment.belongsTo(db.Paper, {
       as: 'Posts',
       foreignKey: 'postId',
+      onDelete: 'cascade',
     });
     db.Comment.belongsTo(db.User, {
       as: 'Users',

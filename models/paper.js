@@ -42,7 +42,7 @@ module.exports = class Paper extends Sequelize.Model {
       through: 'likes',
       as: 'Likes',
     });
-    db.Paper.hasMany(db.Comment, { foreignKey: 'postId' });
+    db.Paper.hasMany(db.Comment, { foreignKey: 'postId', onDelete: 'cascade' });
     db.Paper.hasMany(db.Tag, { foreignKey: 'postId' });
   }
 };
