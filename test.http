@@ -30,6 +30,11 @@ Content-Type: application/json
 GET http://15.164.50.132/user/login/naver
 Content-Type: application/json
 
+// 구글 로그인
+###
+GET http://first-sw.shop/user/login/google
+Content-Type: application/json
+
 // 이메일중복검사
 ###
 POST http://15.164.50.132/user/idcheck/test1234@naver.com
@@ -45,7 +50,7 @@ Content-Type: application/json
 // 마이프로필
 ###
 GET  http://15.164.50.132/user/myprofile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1NjM5MDE4OX0.F48EWvhrnsejx7LmiSQRTnB8-ww_HCzwU6PyZ7CX-F8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1NjQ3MTQzMSwiZXhwIjoxNjU2NDgyMjMxfQ.MTEdOHXlMXefdqkLihsbo1vAGgFJv_NfahoWlL6IRpY
 Content-Type: application/json
 
 // 마이프로필 수정
