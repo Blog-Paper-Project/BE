@@ -43,7 +43,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/user', UserRouter);
-app.use('/api/paper/', paperRouter);
+app.use('/api/paper', paperRouter);
 
 app.get('/', (req, res, next) => {
   res.send('Paper-Project');
