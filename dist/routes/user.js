@@ -14,9 +14,10 @@ const Bcrypt = require('bcrypt');
 const Op = sequelize.Op;
 require('dotenv').config();
 
-// 카카오 로그인
+// 카카오 로그인 버튼 클릭시 카카오 페이지로 이동하는 역할
 router.get('/login/kakao', isNotLoggedIn, passport.authenticate('kakao'));
 
+// 카카오 서버 로그인시
 const kakaoCallback = (req, res, next) => {
   passport.authenticate(
     'kakao',
@@ -40,10 +41,10 @@ const kakaoCallback = (req, res, next) => {
 
 router.get('/login/kakao/callback', kakaoCallback);
 
-// 네이버 로그인
+// 네이버 로그인 버튼 클릭시 네이버 페이지로 이동하는 역할
 router.get('/login/naver', isNotLoggedIn, passport.authenticate('naver'));
 
-// 위에서 네이버 서버 로그인이 되면, 네이버 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+// 네이버 서버 로그인시
 const naverCallback = (req, res, next) => {
   passport.authenticate(
     'naver',
@@ -74,7 +75,7 @@ router.get(
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-//구글 로그인 후 자신의 웹사이트로 돌아오게될 주소 (콜백 url)
+//구글 로그인시
 const googleCallback = (req, res, next) => {
   passport.authenticate(
     'google',
@@ -97,6 +98,14 @@ const googleCallback = (req, res, next) => {
 
 router.get('/login/google/callback', googleCallback);
 
+// 게정복구
+// await User.restore({
+//   where: { email },
+// });
+// res.status(200).send({
+//   result1: true,
+// });
+
 // 회원가입
 router.post('/signup', isNotLoggedIn, async (req, res, next) => {
   try {
@@ -107,32 +116,20 @@ router.post('/signup', isNotLoggedIn, async (req, res, next) => {
     const duplicate = await User.findAll({
       where: { [Op.or]: { email, nickname } },
     });
-
-    const userche = await User.findAll({
-      where: { email },
-    });
-    console.log(userche);
+    // console.log(userche);
     if (duplicate.length) {
       res.status(200).send({
-        result: false,
+        result2: false,
       });
       return;
     }
-    // 게정복구 아직 미정
-    // else if (userche) {
-    //   await User.restore({
-    //     where: { email },
-    //   });
-    //   return res.status(200).send({
-    //     result2: true,
-    //   });
-    // }
+
     const salt = await Bcrypt.genSalt();
     const pwhash = await Bcrypt.hash(password, salt);
 
     await User.create({ email, nickname, password: pwhash });
     res.status(200).send({
-      result: true,
+      result3: true,
     });
   } catch (error) {
     console.log(error);
@@ -156,6 +153,9 @@ router.delete('/', Authmiddle, async (req, res, next) => {
     next(error);
   }
 });
+
+// 있는계정
+// router.get('/restore', async (req, res, next) => {});
 
 // 로그인
 router.post('/login', isNotLoggedIn, async (req, res, next) => {
