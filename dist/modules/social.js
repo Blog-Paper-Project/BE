@@ -1,6 +1,6 @@
 const passport = require('passport');
 const naver = require('../modules/naverStrategy');
-const google = require('../models/googleStrategy');
+const google = require('../modules/googleStrategy');
 const kakao = require('../modules/KakaoStrategy');
 const User = require('../../models/user');
 
