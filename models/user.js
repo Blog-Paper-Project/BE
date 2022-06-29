@@ -18,6 +18,7 @@ module.exports = class User extends Sequelize.Model {
         nickname: {
           type: Sequelize.STRING(30),
           allowNull: false,
+          defaultValue: 'utf8mb4_general_ci',
         },
         profileImage: {
           type: Sequelize.TEXT,
@@ -33,7 +34,7 @@ module.exports = class User extends Sequelize.Model {
         },
         point: {
           type: Sequelize.INTEGER,
-          defaultValue: 0,
+          defaultValue: '10',
         },
         popularity: {
           type: Sequelize.INTEGER,
