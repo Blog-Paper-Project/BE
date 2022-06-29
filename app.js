@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
+const webSocket = require('./socket');
 const UserRouter = require('./dist/routes/user');
 const passportConfigkakao = require('./dist/routes/kakao');
 const passportConfignaver = require('./dist/routes/naver');
@@ -9,11 +10,10 @@ const passport = require('passport');
 const expressSession = require('express-session');
 require('dotenv').config();
 
+webSocket(http);
 const port = process.env.PORT;
 
 module.exports = http;
-
-// require('./modules/socket');
 
 const db = require('./models');
 
