@@ -1,5 +1,7 @@
 const passport = require('passport');
-const naver = require('../routes/naverStrategy'); // 네이버서버로 로그인할때
+const naver = require('../modules/naverStrategy');
+const google = require('../modules/googleStrategy');
+const kakao = require('../modules/KakaoStrategy');
 const User = require('../../models/user');
 
 module.exports = () => {
@@ -16,4 +18,6 @@ module.exports = () => {
   });
 
   naver(); // 네이버 전략 등록
+  google();
+  kakao();
 };
