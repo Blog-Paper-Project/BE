@@ -78,9 +78,10 @@ router.get('/users/:userId/:postId', async (req, res, next) => {
     }
 });
 // 상세 페이지 작성
-router.post('/', auth, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     try {
-        const { userId } = res.locals.user;
+        // const { userId } = res.locals.user;
+        const userId = 1; // 임시로 로그인 인증 기능 제거
         const { title, contents } = req.body;
         if (!userId) {
             return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
