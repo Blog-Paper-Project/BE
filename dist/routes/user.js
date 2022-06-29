@@ -73,6 +73,24 @@ router.get(
   }
 );
 
+//구글 로그인 버튼 클릭시 구글 페이지로 이동하는 역할
+router.get(
+  '/login/google',
+  isNotLoggedIn,
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+//구글 로그인 후 자신의 웹사이트로 돌아오게될 주소 (콜백 url)
+router.get(
+  '/login/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/',
+  }),
+  function (req, res) {
+    res.redirect('/');
+  }
+);
+
 // 로그인
 router.post('/login', isNotLoggedIn, async (req, res, next) => {
   try {
