@@ -13,7 +13,7 @@ Content-Type: application/json
 // 회원가입 탈퇴
 ###
 DELETE  http://127.0.0.1:8000/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsImlhdCI6MTY1NjQ3OTYwMSwiZXhwIjoxNjU2NDkwNDAxfQ.2WCX8-xLK5RHsQLfnj-SSfBZioabaftvXb69sCEVd2I
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJpYXQiOjE2NTY0ODQyMDQsImV4cCI6MTY1NjQ5NTAwNH0.h8D-vEezhTL9ISgP24rmT1QkxrqkGejGWx9WqJGA8bY
 Content-Type: application/json
 
 // 로그인
