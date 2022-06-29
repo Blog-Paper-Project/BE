@@ -3,6 +3,7 @@ const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
 const UserRouter = require('./dist/routes/user');
+const BookingRouter = require('./dist/routes/booking.route.js');
 const passportConfig = require('./dist/modules/social');
 const passport = require('passport');
 const expressSession = require('express-session');
@@ -45,7 +46,7 @@ app.use(passport.session());
 app.use('/user', UserRouter);
 
 app.use('/api/paper/', paper);
-
+app.use('/api/booking', BookingRouter);
 app.get('/', (req, res, next) => {
   res.send('Paper-Project');
 });
