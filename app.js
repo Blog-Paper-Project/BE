@@ -19,6 +19,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const UserRouter = require('./dist/routes/user.route');
 const paperRouter = require('./dist/routes/paper.route');
+const BookingRouter = require('./dist/routes/booking.route');
 
 db.sequelize
   .sync({ force: false, logging: false })
@@ -43,7 +44,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/user', UserRouter);
-app.use('/api/paper', paperRouter);
+app.use('/api/paper/', paperRouter);
+app.use('/api/booking', BookingRouter);
 
 app.get('/', (req, res, next) => {
   res.send('Paper-Project');
