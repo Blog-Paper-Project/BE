@@ -14,53 +14,6 @@ const Bcrypt = require('bcrypt');
 const Op = sequelize.Op;
 require('dotenv').config();
 
-// 회원가입
-router.post('/signup', isNotLoggedIn, async (req, res, next) => {
-  try {
-    const { email, nickname, password, confirmPassword } =
-      await signupmiddle.validateAsync(req.body);
-
-    // 이메일 || 닉네임 중복체크
-    const userck = await User.findAll({
-      where: { [Op.or]: { email, nickname } },
-    });
-    if (userck.length) {
-      res.status(200).send({
-        result: false,
-      });
-      return;
-    }
-
-    const salt = await Bcrypt.genSalt();
-    const pwhash = await Bcrypt.hash(password, salt);
-
-    await User.create({ email, nickname, password: pwhash });
-    res.status(200).send({
-      result: true,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
-
-// 회원탈퇴
-router.delete('/', Authmiddle, async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    console.log(user);
-    await User.destroy({
-      where: { userId: user.userId },
-    });
-    res.status(200).send({
-      result: true,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
-
 // 카카오 로그인
 router.get('/login/kakao', isNotLoggedIn, passport.authenticate('kakao'));
 
@@ -143,6 +96,66 @@ const googleCallback = (req, res, next) => {
 };
 
 router.get('/login/google/callback', googleCallback);
+
+// 회원가입
+router.post('/signup', isNotLoggedIn, async (req, res, next) => {
+  try {
+    const { email, nickname, password, confirmPassword } =
+      await signupmiddle.validateAsync(req.body);
+
+    // 이메일 || 닉네임 중복체크
+    const duplicate = await User.findAll({
+      where: { [Op.or]: { email, nickname } },
+    });
+
+    const userche = await User.findAll({
+      where: { email },
+    });
+    console.log(userche);
+    if (duplicate.length) {
+      res.status(200).send({
+        result: false,
+      });
+      return;
+    }
+    // 게정복구 아직 미정
+    // else if (userche) {
+    //   await User.restore({
+    //     where: { email },
+    //   });
+    //   return res.status(200).send({
+    //     result2: true,
+    //   });
+    // }
+    const salt = await Bcrypt.genSalt();
+    const pwhash = await Bcrypt.hash(password, salt);
+
+    await User.create({ email, nickname, password: pwhash });
+    res.status(200).send({
+      result: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// 회원탈퇴
+router.delete('/', Authmiddle, async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    console.log(user);
+    await User.destroy({
+      where: { userId: user.userId },
+    });
+    res.status(200).send({
+      result: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 
 // 로그인
 router.post('/login', isNotLoggedIn, async (req, res, next) => {

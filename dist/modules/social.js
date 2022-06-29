@@ -1,7 +1,7 @@
 const passport = require('passport');
-const naver = require('../routes/naverStrategy');
-const google = require('../routes/googleStrategy');
-const kakao = require('../routes/KakaoStrategy');
+const naver = require('../modules/naverStrategy');
+const google = require('../models/googleStrategy');
+const kakao = require('../modules/KakaoStrategy');
 const User = require('../../models/user');
 
 module.exports = () => {

@@ -3,7 +3,7 @@ const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
 const UserRouter = require('./dist/routes/user');
-const passportConfig = require('./dist/routes/social');
+const passportConfig = require('./dist/modules/social');
 const passport = require('passport');
 const expressSession = require('express-session');
 require('dotenv').config();
