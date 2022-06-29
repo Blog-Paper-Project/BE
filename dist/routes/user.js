@@ -128,8 +128,7 @@ const googleCallback = (req, res, next) => {
     { failureRedirect: '/' },
     (err, user, info) => {
       if (err) return next(err);
-      console.log('콜백~~~');
-      const userInfo = user;
+      const userInfo = user.email;
       const { userId } = user;
       const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
