@@ -360,6 +360,7 @@ router.post(
 
       res.json({ result: true, message: '구독 완료' });
     } catch (err) {
+    
       next(err);
     }
   }
