@@ -118,7 +118,7 @@ router.post('/signup', isNotLoggedIn, async (req, res, next) => {
       });
       return;
     }
-    // 게정복구 아직 미정
+    // 게정복구 아직 미정!!
     // else if (userche) {
     //   await User.restore({
     //     where: { email },
