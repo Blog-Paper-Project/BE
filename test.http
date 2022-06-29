@@ -10,9 +10,15 @@ Content-Type: application/json
   "confirmPassword" : "12345678"
 }
 
+// 회원가입 탈퇴
+###
+DELETE  http://127.0.0.1:8000/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJpYXQiOjE2NTY0ODQyMDQsImV4cCI6MTY1NjQ5NTAwNH0.h8D-vEezhTL9ISgP24rmT1QkxrqkGejGWx9WqJGA8bY
+Content-Type: application/json
+
 // 로그인
 ###
-POST http://15.164.50.132/user/login
+POST http://127.0.0.1:8000/user/login
 Content-Type: application/json
 
 {
@@ -22,12 +28,12 @@ Content-Type: application/json
 
 // 카카오 로그인
 ###
-GET http://15.164.50.132/user/login/kakao
+GET http://first-sw.shop/user/login/kakao
 Content-Type: application/json
 
 // 네이버 로그인
 ###
-GET http://15.164.50.132/user/login/naver
+GET http://first-sw.shop/user/login/naver
 Content-Type: application/json
 
 // 구글 로그인
