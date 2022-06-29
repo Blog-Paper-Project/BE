@@ -70,8 +70,8 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Comment, { foreignKey: 'userId' });
     db.User.belongsToMany(db.Paper, {
       foreignKey: 'userId',
-      through: 'likes',
       as: 'Likes',
+      through: 'likes',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followingId',
