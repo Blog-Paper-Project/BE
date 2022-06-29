@@ -1,12 +1,12 @@
 const express = require('express');
 const sequelize = require('sequelize');
 const { isNotLoggedIn } = require('../middleware/loging');
-const signupmiddle = require('../middleware/joi-signup');
-const loginmiddle = require('../middleware/joi-login');
-const Authmiddle = require('../middleware/Auth');
+const signupmiddle = require('../middleware/joi_signup');
+const loginmiddle = require('../middleware/joi_login');
+const Authmiddle = require('../middleware/auth');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
-const { upload, deleteImg } = require('../../dist/modules/multer');
+const { upload, deleteImg } = require('../modules/multer');
 const { User } = require('../../models');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
@@ -18,24 +18,20 @@ require('dotenv').config();
 router.get('/login/kakao', isNotLoggedIn, passport.authenticate('kakao'));
 
 const kakaoCallback = (req, res, next) => {
-  passport.authenticate(
-    'kakao',
-    { failureRedirect: '/' },
-    (err, user, info) => {
-      if (err) return next(err);
-      console.log('콜백~~~');
-      const userInfo = user.nickname;
-      const { userId } = user;
-      const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+  passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
+    if (err) return next(err);
+    console.log('콜백~~~');
+    const userInfo = user.nickname;
+    const { userId } = user;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-      result = {
-        token,
-        userInfo,
-      };
-      console.log('카카오 콜백 함수 결과', result);
-      res.send({ user: result });
-    }
-  )(req, res, next);
+    result = {
+      token,
+      userInfo,
+    };
+    console.log('카카오 콜백 함수 결과', result);
+    res.send({ user: result });
+  })(req, res, next);
 };
 
 router.get('/login/kakao/callback', kakaoCallback);
@@ -45,24 +41,20 @@ router.get('/login/naver', isNotLoggedIn, passport.authenticate('naver'));
 
 // 위에서 네이버 서버 로그인이 되면, 네이버 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
 const naverCallback = (req, res, next) => {
-  passport.authenticate(
-    'naver',
-    { failureRedirect: '/' },
-    (err, user, info) => {
-      if (err) return next(err);
-      console.log('콜백~~~');
-      const userInfo = user.email;
-      const { userId } = user;
-      const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+  passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
+    if (err) return next(err);
+    console.log('콜백~~~');
+    const userInfo = user.email;
+    const { userId } = user;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-      result = {
-        token,
-        userInfo,
-      };
-      console.log('네이버 콜백 함수 결과', result);
-      res.send({ user: result });
-    }
-  )(req, res, next);
+    result = {
+      token,
+      userInfo,
+    };
+    console.log('네이버 콜백 함수 결과', result);
+    res.send({ user: result });
+  })(req, res, next);
 };
 
 router.get('/login/naver/callback', naverCallback);
@@ -76,23 +68,19 @@ router.get(
 
 //구글 로그인 후 자신의 웹사이트로 돌아오게될 주소 (콜백 url)
 const googleCallback = (req, res, next) => {
-  passport.authenticate(
-    'google',
-    { failureRedirect: '/' },
-    (err, user, info) => {
-      if (err) return next(err);
-      const userInfo = user.nickname;
-      const { userId } = user;
-      const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+  passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
+    if (err) return next(err);
+    const userInfo = user.nickname;
+    const { userId } = user;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-      result = {
-        token,
-        userInfo,
-      };
-      console.log('네이버 콜백 함수 결과', result);
-      res.send({ user: result });
-    }
-  )(req, res, next);
+    result = {
+      token,
+      userInfo,
+    };
+    console.log('네이버 콜백 함수 결과', result);
+    res.send({ user: result });
+  })(req, res, next);
 };
 
 router.get('/login/google/callback', googleCallback);
@@ -231,35 +219,30 @@ router.get('/myprofile', Authmiddle, async (req, res, next) => {
 });
 
 // 마이프로필 수정
-router.patch(
-  '/myprofile',
-  Authmiddle,
-  upload.single('image'),
-  async (req, res, next) => {
-    try {
-      const { user } = res.locals;
-      const profileImage = req.file.key;
-      const { nickname, introduction } = req.body;
+router.patch('/myprofile', Authmiddle, upload.single('image'), async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    const profileImage = req.file.key;
+    const { nickname, introduction } = req.body;
 
-      await deleteImg(user.profileImage);
+    await deleteImg(user.profileImage);
 
-      await User.update(
-        { profileImage, nickname, introduction },
-        { where: { userId: user.userId } }
-      );
-      const profileimg = await User.findOne({
-        where: { userId: user.userId },
-        attributes: { exclude: ['password'] },
-      });
-      res.status(200).send({
-        profileimg,
-      });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
+    await User.update(
+      { profileImage, nickname, introduction },
+      { where: { userId: user.userId } }
+    );
+    const profileimg = await User.findOne({
+      where: { userId: user.userId },
+      attributes: { exclude: ['password'] },
+    });
+    res.status(200).send({
+      profileimg,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
-);
+});
 
 // 이메일 인증
 router.post('/emailauth', Authmiddle, async (req, res, next) => {

@@ -1,6 +1,6 @@
 "use strict";
 const express = require("express");
-const auth = require('../middleware/Auth');
+const auth = require('../middleware/auth');
 const paperController = require("../controllers/paper.controller");
 const router = express.Router();
 // 메인 페이지 조회 & 게시글 검색
