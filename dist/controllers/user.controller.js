@@ -134,9 +134,13 @@ const login = async (req, res, next) => {
         result: false,
       });
     }
-    const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
-      expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
-    });
+    const token = jwt.sign(
+      { userId: user.userId },
+      process.env.SECRET_KEY
+      // {
+      // expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+      // }
+    );
     res.status(200).send({
       result: true,
       nickname: user.nickname,
