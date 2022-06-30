@@ -2,9 +2,9 @@ const { Paper, User, Comment } = require('../../models');
 import { Op } from 'sequelize';
 
 // 키워드를 포함한 게시글 검색
-export const findBestPosts = async (keyword: string) => {
+export const findPostsBy = async (keyword: string) => {
   return await Paper.findAll({
-    where: { title: { [Op.like]: `%${keyword || ''}%` } },
+    where: { title: { [Op.like]: `%${keyword}%` } },
     order: [['createdAt', 'DESC']],
   });
 };

@@ -3,7 +3,7 @@ import { loggers } from 'winston';
 import { createError } from '../modules/custom_error';
 import calcOneWeek from '../modules/date';
 import * as paperService from '../services/paper.service';
-const { Paper, User, Comment } = require('../../models');
+const { Paper } = require('../../models');
 
 export const readMain = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -11,7 +11,7 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
 
     if (keyword) {
       // 키워드를 입력하면 최신 순으로 결과 출력
-      const papers = await paperService.findBestPosts(keyword);
+      const papers = await paperService.findPostsBy(keyword);
 
       return res.json({ papers });
     }
@@ -40,6 +40,11 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
 export const readBlog = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
+
+    if (!+userId) {
+      return next(createError(400, '유효하지 않은 입력값'));
+    }
+
     const papers = await paperService.findUserPosts(userId);
     const user = await paperService.findUser(userId);
 
