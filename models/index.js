@@ -15,6 +15,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
   dialect: 'mysql',
   timezone: '+09:00',
   dialectOptions: { charset: 'utf8mb4', dateStrings: true, typeCast: true },
+  logging: false,
 });
 
 db.sequelize = sequelize;

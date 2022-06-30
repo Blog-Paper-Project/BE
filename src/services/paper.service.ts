@@ -29,7 +29,7 @@ export const findUser = async (userId: string) => {
 };
 
 // 특정 유저 정보와 관련 구독 내역 검색
-export const findMiniInfo = async (userId: string) => {
+export const findMiniInfo = async (userId: number) => {
   return await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
@@ -70,7 +70,7 @@ export const createPost = async (title: string, contents: string, userId: number
 
 // 포인트 지급
 export const updatePoint = async (userId: number) => {
-  return await User.increment({ point: +1 }, { where: { userId } });
+  await User.increment({ point: +1 }, { where: { userId } });
 };
 
 // 게시글 수정
@@ -85,14 +85,13 @@ export const updatePost = async (
 
 // 게시글 삭제
 export const destroyPost = async (userId: number, postId: string) => {
-  console.log(userId, postId);
   return await Paper.destroy({ where: { userId, postId } });
 };
 
 // 댓글 작성
-export const createComment = async (comment: string, userId: string, postId: string) => {
+export const createComment = async (text: string, userId: string, postId: string) => {
   return await Comment.create({
-    comment,
+    text,
     userId,
     postId: +postId,
   });
@@ -100,12 +99,12 @@ export const createComment = async (comment: string, userId: string, postId: str
 
 // 댓글 수정
 export const updateComment = async (
-  comment: string,
+  text: string,
   commentId: string,
   userId: number,
   postId: string
 ) => {
-  return await Comment.update({ comment }, { where: { commentId, userId, postId } });
+  return await Comment.update({ text }, { where: { commentId, userId, postId } });
 };
 
 // 댓글 삭제

@@ -9,11 +9,8 @@ const expressSession = require('express-session');
 require('dotenv').config();
 
 webSocket(http);
+
 const port = process.env.PORT;
-
-module.exports = http;
-
-// require('./modules/socket');
 
 const db = require('./models');
 
@@ -63,6 +60,10 @@ app.use((err, req, res, next) => {
   res.status(status || 500).json({ result: false, message });
 });
 
-http.listen(port, () => {
-  console.log('🟢', '서버연결');
-});
+if (process.env.NODE_ENV !== 'test') {
+  http.listen(port, () => {
+    console.log('🟢', '서버연결');
+  });
+}
+
+module.exports = app;

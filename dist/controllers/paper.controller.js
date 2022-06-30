@@ -37,6 +37,9 @@ const readBlog = async (req, res, next) => {
             return next((0, custom_error_1.createError)(400, '유효하지 않은 입력값'));
         }
         const user = await paperService.findUserInfo(userId);
+        if (!user) {
+            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+        }
         res.json({ user });
     }
     catch (err) {
