@@ -201,9 +201,8 @@ const myprofile_correction = async (req, res, next) => {
       nickname,
       introduction
     );
-    res.status(200).send({
-      profileimg,
-    });
+
+    res.status(200).send(profileimg);
   } catch (error) {
     console.log(error);
     next(error);
