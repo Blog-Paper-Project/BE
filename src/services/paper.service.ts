@@ -1,7 +1,7 @@
 const { Paper, User, Comment } = require('../../models');
 import { Op } from 'sequelize';
 
-// 키워드를 포함한 게시글 검색
+// 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
   return await Paper.findAll({
     where: { title: { [Op.like]: `%${keyword}%` } },
@@ -23,30 +23,57 @@ export const findBestUsers = async () => {
   });
 };
 
-export const findUserPosts = async (userId: string) => {
-  return await Paper.findAll({
-    where: { userId },
-    order: [['createdAt', 'DESC']],
-  });
+// 특정 유저 검색
+export const findUser = async (userId: string) => {
+  return await User.findOne({ where: { userId } });
 };
 
-export const findUser = async (userId: string) => {
+// 특정 유저 정보와 관련 구독 내역 검색
+export const findMiniInfo = async (userId: number) => {
   return await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
+    include: { model: User, as: 'Followers', attributes: ['userId'] },
   });
 };
 
-export const findUserPost = async (postId: string, userId?: string) => {
-  return userId
-    ? await Paper.findOne({ where: { postId, userId } })
-    : await Paper.findOne({ where: { postId } });
+// 특정 유저 정보와 관련 게시글 검색
+export const findUserInfo = async (userId: string) => {
+  return await User.findOne({
+    where: { userId },
+    attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
+    include: { model: Paper, attributes: ['postId', 'title', 'contents', 'createdAt'] },
+    order: [[Paper, 'createdAt', 'DESC']],
+  });
 };
 
+// 특정 게시글 검색
+export const findPost = async (postId: string) => {
+  return await Paper.findOne({ where: { postId } });
+};
+
+// 특정 게시글 정보와 관련 유저, 댓글 검색
+export const findPostInfo = async (postId: string) => {
+  return await Paper.findOne({
+    where: { postId },
+    include: [
+      { model: Comment },
+      { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
+    ],
+  });
+};
+
+// 게시글 작성
 export const createPost = async (title: string, contents: string, userId: number) => {
   return await Paper.create({ title, contents, userId });
 };
 
+// 포인트 지급
+export const updatePoint = async (userId: number) => {
+  await User.increment({ point: +1 }, { where: { userId } });
+};
+
+// 게시글 수정
 export const updatePost = async (
   title: string,
   contents: string,
@@ -56,28 +83,31 @@ export const updatePost = async (
   return await Paper.update({ title, contents }, { where: { userId, postId } });
 };
 
+// 게시글 삭제
 export const destroyPost = async (userId: number, postId: string) => {
-  console.log(userId, postId);
   return await Paper.destroy({ where: { userId, postId } });
 };
 
-export const createComment = async (comment: string, userId: string, postId: string) => {
+// 댓글 작성
+export const createComment = async (text: string, userId: string, postId: string) => {
   return await Comment.create({
-    comment,
+    text,
     userId,
     postId: +postId,
   });
 };
 
+// 댓글 수정
 export const updateComment = async (
-  comment: string,
+  text: string,
   commentId: string,
   userId: number,
   postId: string
 ) => {
-  return await Comment.update({ comment }, { where: { commentId, userId, postId } });
+  return await Comment.update({ text }, { where: { commentId, userId, postId } });
 };
 
+// 댓글 삭제
 export const destroyComment = async (
   commentId: string,
   userId: number,
