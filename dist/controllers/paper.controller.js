@@ -47,8 +47,14 @@ exports.readBlog = readBlog;
 const readMiniProfile = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
-        const result = await paperService.findMiniInfo(userId);
-        res.json({ result });
+        if (!userId) {
+            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+        }
+        const user = await paperService.findMiniInfo(userId);
+        if (!user) {
+            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+        }
+        res.json({ user });
     }
     catch (err) {
         next(err);
@@ -261,10 +267,10 @@ const createSubs = async (req, res, next) => {
         const subbed = await user.getFollowees({ where: { userId: myId } });
         if (subbed.length) {
             await user.removeFollowees(myId);
-            return res.json({ result: true, message: '구독 취소', subbed });
+            return res.json({ result: true, message: '구독 취소' });
         }
         await user.addFollowees(myId);
-        res.json({ result: true, message: '구독 완료', subbed });
+        res.json({ result: true, message: '구독 완료' });
     }
     catch (err) {
         next(err);

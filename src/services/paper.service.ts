@@ -33,7 +33,7 @@ export const findMiniInfo = async (userId: string) => {
   return await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-    include: { model: User, as: 'Followees' },
+    include: { model: User, as: 'Followers', attributes: ['userId'] },
   });
 };
 
