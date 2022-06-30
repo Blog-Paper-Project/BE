@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { loggers } from 'winston';
 import { createError } from '../modules/custom_error';
 import calcOneWeek from '../modules/date';
 import * as paperService from '../services/paper.service';
-import { validatePaper } from '../modules/validate_paper';
+import { validatePaper, validateComment } from '../modules/validate_paper';
 const { Paper } = require('../../models');
 
 export const readMain = async (req: Request, res: Response, next: NextFunction) => {
@@ -46,10 +45,25 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(400, '유효하지 않은 입력값'));
     }
 
-    const papers = await paperService.findUserPosts(userId);
-    const user = await paperService.findUser(userId);
+    const user = await paperService.findUserInfo(userId);
 
-    res.json({ papers, user });
+    res.json({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const readMiniProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = res.locals?.user?.userId;
+
+    const result = await paperService.findMiniInfo(userId);
+
+    res.json({ result });
   } catch (err) {
     next(err);
   }
@@ -63,14 +77,13 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(400, '유효하지 않은 입력값'));
     }
 
-    const papers = await paperService.findUserPost(postId, userId);
-    const user = await paperService.findUser(userId);
+    const paper = await paperService.findPostInfo(postId);
 
-    if (!user || !papers) {
+    if (!paper) {
       return next(createError(404, 'Not Found!'));
     }
 
-    res.json({ papers, user });
+    res.json({ paper });
   } catch (err) {
     next(err);
   }
@@ -78,7 +91,7 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
 
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const userId = +res.locals?.user?.userId;
+    // const userId = res.locals?.user?.userId;
     const userId = 1; // 임시로 로그인 인증 기능 제거
     const { title, contents } = req.body;
 
@@ -86,11 +99,17 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
       return next(createError(401, '유저 인증 실패'));
     }
 
+    const schema = validatePaper();
+
+    await schema.validateAsync({ title, contents });
+
     const paper = await paperService.createPost(title, contents, userId);
 
     if (!paper) {
       return next(createError(400, '게시글 생성 실패'));
     }
+
+    await paperService.updatePoint(userId);
 
     res.json({ paper });
   } catch (err) {
@@ -100,13 +119,21 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 
 export const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId } = res.locals.user;
+    const userId = res.locals?.user?.userId;
     const { title, contents } = req.body;
     const { postId } = req.params;
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
     }
+
+    if (!+userId || !+postId) {
+      return next(createError(400, '유효하지 않은 입력값'));
+    }
+
+    const schema = validatePaper();
+
+    await schema.validateAsync({ title, contents });
 
     const paper = await paperService.updatePost(title, contents, userId, postId);
 
@@ -122,11 +149,15 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
 
 export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId } = res.locals.user;
+    const userId = res.locals?.user?.userId;
     const { postId } = req.params;
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
+    }
+
+    if (!+postId) {
+      return next(createError(400, '유효하지 않은 입력값'));
     }
 
     const paper = await paperService.destroyPost(userId, postId);
@@ -143,15 +174,19 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
 
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId } = res.locals.user;
+    const userId = res.locals?.user?.userId;
     const { postId } = req.params;
     const { comment } = req.body;
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
     } else if (!comment) {
-      return next(createError(400, '댓글 미작성'));
+      return next(createError(400, '내용을 입력해주세요'));
     }
+
+    const schema = validateComment();
+
+    await schema.validateAsync({ comment });
 
     const paper = await Paper.findOne({ where: { postId } });
 
@@ -169,17 +204,21 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
 
 export const updateComment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId } = res.locals.user;
+    const userId = res.locals?.user?.userId;
     const { postId, commentId } = req.params;
     const { comment } = req.body;
 
     if (!+userId) {
       return next(createError(401, '유저 인증 실패'));
     } else if (!comment) {
-      return next(createError(400, '댓글 미작성'));
+      return next(createError(400, '내용을 입력해주세요'));
     }
 
-    const paper = await paperService.findUserPost(postId);
+    const schema = validateComment();
+
+    await schema.validateAsync({ comment });
+
+    const paper = await paperService.findPost(postId);
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
@@ -204,14 +243,14 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
 
 export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId } = res.locals.user;
+    const userId = res.locals?.user?.userId;
     const { postId, commentId } = req.params;
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
     }
 
-    const paper = await paperService.findUserPost(postId);
+    const paper = await paperService.findPost(postId);
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
@@ -231,14 +270,14 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
 
 export const createLike = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId } = res.locals.user;
+    const userId = res.locals?.user?.userId;
     const { postId } = req.params;
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
     }
 
-    const paper = await paperService.findUserPost(postId);
+    const paper = await paperService.findPost(postId);
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
@@ -264,7 +303,7 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
 
 export const createSubs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId: myId } = res.locals.user;
+    const myId = res.locals?.user?.userId;
     const { userId: writerId } = req.params;
 
     if (!myId) {
@@ -280,18 +319,18 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
     if (!user) {
       return next(createError(404, 'Not Found!'));
     }
-    console.log(user);
-    const subbed = await user.getFollowers({ where: { userId: myId } });
+
+    const subbed = await user.getFollowees({ where: { userId: myId } });
 
     if (subbed.length) {
-      await user.removeFollowers(myId);
+      await user.removeFollowees(myId);
 
-      return res.json({ result: true, message: '구독 취소' });
+      return res.json({ result: true, message: '구독 취소', subbed });
     }
 
-    await user.addFollowers(myId);
+    await user.addFollowees(myId);
 
-    res.json({ result: true, message: '구독 완료' });
+    res.json({ result: true, message: '구독 완료', subbed });
   } catch (err) {
     next(err);
   }
