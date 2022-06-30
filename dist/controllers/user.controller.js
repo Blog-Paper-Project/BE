@@ -1,15 +1,14 @@
-const sequelize = require('sequelize');
 const Bcrypt = require('bcrypt');
-const { Op } = sequelize;
-const Joi = require('joi');
 const jwt = require('jsonwebtoken');
-const { deleteImg } = require('../modules/multer');
 const nodemailer = require('nodemailer');
-const { User } = require('../../models');
+const userService = require('../services/user.service');
 const Validatorsinup = require('../middleware/signup.validator');
 const Validatorlogin = require('../middleware/login.validator');
+const User = require('../../models/user');
 
-// 카카오
+require('dotenv').config();
+
+// 카카오 로그인
 const kakaoCallback = (req, res, next) => {
   passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
@@ -28,7 +27,7 @@ const kakaoCallback = (req, res, next) => {
 };
 exports.kakaoCallback = kakaoCallback;
 
-// 네이버
+// 네이버 로그인
 const naverCallback = (req, res, next) => {
   passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
@@ -47,7 +46,7 @@ const naverCallback = (req, res, next) => {
 };
 exports.naverCallback = naverCallback;
 
-//구글 로그인 후 자신의 웹사이트로 돌아오게될 주소 (콜백 url)
+// 구글 로그인
 const googleCallback = (req, res, next) => {
   passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
@@ -71,38 +70,35 @@ const signup = async (req, res, next) => {
     const { email, nickname, password, confirmPassword } =
       await Validatorsinup.validateAsync(req.body);
 
-    // 이메일 || 닉네임 중복체크
-    const duplicate = await User.findAll({
-      where: { [Op.or]: { email, nickname } },
-    });
+    const rows = await userService.signup(email, nickname, password);
+    console.log(rows);
+    if (rows === false) {
+      return res.status(200).send({
+        result: false,
+      });
+    } else {
+      res.status(200).send({
+        result: true,
+      });
+    }
 
+    /** 
     const userche = await User.findAll({
       where: { email },
     });
     console.log(userche);
-    if (duplicate.length) {
-      res.status(200).send({
-        result: false,
-      });
-      return;
-    }
-    // 게정복구 아직 미정!!
-    // else if (userche) {
-    //   await User.restore({
-    //     where: { email },
-    //     parnoid : false // 일시삭제 검색가능
-    //   });
-    //   return res.status(200).send({
-    //     result2: true,
-    //   });
-    // }
-    const salt = await Bcrypt.genSalt();
-    const pwhash = await Bcrypt.hash(password, salt);
 
-    await User.create({ email, nickname, password: pwhash });
-    res.status(200).send({
-      result: true,
-    });
+    게정복구 아직 미정!!
+    else if (userche) {
+      await User.restore({
+        where: { email },
+        parnoid : false // 일시삭제 검색가능
+      });
+      return res.status(200).send({
+        result2: true,
+      });
+    }
+    */
   } catch (error) {
     console.log(error);
     next(error);
@@ -114,10 +110,8 @@ exports.signup = signup;
 const userDelete = async (req, res, next) => {
   try {
     const { user } = res.locals;
-    console.log(user);
-    await User.destroy({
-      where: { userId: user.userId },
-    });
+    await userService.userDelete(user);
+
     res.status(200).send({
       result: true,
     });
@@ -132,16 +126,13 @@ exports.userDelete = userDelete;
 const login = async (req, res, next) => {
   try {
     const { email, password } = await Validatorlogin.validateAsync(req.body);
-    const user = await User.findOne({
-      where: { email },
-    });
+    const user = await userService.login(email);
     const passwordck = Bcrypt.compare(password, user.password);
     // 이메일이 틀리거나 패스워드가 틀렸을때
     if (!user || !passwordck) {
-      res.status(400).send({
+      return res.status(400).send({
         result: false,
       });
-      return;
     }
     const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
       expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
@@ -162,14 +153,8 @@ exports.login = login;
 const duplicate = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const idcheck = await User.findAll({
-      where: {
-        [Op.or]: {
-          email: { [Op.like]: `%${id}%` },
-          nickname: { [Op.like]: `%${id}%` },
-        },
-      },
-    });
+    const idcheck = await userService.duplicate(id);
+
     if (idcheck.length) {
       res.status(400).send({
         result: false,
@@ -190,10 +175,8 @@ exports.duplicate = duplicate;
 const myprofile = async (req, res, next) => {
   try {
     const { user } = res.locals;
-    const myprofile = await User.findOne({
-      where: { userId: user.userId },
-      attributes: { exclude: ['password'] },
-    });
+    const myprofile = await userService.myprofile(user);
+
     res.status(200).send({
       myprofile,
     });
@@ -208,19 +191,16 @@ exports.myprofile = myprofile;
 const myprofile_correction = async (req, res, next) => {
   try {
     const { user } = res.locals;
-    const profileImage = req.file.key;
+    const profileImage = req.file?.key;
+    console.log(profileImage);
     const { nickname, introduction } = req.body;
 
-    await deleteImg(user.profileImage);
-
-    await User.update(
-      { profileImage, nickname, introduction },
-      { where: { userId: user.userId } }
+    const profileimg = await userService.myprofile_correction(
+      user,
+      profileImage,
+      nickname,
+      introduction
     );
-    const profileimg = await User.findOne({
-      where: { userId: user.userId },
-      attributes: { exclude: ['password'] },
-    });
     res.status(200).send({
       profileimg,
     });
@@ -233,32 +213,39 @@ exports.myprofile_correction = myprofile_correction;
 
 // 이메일 인증
 const emailauth = async (req, res, next) => {
-  const { user } = res.locals;
-  const { email } = req.body;
-  // 인증메일 (번호)
-  const emailAuth = Math.floor(Math.random() * 10000);
-  await User.update({ emailAuth }, { where: { userId: user.userId } });
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.NODEMAILER_USER,
-      pass: process.env.NODEMAILER_PASS,
-    },
-  });
+  try {
+    const { user } = res.locals;
+    const { email } = req.body;
+    // 인증메일 (번호)
+    const emailAuth = Math.floor(Math.random() * 10000);
 
-  let info = await transporter.sendMail({
-    from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
-    to: email,
-    subject: '[Paper] 인증번호가 도착했습니다.',
-    text: `${emailAuth}`,
-  });
+    await userService.emailauth(user, emailAuth);
 
-  res.status(200).json({
-    result: true,
-  });
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS,
+      },
+    });
+
+    let info = await transporter.sendMail({
+      from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
+      to: email,
+      subject: '[Paper] 인증번호가 도착했습니다.',
+      text: `${emailAuth}`,
+    });
+
+    res.status(200).json({
+      result: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
 };
 exports.emailauth = emailauth;
 
@@ -267,10 +254,7 @@ const check_emaliauth = async (req, res, next) => {
   try {
     const { user } = res.locals;
     const { emailAuth } = req.body;
-    const text = await User.findOne({
-      where: { userId: user.userId },
-      attributes: ['emailAuth'],
-    });
+    const text = await userService.check_emaliauth(user);
     if (Number(emailAuth) === text.emailAuth) {
       res.status(200).send({
         result: true,
@@ -293,10 +277,8 @@ const change_password = async (req, res, next) => {
     const { user } = res.locals;
     const { password } = req.body;
 
-    const salt = await Bcrypt.genSalt();
-    const pwhash = await Bcrypt.hash(password, salt);
+    await userService.change_password(user, password);
 
-    await User.update({ password: pwhash }, { where: { userId: user.userId } });
     res.status(200).send({
       result: true,
     });
