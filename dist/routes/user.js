@@ -251,9 +251,7 @@ router.patch(
         where: { userId: user.userId },
         attributes: { exclude: ['password'] },
       });
-      res.status(200).send({
-        profileimg,
-      });
+      res.status(200).send(profileimg);
     } catch (error) {
       console.log(error);
       next(error);
