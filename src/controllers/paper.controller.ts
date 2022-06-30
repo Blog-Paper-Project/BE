@@ -47,6 +47,10 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
 
     const user = await paperService.findUserInfo(userId);
 
+    if (!user) {
+      return next(createError(404, 'Not Found!'));
+    }
+
     res.json({ user });
   } catch (err) {
     next(err);
@@ -59,7 +63,8 @@ export const readMiniProfile = async (
   next: NextFunction
 ) => {
   try {
-    const userId = res.locals?.user?.userId;
+    // const userId = res.locals?.user?.userId;
+    const userId = 1; // 임시로 로그인 기능 제거
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
@@ -184,17 +189,17 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
   try {
     const userId = res.locals?.user?.userId;
     const { postId } = req.params;
-    const { comment } = req.body;
+    const { text } = req.body;
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
-    } else if (!comment) {
+    } else if (!text) {
       return next(createError(400, '내용을 입력해주세요'));
     }
 
     const schema = validateComment();
 
-    await schema.validateAsync({ comment });
+    await schema.validateAsync({ text });
 
     const paper = await Paper.findOne({ where: { postId } });
 
@@ -202,9 +207,9 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
       return next(createError(404, 'Not Found!'));
     }
 
-    const newComment = await paperService.createComment(comment, userId, postId);
+    const comment = await paperService.createComment(text, userId, postId);
 
-    res.json({ result: true, newComment });
+    res.json({ result: true, comment });
   } catch (err) {
     next(err);
   }
@@ -214,17 +219,17 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
   try {
     const userId = res.locals?.user?.userId;
     const { postId, commentId } = req.params;
-    const { comment } = req.body;
+    const { text } = req.body;
 
     if (!+userId) {
       return next(createError(401, '유저 인증 실패'));
-    } else if (!comment) {
+    } else if (!text) {
       return next(createError(400, '내용을 입력해주세요'));
     }
 
     const schema = validateComment();
 
-    await schema.validateAsync({ comment });
+    await schema.validateAsync({ text });
 
     const paper = await paperService.findPost(postId);
 
@@ -233,7 +238,7 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
     }
 
     const updatedComment = await paperService.updateComment(
-      comment,
+      text,
       commentId,
       userId,
       postId
@@ -243,7 +248,7 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
       return next(createError(404, 'Not Found 혹은 변경사항 없음'));
     }
 
-    res.json({ result: true, comment });
+    res.json({ result: true, text });
   } catch (err) {
     next(err);
   }

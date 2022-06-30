@@ -10,7 +10,7 @@ module.exports = class Comment extends Sequelize.Model {
           allowNull: false,
           autoIncrement: true,
         },
-        comment: {
+        text: {
           type: Sequelize.TEXT,
           allowNull: false,
         },
