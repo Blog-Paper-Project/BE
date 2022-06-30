@@ -11,5 +11,4 @@ const AuthScheam = Joi.object({
     'string.empty': '패스워드를 입력해주세요',
   }),
 });
-
 module.exports = AuthScheam;
