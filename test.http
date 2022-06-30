@@ -1,6 +1,6 @@
 // 회원가입
 ###
-POST http://127.0.0.1:8000/user/signup
+POST http://3.38.210.196/user/signup
 Content-Type: application/json
 
 {
@@ -12,13 +12,13 @@ Content-Type: application/json
 
 // 회원가입 탈퇴
 ###
-DELETE  http://127.0.0.1:8000/user
+DELETE  http://3.38.210.196/user
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE5LCJpYXQiOjE2NTY1ODU5MzF9.c_NwUfINfIuPcWBFpCKAhM4vOPvftw0mqig8fUD9ebY
 Content-Type: application/json
 
 // 로그인
 ###
-POST http://127.0.0.1:8000/user/login
+POST http://3.38.210.196/user/login
 Content-Type: application/json
 
 {
@@ -43,26 +43,25 @@ Content-Type: application/json
 
 // 이메일중복검사
 ###
-POST http://127.0.0.1:8000/user/idcheck/test1234@naver.com
+POST http://3.38.210.196/user/idcheck/test1234@naver.com
 Content-Type: application/json
 
 
 // 아이디중복검사
 ###
-POST http://127.0.0.1:8000/user/idcheck/공백크
+POST http://3.38.210.196/user/idcheck/공백크
 Content-Type: application/json
 
 
 // 마이프로필
 ###
-GET  http://127.0.0.1:8000/user/myprofile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIzLCJpYXQiOjE2NTY1ODc4ODd9.gZp1lb186g9MQwg6eoZPJN4bVJEnQ-QzwtC5_sGgOw8
-Content-Type: application/json
+GET  http://3.38.210.196/user/myprofile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5NDU4OCwiZXhwIjoxNjU2NjA1Mzg4fQ.a4S_J3XT5QCISwpyRRl2Fi6Hr3a327yGnA5v-AcHiJ0
 
 // 마이프로필 수정
 ###
-PATCH  http://127.0.0.1:8000/user/myprofile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MzgwNSwiZXhwIjoxNjU2NjA0NjA1fQ.ZkOJCBaXjc1tFic-6qzBaXb4HJit2OuoAuzwZXLPrDY
+PATCH  http://3.38.210.196/user/myprofile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5NDY3OCwiZXhwIjoxNjU2NjA1NDc4fQ.82lLkj1OK9OUeEovdII_vRt6EJpWugWPsYTiiHrgV1s
 Content-Type: application/json
 
 {
@@ -72,7 +71,7 @@ Content-Type: application/json
 
 // 이메일 인증
 ###
-POST http://127.0.0.1:8000/user/emailauth
+POST http://3.38.210.196/user/emailauth
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
 Content-Type: application/json
 
@@ -82,7 +81,7 @@ Content-Type: application/json
 
 // 이메일 인증 체크
 ###
-POST http://127.0.0.1:8000/user/check-emailauth
+POST http://3.38.210.196/user/check-emailauth
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
 Content-Type: application/json
 
@@ -92,7 +91,7 @@ Content-Type: application/json
 
 // 비밀번호 재설정 
 ###
-PATCH http://127.0.0.1:8000/user/change-password
+PATCH http://3.38.210.196/user/change-password
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
 Content-Type: application/json
 
