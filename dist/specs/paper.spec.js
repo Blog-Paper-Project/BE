@@ -113,13 +113,13 @@ describe('게시글 테스트', () => {
 describe('댓글 테스트', () => {
   it('댓글 작성', (done) => {
     request(app)
-      .post('/api/paper/10/comments')
+      .post('/api/paper/2/comments')
       .send({ text: '성공인가?' })
       .set('Authorization', token)
       .then((res) => {
         const { comment } = res.body;
         commentId = comment.commentId;
-        expect(comment.text).toBe('Jest 수정 중');
+        expect(comment.text).toBe('성공인가?');
         expect(res.status).toBe(200);
         done();
       });
@@ -127,11 +127,11 @@ describe('댓글 테스트', () => {
 
   it('댓글 수정', (done) => {
     request(app)
-      .patch(`/api/paper/10/comments/${commentId}`)
+      .patch(`/api/paper/2/comments/${commentId}`)
       .send({ text: '수정 성공?' })
       .set('Authorization', token)
       .then((res) => {
-        expect(res.body.comment.text).toBe('Jest 수정 중');
+        expect(res.body.text).toBe('수정 성공?');
         expect(res.status).toBe(200);
         done();
       });
@@ -139,7 +139,7 @@ describe('댓글 테스트', () => {
 
   it('댓글 삭제', (done) => {
     request(app)
-      .delete(`/api/paper/10/comments/${commentId}`)
+      .delete(`/api/paper/2/comments/${commentId}`)
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);

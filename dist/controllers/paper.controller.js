@@ -49,7 +49,8 @@ const readBlog = async (req, res, next) => {
 exports.readBlog = readBlog;
 const readMiniProfile = async (req, res, next) => {
     try {
-        const userId = res.locals?.user?.userId;
+        // const userId = res.locals?.user?.userId;
+        const userId = 1; // 임시로 로그인 기능 제거
         if (!userId) {
             return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
         }
@@ -152,21 +153,21 @@ const createComment = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
         const { postId } = req.params;
-        const { comment } = req.body;
+        const { text } = req.body;
         if (!userId) {
             return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
         }
-        else if (!comment) {
+        else if (!text) {
             return next((0, custom_error_1.createError)(400, '내용을 입력해주세요'));
         }
         const schema = (0, validate_paper_1.validateComment)();
-        await schema.validateAsync({ comment });
+        await schema.validateAsync({ text });
         const paper = await Paper.findOne({ where: { postId } });
         if (!paper) {
             return next((0, custom_error_1.createError)(404, 'Not Found!'));
         }
-        const newComment = await paperService.createComment(comment, userId, postId);
-        res.json({ result: true, newComment });
+        const comment = await paperService.createComment(text, userId, postId);
+        res.json({ result: true, comment });
     }
     catch (err) {
         next(err);
@@ -177,24 +178,24 @@ const updateComment = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
         const { postId, commentId } = req.params;
-        const { comment } = req.body;
+        const { text } = req.body;
         if (!+userId) {
             return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
         }
-        else if (!comment) {
+        else if (!text) {
             return next((0, custom_error_1.createError)(400, '내용을 입력해주세요'));
         }
         const schema = (0, validate_paper_1.validateComment)();
-        await schema.validateAsync({ comment });
+        await schema.validateAsync({ text });
         const paper = await paperService.findPost(postId);
         if (!paper) {
             return next((0, custom_error_1.createError)(404, 'Not Found!'));
         }
-        const updatedComment = await paperService.updateComment(comment, commentId, userId, postId);
+        const updatedComment = await paperService.updateComment(text, commentId, userId, postId);
         if (!updatedComment[0]) {
             return next((0, custom_error_1.createError)(404, 'Not Found 혹은 변경사항 없음'));
         }
-        res.json({ result: true, comment });
+        res.json({ result: true, text });
     }
     catch (err) {
         next(err);
