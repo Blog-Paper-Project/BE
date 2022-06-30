@@ -2,11 +2,13 @@ const express = require('express');
 const app = express();
 const Http = require('http');
 const http = Http.createServer(app);
+const webSocket = require('./dist/modules/socket');
 const passportConfig = require('./dist/modules/social');
 const passport = require('passport');
 const expressSession = require('express-session');
 require('dotenv').config();
 
+webSocket(http);
 const port = process.env.PORT;
 
 module.exports = http;
