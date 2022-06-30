@@ -3,6 +3,7 @@ import { loggers } from 'winston';
 import { createError } from '../modules/custom_error';
 import calcOneWeek from '../modules/date';
 import * as paperService from '../services/paper.service';
+import { validatePaper } from '../modules/validate_paper';
 const { Paper } = require('../../models');
 
 export const readMain = async (req: Request, res: Response, next: NextFunction) => {
