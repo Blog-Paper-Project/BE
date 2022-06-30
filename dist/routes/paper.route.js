@@ -7,6 +7,8 @@ const router = express.Router();
 router.get('/', paperController.readMain);
 // 개인 페이지 조회
 router.get('/users/:userId', paperController.readBlog);
+// 미니 프로필 조회
+router.get('/miniprofile', auth, paperController.readMiniProfile);
 // 상세 페이지 조회
 router.get('/users/:userId/:postId', paperController.readPost);
 // 상세 페이지 작성
