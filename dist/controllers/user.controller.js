@@ -196,6 +196,7 @@ const myprofile_correction = async (req, res, next) => {
   try {
     const { user } = res.locals;
     const profileImage = req.file?.key;
+    console.log(profileImage);
     const { nickname, introduction } = req.body;
 
     const profileimg = await userService.myprofile_correction(
