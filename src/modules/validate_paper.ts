@@ -15,7 +15,7 @@ export function validatePaper() {
 
 export function validateComment() {
   return Joi.object({
-    comment: Joi.string().min(2).max(100).required().messages({
+    text: Joi.string().min(2).max(100).required().messages({
       'string.min': '댓글은 최소 2글자 이상입니다.',
       'string.max': '댓글은 최대 100글자 이하입니다.',
     }),
