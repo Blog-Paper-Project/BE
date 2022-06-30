@@ -1,17 +1,21 @@
 const Sequelize = require('sequelize');
 
-module.exports = class Comment extends Sequelize.Model {
+module.exports = class Leaf extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        commentId: {
+        id: {
           primaryKey: true,
           type: Sequelize.INTEGER,
           allowNull: false,
           autoIncrement: true,
         },
-        text: {
-          type: Sequelize.TEXT,
+        leaf: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        remarks: {
+          type: Sequelize.STRING(100),
           allowNull: false,
         },
       },
@@ -19,23 +23,13 @@ module.exports = class Comment extends Sequelize.Model {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: 'Comment',
-        tableName: 'comments',
+        modelName: 'Leaf',
+        tableName: 'leafs',
         paranoid: false,
         charset: 'utf8mb4',
         collate: 'utf8mb4_general_ci',
       }
     );
   }
-  static associate(db) {
-    db.Comment.belongsTo(db.Paper, {
-      as: 'Posts',
-      foreignKey: 'postId',
-      onDelete: 'cascade',
-    });
-    db.Comment.belongsTo(db.User, {
-      as: 'Users',
-      foreignKey: 'userId',
-    });
-  }
+  static associate(db) {}
 };
