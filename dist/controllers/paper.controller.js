@@ -4,13 +4,13 @@ exports.createSubs = exports.createLike = exports.deleteComment = exports.update
 const custom_error_1 = require("../modules/custom_error");
 const date_1 = require("../modules/date");
 const paperService = require("../services/paper.service");
-const { Paper, User, Comment } = require('../../models');
+const { Paper } = require('../../models');
 const readMain = async (req, res, next) => {
     try {
         const { keyword } = req.query;
         if (keyword) {
             // 키워드를 입력하면 최신 순으로 결과 출력
-            const papers = await paperService.findBestPosts(keyword);
+            const papers = await paperService.findPostsBy(keyword);
             return res.json({ papers });
         }
         let papers = await paperService.findAllPosts();
@@ -32,6 +32,9 @@ exports.readMain = readMain;
 const readBlog = async (req, res, next) => {
     try {
         const { userId } = req.params;
+        if (!+userId) {
+            return next((0, custom_error_1.createError)(400, '유효하지 않은 입력값'));
+        }
         const papers = await paperService.findUserPosts(userId);
         const user = await paperService.findUser(userId);
         res.json({ papers, user });

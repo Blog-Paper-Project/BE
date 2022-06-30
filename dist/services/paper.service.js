@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updatePost = exports.createPost = exports.findUserPost = exports.findUser = exports.findUserPosts = exports.findBestUsers = exports.findAllPosts = exports.findBestPosts = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updatePost = exports.createPost = exports.findUserPost = exports.findUser = exports.findUserPosts = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
 const { Paper, User, Comment } = require('../../models');
 const sequelize_1 = require("sequelize");
 // 키워드를 포함한 게시글 검색
-const findBestPosts = async (keyword) => {
+const findPostsBy = async (keyword) => {
     return await Paper.findAll({
-        where: { title: { [sequelize_1.Op.like]: `%${keyword || ''}%` } },
+        where: { title: { [sequelize_1.Op.like]: `%${keyword}%` } },
         order: [['createdAt', 'DESC']],
     });
 };
-exports.findBestPosts = findBestPosts;
+exports.findPostsBy = findPostsBy;
 // 좋아요 정보를 포함한 모든 게시글 검색
 const findAllPosts = async () => {
     return await Paper.findAll({ include: { model: User, as: 'Likes' } });
