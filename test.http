@@ -62,7 +62,7 @@ Content-Type: application/json
 // 마이프로필 수정
 ###
 PATCH  http://127.0.0.1:8000/user/myprofile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIzLCJpYXQiOjE2NTY1ODg2Njl9.UGFhoBMX5QnFOnJnsiimV_lqeWZmkR53qR69zrz9YNM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MzgwNSwiZXhwIjoxNjU2NjA0NjA1fQ.ZkOJCBaXjc1tFic-6qzBaXb4HJit2OuoAuzwZXLPrDY
 Content-Type: application/json
 
 {
