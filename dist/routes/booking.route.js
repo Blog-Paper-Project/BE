@@ -1,6 +1,6 @@
 const express = require('express');
 const sequelize = require('sequelize');
-const Authmiddle = require('../middleware/Auth');
+const Authmiddle = require('../middleware/auth');
 const { User, Paper, Booking } = require('../../models');
 const router = express.Router();
 
