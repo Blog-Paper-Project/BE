@@ -61,9 +61,17 @@ export const readMiniProfile = async (
   try {
     const userId = res.locals?.user?.userId;
 
-    const result = await paperService.findMiniInfo(userId);
+    if (!userId) {
+      return next(createError(401, '유저 인증 실패'));
+    }
 
-    res.json({ result });
+    const user = await paperService.findMiniInfo(userId);
+
+    if (!user) {
+      return next(createError(404, 'Not Found!'));
+    }
+
+    res.json({ user });
   } catch (err) {
     next(err);
   }
@@ -325,12 +333,12 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
     if (subbed.length) {
       await user.removeFollowees(myId);
 
-      return res.json({ result: true, message: '구독 취소', subbed });
+      return res.json({ result: true, message: '구독 취소' });
     }
 
     await user.addFollowees(myId);
 
-    res.json({ result: true, message: '구독 완료', subbed });
+    res.json({ result: true, message: '구독 완료' });
   } catch (err) {
     next(err);
   }

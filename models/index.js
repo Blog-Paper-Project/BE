@@ -11,7 +11,7 @@ const Leaf = require('./leaf');
 const db = {};
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
-  host: '127.0.0.1',
+  host: 'database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com',
   dialect: 'mysql',
   timezone: '+09:00',
   dialectOptions: { charset: 'utf8mb4', dateStrings: true, typeCast: true },
