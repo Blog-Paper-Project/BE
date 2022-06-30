@@ -72,7 +72,7 @@ const createPost = async (title, contents, userId) => {
 exports.createPost = createPost;
 // 포인트 지급
 const updatePoint = async (userId) => {
-    return await User.increment({ point: +1 }, { where: { userId } });
+    await User.increment({ point: +1 }, { where: { userId } });
 };
 exports.updatePoint = updatePoint;
 // 게시글 수정
@@ -82,22 +82,21 @@ const updatePost = async (title, contents, userId, postId) => {
 exports.updatePost = updatePost;
 // 게시글 삭제
 const destroyPost = async (userId, postId) => {
-    console.log(userId, postId);
     return await Paper.destroy({ where: { userId, postId } });
 };
 exports.destroyPost = destroyPost;
 // 댓글 작성
-const createComment = async (comment, userId, postId) => {
+const createComment = async (text, userId, postId) => {
     return await Comment.create({
-        comment,
+        text,
         userId,
         postId: +postId,
     });
 };
 exports.createComment = createComment;
 // 댓글 수정
-const updateComment = async (comment, commentId, userId, postId) => {
-    return await Comment.update({ comment }, { where: { commentId, userId, postId } });
+const updateComment = async (text, commentId, userId, postId) => {
+    return await Comment.update({ text }, { where: { commentId, userId, postId } });
 };
 exports.updateComment = updateComment;
 // 댓글 삭제
