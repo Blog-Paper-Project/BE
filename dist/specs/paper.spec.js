@@ -147,3 +147,25 @@ describe('댓글 테스트', () => {
       });
   });
 });
+
+describe('좋아요 & 구독 테스트', () => {
+  it('좋아요', (done) => {
+    request(app)
+      .post(`/api/paper/4/likes`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        done();
+      });
+  });
+
+  it('구독', (done) => {
+    request(app)
+      .post(`/api/paper/users/2/subscription`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+});
