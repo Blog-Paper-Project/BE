@@ -2,6 +2,7 @@
 const express = require("express");
 const auth = require('../middleware/auth');
 const paperController = require("../controllers/paper.controller");
+const { upload } = require('../modules/multer');
 const router = express.Router();
 // 메인 페이지 조회 & 게시글 검색
 router.get('/', paperController.readMain);
@@ -13,6 +14,8 @@ router.get('/miniprofile', paperController.readMiniProfile);
 router.get('/users/:userId/:postId', paperController.readPost);
 // 상세 페이지 작성
 router.post('/', paperController.createPost);
+// 상세 페이지 이미지 첨부
+router.post('/image', upload.single('image'), paperController.createImage);
 // 상세 페이지 수정
 router.patch('/:postId', auth, paperController.updatePost);
 // 상세 페이지 삭제

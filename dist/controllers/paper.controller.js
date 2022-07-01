@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createPost = exports.readPost = exports.readMiniProfile = exports.readBlog = exports.readMain = void 0;
+exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMiniProfile = exports.readBlog = exports.readMain = void 0;
 const custom_error_1 = require("../modules/custom_error");
 const date_1 = require("../modules/date");
 const paperService = require("../services/paper.service");
@@ -104,6 +104,22 @@ const createPost = async (req, res, next) => {
     }
 };
 exports.createPost = createPost;
+// 이미지 첨부
+const createImage = async (req, res, next) => {
+    try {
+        // const userId = res.locals?.user?.userId;
+        // const userId = 1; // 임시로 로그인 인증 기능 제거
+        const file = req.file;
+        if (!file.key) {
+            return next((0, custom_error_1.createError)(400, '이미지 등록 오류 발생'));
+        }
+        res.json({ result: true, imageUrl: file.key });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.createImage = createImage;
 const updatePost = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
