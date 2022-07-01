@@ -23,7 +23,6 @@ exports.signup = signup;
 
 // 회원탈퇴
 const userDelete = async (user) => {
-  console.log(user);
   return await User.destroy({
     where: { userId: user.userId },
   });
