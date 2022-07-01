@@ -130,6 +130,23 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
   }
 };
 
+// 이미지 첨부
+export const createImage = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // const userId = res.locals?.user?.userId;
+    // const userId = 1; // 임시로 로그인 인증 기능 제거
+    const file = req.file as { key?: string };
+
+    if (!file.key) {
+      return next(createError(400, '이미지 등록 오류 발생'));
+    }
+
+    res.json({ result: true, imageUrl: file.key });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
