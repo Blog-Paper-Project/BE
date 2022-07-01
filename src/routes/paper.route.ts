@@ -1,6 +1,7 @@
 import * as express from 'express';
 const auth = require('../middleware/auth');
 import * as paperController from '../controllers/paper.controller';
+const { upload } = require('../modules/multer');
 
 const router = express.Router();
 
@@ -18,6 +19,9 @@ router.get('/users/:userId/:postId', paperController.readPost);
 
 // 상세 페이지 작성
 router.post('/', paperController.createPost);
+
+// 상세 페이지 이미지 첨부
+router.post('/image', upload.single('image'), paperController.createImage);
 
 // 상세 페이지 수정
 router.patch('/:postId', auth, paperController.updatePost);
