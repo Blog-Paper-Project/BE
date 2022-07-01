@@ -5,20 +5,28 @@ Content-Type: application/json
 
 {
   "email": "test1234@naver.com",
-  "nickname": "공백크44",
+  "nickname": "공백크",
   "password" : "12345678",
   "confirmPassword" : "12345678"
 }
 
 // 회원가입 탈퇴
 ###
+<<<<<<< HEAD
 DELETE  http://3.38.210.196/user
+=======
+DELETE  http://3.38.183.152/user
+>>>>>>> sw
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE5LCJpYXQiOjE2NTY1ODU5MzF9.c_NwUfINfIuPcWBFpCKAhM4vOPvftw0mqig8fUD9ebY
 Content-Type: application/json
 
 // 로그인
 ###
+<<<<<<< HEAD
 POST http://3.38.210.196/user/login
+=======
+POST http://3.38.183.152/user/login
+>>>>>>> sw
 Content-Type: application/json
 
 {
@@ -33,7 +41,7 @@ Content-Type: application/json
 
 // 네이버 로그인
 ###
-GET http://first-sw.shop/user/login/naver
+GET http://3.38.183.152/user/login/naver
 Content-Type: application/json
 
 // 구글 로그인
@@ -43,18 +51,27 @@ Content-Type: application/json
 
 // 이메일중복검사
 ###
+<<<<<<< HEAD
 POST http://3.38.210.196/user/idcheck/test1234@naver.com
+=======
+POST http://3.38.183.152/user/idcheck/test1234@naver.com
+>>>>>>> sw
 Content-Type: application/json
 
 
-// 아이디중복검사
+// 닉네임중복검사
 ###
+<<<<<<< HEAD
 POST http://3.38.210.196/user/idcheck/공백크
+=======
+POST http://3.38.183.152/user/idcheck/공백크
+>>>>>>> sw
 Content-Type: application/json
 
 
 // 마이프로필
 ###
+<<<<<<< HEAD
 GET  http://3.38.210.196/user/myprofile
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5NDU4OCwiZXhwIjoxNjU2NjA1Mzg4fQ.a4S_J3XT5QCISwpyRRl2Fi6Hr3a327yGnA5v-AcHiJ0
 
@@ -62,6 +79,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhd
 ###
 PATCH  http://3.38.210.196/user/myprofile
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5NDY3OCwiZXhwIjoxNjU2NjA1NDc4fQ.82lLkj1OK9OUeEovdII_vRt6EJpWugWPsYTiiHrgV1s
+=======
+GET  http://3.38.183.152/user/myprofile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIzLCJpYXQiOjE2NTY1ODc4ODd9.gZp1lb186g9MQwg6eoZPJN4bVJEnQ-QzwtC5_sGgOw8
+Content-Type: application/json
+
+// 마이프로필 수정
+###
+PATCH  http://3.38.183.152/user/myprofile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MzgwNSwiZXhwIjoxNjU2NjA0NjA1fQ.ZkOJCBaXjc1tFic-6qzBaXb4HJit2OuoAuzwZXLPrDY
+>>>>>>> sw
 Content-Type: application/json
 
 {
@@ -71,7 +98,11 @@ Content-Type: application/json
 
 // 이메일 인증
 ###
+<<<<<<< HEAD
 POST http://3.38.210.196/user/emailauth
+=======
+POST http://3.38.183.152/user/emailauth
+>>>>>>> sw
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
 Content-Type: application/json
 
@@ -81,7 +112,11 @@ Content-Type: application/json
 
 // 이메일 인증 체크
 ###
+<<<<<<< HEAD
 POST http://3.38.210.196/user/check-emailauth
+=======
+POST http://3.38.183.152/user/check-emailauth
+>>>>>>> sw
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
 Content-Type: application/json
 
@@ -91,7 +126,11 @@ Content-Type: application/json
 
 // 비밀번호 재설정 
 ###
+<<<<<<< HEAD
 PATCH http://3.38.210.196/user/change-password
+=======
+PATCH http://3.38.183.152/user/change-password
+>>>>>>> sw
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
 Content-Type: application/json
 
