@@ -2,9 +2,7 @@ const request = require('supertest');
 const app = require('../../app');
 
 const token = process.env.JEST_TOKEN || ' ';
-const token1 =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMwLCJpYXQiOjE2NTY2NjI5ODl9.4zjmiP67PKPfWfrWjvtPurNLiixYy9GYiyD-pNncG98' ||
-  ' ';
+const token1 = process.env.JEST_TOKEN1 || ' ';
 require('dotenv').config();
 
 describe('회원가입 테스트', () => {
