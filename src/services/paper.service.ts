@@ -1,5 +1,6 @@
+/* eslint-disable */
+const { Op } = require('sequelize');
 const { Paper, User, Comment } = require('../../models');
-import { Op } from 'sequelize';
 
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {

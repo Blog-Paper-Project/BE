@@ -22,12 +22,12 @@ const readMain = async (req, res, next) => {
             const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
             return { postId, userId, title, likes };
         })
-            .sort((a, b) => b['likes'] - a['likes']);
+            .sort((a, b) => b.likes - a.likes);
         const popularUsers = await paperService.findBestUsers();
-        res.json({ papers, popularUsers });
+        return res.json({ papers, popularUsers });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.readMain = readMain;
@@ -36,16 +36,16 @@ const readBlog = async (req, res, next) => {
     try {
         const { userId } = req.params;
         if (!+userId) {
-            return next((0, custom_error_1.createError)(400, '유효하지 않은 입력값'));
+            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
         }
         const user = await paperService.findUserInfo(userId);
         if (!user) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
-        res.json({ user });
+        return res.json({ user });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.readBlog = readBlog;
@@ -54,16 +54,16 @@ const readMiniProfile = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
         if (!userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
         const user = await paperService.findMiniInfo(userId);
         if (!user) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
-        res.json({ user });
+        return res.json({ user });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.readMiniProfile = readMiniProfile;
@@ -72,16 +72,16 @@ const readPost = async (req, res, next) => {
     try {
         const { userId, postId } = req.params;
         if (!+userId || !+postId) {
-            return next((0, custom_error_1.createError)(400, '유효하지 않은 입력값'));
+            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
         }
         const paper = await paperService.findPostInfo(postId);
         if (!paper) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
-        res.json({ paper });
+        return res.json({ paper });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.readPost = readPost;
@@ -91,34 +91,33 @@ const createPost = async (req, res, next) => {
         const userId = res.locals?.user?.userId;
         const { title, contents } = req.body;
         if (!userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
         const paper = await paperService.createPost(title, contents, userId);
         if (!paper) {
-            return next((0, custom_error_1.createError)(400, '게시글 생성 실패'));
+            return next((0, custom_error_1.default)(400, '게시글 생성 실패'));
         }
         await paperService.updatePoint(userId);
-        res.json({ paper });
+        return res.json({ paper });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.createPost = createPost;
 // 상세 페이지 이미지 첨부
 const createImage = async (req, res, next) => {
     try {
-        const file = req.file;
-        console.log(file);
+        const { file } = req;
         if (!file?.transforms) {
-            return next((0, custom_error_1.createError)(400, '이미지 등록 오류 발생'));
+            return next((0, custom_error_1.default)(400, '이미지 등록 오류 발생'));
         }
-        res.json({ result: true, imageUrl: file.transforms[0].key });
+        return res.json({ result: true, imageUrl: file.transforms[0]?.key });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.createImage = createImage;
@@ -129,21 +128,21 @@ const updatePost = async (req, res, next) => {
         const { title, contents } = req.body;
         const { postId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
         if (!+userId || !+postId) {
-            return next((0, custom_error_1.createError)(400, '유효하지 않은 입력값'));
+            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
         const paper = await paperService.updatePost(title, contents, userId, postId);
         if (!paper[0]) {
-            return next((0, custom_error_1.createError)(400, '게시글 수정 실패'));
+            return next((0, custom_error_1.default)(400, '게시글 수정 실패'));
         }
-        res.json({ result: true, title, contents });
+        return res.json({ result: true, title, contents });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.updatePost = updatePost;
@@ -153,19 +152,19 @@ const deletePost = async (req, res, next) => {
         const userId = res.locals?.user?.userId;
         const { postId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
         if (!+postId) {
-            return next((0, custom_error_1.createError)(400, '유효하지 않은 입력값'));
+            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
         }
         const paper = await paperService.destroyPost(userId, postId);
         if (!paper) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
-        res.json({ result: true });
+        return res.json({ result: true });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.deletePost = deletePost;
@@ -176,22 +175,22 @@ const createComment = async (req, res, next) => {
         const { postId } = req.params;
         const { text } = req.body;
         if (!userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
-        else if (!text) {
-            return next((0, custom_error_1.createError)(400, '내용을 입력해주세요'));
+        if (!text) {
+            return next((0, custom_error_1.default)(400, '내용을 입력해주세요'));
         }
         const schema = (0, validate_paper_1.validateComment)();
         await schema.validateAsync({ text });
         const paper = await Paper.findOne({ where: { postId } });
         if (!paper) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         const comment = await paperService.createComment(text, userId, postId);
-        res.json({ result: true, comment });
+        return res.json({ result: true, comment });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.createComment = createComment;
@@ -202,25 +201,25 @@ const updateComment = async (req, res, next) => {
         const { postId, commentId } = req.params;
         const { text } = req.body;
         if (!+userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
-        else if (!text) {
-            return next((0, custom_error_1.createError)(400, '내용을 입력해주세요'));
+        if (!text) {
+            return next((0, custom_error_1.default)(400, '내용을 입력해주세요'));
         }
         const schema = (0, validate_paper_1.validateComment)();
         await schema.validateAsync({ text });
         const paper = await paperService.findPost(postId);
         if (!paper) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         const updatedComment = await paperService.updateComment(text, commentId, userId, postId);
         if (!updatedComment[0]) {
-            return next((0, custom_error_1.createError)(404, 'Not Found 혹은 변경사항 없음'));
+            return next((0, custom_error_1.default)(404, 'Not Found 혹은 변경사항 없음'));
         }
-        res.json({ result: true, text });
+        return res.json({ result: true, text });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.updateComment = updateComment;
@@ -230,20 +229,20 @@ const deleteComment = async (req, res, next) => {
         const userId = res.locals?.user?.userId;
         const { postId, commentId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
         const paper = await paperService.findPost(postId);
         if (!paper) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         const deletedComment = await paperService.destroyComment(commentId, userId, postId);
         if (!deletedComment) {
-            return next((0, custom_error_1.createError)(404, 'Not Found'));
+            return next((0, custom_error_1.default)(404, 'Not Found'));
         }
-        res.json({ result: true });
+        return res.json({ result: true });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.deleteComment = deleteComment;
@@ -253,14 +252,14 @@ const createLike = async (req, res, next) => {
         const userId = res.locals?.user?.userId;
         const { postId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
         const paper = await paperService.findPost(postId);
         if (!paper) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
-        else if (userId === paper.userId) {
-            return next((0, custom_error_1.createError)(400, '본인 게시글에 추천 불가'));
+        if (userId === paper.userId) {
+            return next((0, custom_error_1.default)(400, '본인 게시글에 추천 불가'));
         }
         const liked = await paper.getLikes({ where: { userId } });
         if (liked.length) {
@@ -268,10 +267,10 @@ const createLike = async (req, res, next) => {
             return res.json({ result: true, message: '좋아요 취소' });
         }
         await paper.addLikes(userId);
-        res.json({ result: true, message: '좋아요 완료' });
+        return res.json({ result: true, message: '좋아요 완료' });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.createLike = createLike;
@@ -281,17 +280,17 @@ const createSubs = async (req, res, next) => {
         const myId = res.locals?.user?.userId;
         const { userId: writerId } = req.params;
         if (!myId) {
-            return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
         }
-        else if (!+myId || !+writerId) {
-            return next((0, custom_error_1.createError)(400, '유효하지 않은 입력값'));
+        if (!+myId || !+writerId) {
+            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
         }
-        else if (+myId === +writerId) {
-            return next((0, custom_error_1.createError)(400, '본인 구독 불가'));
+        if (+myId === +writerId) {
+            return next((0, custom_error_1.default)(400, '본인 구독 불가'));
         }
         const user = await paperService.findUser(writerId);
         if (!user) {
-            return next((0, custom_error_1.createError)(404, 'Not Found!'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         const subbed = await user.getFollowees({ where: { userId: myId } });
         if (subbed.length) {
@@ -299,10 +298,10 @@ const createSubs = async (req, res, next) => {
             return res.json({ result: true, message: '구독 취소' });
         }
         await user.addFollowees(myId);
-        res.json({ result: true, message: '구독 완료' });
+        return res.json({ result: true, message: '구독 완료' });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 };
 exports.createSubs = createSubs;

@@ -1,6 +1,7 @@
 import * as express from 'express';
-const auth = require('../middleware/auth');
 import * as paperController from '../controllers/paper.controller';
+// eslint-disable-next-line
+const auth = require('../middleware/auth');
 const { upload } = require('../modules/multer');
 
 const router = express.Router();
