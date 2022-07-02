@@ -111,10 +111,11 @@ exports.createPost = createPost;
 const createImage = async (req, res, next) => {
     try {
         const file = req.file;
-        if (!file) {
+        console.log(file);
+        if (!file?.transforms) {
             return next((0, custom_error_1.createError)(400, '이미지 등록 오류 발생'));
         }
-        res.json({ result: true, imageUrl: file.key });
+        res.json({ result: true, imageUrl: file.transforms[0].key });
     }
     catch (err) {
         next(err);
