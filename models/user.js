@@ -1,6 +1,12 @@
 const Sequelize = require('sequelize');
+<<<<<<< HEAD
 const bookings = require('./booking');
 const leafs = require('./leaf');
+=======
+const booking = require('./booking.js');
+const leaf = require('./leaf.js');
+const review = require('./review.js');
+>>>>>>> moon
 
 module.exports = class User extends Sequelize.Model {
   static init(sequelize) {
@@ -111,6 +117,9 @@ module.exports = class User extends Sequelize.Model {
       as: 'recipient',
       through: leafs,
       onDelete: 'cascade',
+    });
+    db.User.hasMany(db.Review, {
+      foreignKey: 'userId',
     });
     db.User.hasMany(db.Review, {
       foreignKey: 'userId',
