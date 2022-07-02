@@ -25,7 +25,7 @@ const upload = multer({
       {
         id: 'resized',
         // @ts-ignore
-        async key(_req, file, cb) {
+        key: (req, file, cb) => {
           const ext = file.originalname.split('.')[1];
 
           if (!['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico'].includes(ext)) {
@@ -35,7 +35,7 @@ const upload = multer({
           return cb(null, `${Date.now()}.${ext}`);
         },
         // @ts-ignore
-        transform(req, file, cb) {
+        transform: (req, file, cb) => {
           cb(null, sharp().resize({ width: 300 }));
         },
       },
