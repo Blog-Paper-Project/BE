@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const booking = require('./booking.js');
 const leaf = require('./leaf.js');
+const review = require('./review.js');
 
 module.exports = class User extends Sequelize.Model {
   static init(sequelize) {
@@ -107,6 +108,9 @@ module.exports = class User extends Sequelize.Model {
       foreignKey: 'recipientId',
       as: 'recipient',
       through: leaf,
+    });
+    db.User.hasMany(db.Review, {
+      foreignKey: 'userId',
     });
   }
 };
