@@ -10,7 +10,7 @@ router.post('/:userId', Authmiddle, async (req, res) => {
   const guestId = res.locals.user.userId;
   console.log(userId, date, time, leaf, guestId);
 
-  if (date === '') {
+  if (!date || !time === '') {
     return res.status(400).send({ result: false });
   }
 
