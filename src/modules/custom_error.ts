@@ -1,6 +1,6 @@
-import { logger } from './winston';
+import logger from './winston';
 
-export function createError(
+export default function createError(
   status: number,
   message: string,
   userId: number | null = null

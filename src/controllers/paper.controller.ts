@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { createError } from '../modules/custom_error';
+import createError from '../modules/custom_error';
 import calcOneWeek from '../modules/date';
 import * as paperService from '../services/paper.service';
 import { validatePaper, validateComment } from '../modules/validate_paper';
+
 const { Paper } = require('../../models');
 
 // 메인 페이지 조회 & 게시글 검색
@@ -28,13 +29,13 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
 
         return { postId, userId, title, likes };
       })
-      .sort((a: Types.LikesCount, b: Types.LikesCount) => b['likes'] - a['likes']);
+      .sort((a: Types.LikesCount, b: Types.LikesCount) => b.likes - a.likes);
 
     const popularUsers = await paperService.findBestUsers();
 
-    res.json({ papers, popularUsers });
+    return res.json({ papers, popularUsers });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -53,9 +54,9 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(404, 'Not Found!'));
     }
 
-    res.json({ user });
+    return res.json({ user });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -78,9 +79,9 @@ export const readMiniProfile = async (
       return next(createError(404, 'Not Found!'));
     }
 
-    res.json({ user });
+    return res.json({ user });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -99,9 +100,9 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(404, 'Not Found!'));
     }
 
-    res.json({ paper });
+    return res.json({ paper });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -127,24 +128,24 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 
     await paperService.updatePoint(userId);
 
-    res.json({ paper });
+    return res.json({ paper });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
 // 상세 페이지 이미지 첨부
 export const createImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const file = req.file as { transforms?: { key?: string }[] };
-    console.log(file);
+    const { file } = req as Types.MulterFile;
+
     if (!file?.transforms) {
       return next(createError(400, '이미지 등록 오류 발생'));
     }
 
-    res.json({ result: true, imageUrl: file.transforms[0].key });
+    return res.json({ result: true, imageUrl: file.transforms[0]?.key });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -173,9 +174,9 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
       return next(createError(400, '게시글 수정 실패'));
     }
 
-    res.json({ result: true, title, contents });
+    return res.json({ result: true, title, contents });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -199,9 +200,9 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
       return next(createError(404, 'Not Found!'));
     }
 
-    res.json({ result: true });
+    return res.json({ result: true });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -214,7 +215,9 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
-    } else if (!text) {
+    }
+
+    if (!text) {
       return next(createError(400, '내용을 입력해주세요'));
     }
 
@@ -230,9 +233,9 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
 
     const comment = await paperService.createComment(text, userId, postId);
 
-    res.json({ result: true, comment });
+    return res.json({ result: true, comment });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -245,7 +248,9 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
 
     if (!+userId) {
       return next(createError(401, '유저 인증 실패'));
-    } else if (!text) {
+    }
+
+    if (!text) {
       return next(createError(400, '내용을 입력해주세요'));
     }
 
@@ -270,9 +275,9 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
       return next(createError(404, 'Not Found 혹은 변경사항 없음'));
     }
 
-    res.json({ result: true, text });
+    return res.json({ result: true, text });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -298,9 +303,9 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
       return next(createError(404, 'Not Found'));
     }
 
-    res.json({ result: true });
+    return res.json({ result: true });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -318,7 +323,9 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
-    } else if (userId === paper.userId) {
+    }
+
+    if (userId === paper.userId) {
       return next(createError(400, '본인 게시글에 추천 불가'));
     }
 
@@ -332,9 +339,9 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
 
     await paper.addLikes(userId);
 
-    res.json({ result: true, message: '좋아요 완료' });
+    return res.json({ result: true, message: '좋아요 완료' });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -346,9 +353,13 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
 
     if (!myId) {
       return next(createError(401, '유저 인증 실패'));
-    } else if (!+myId || !+writerId) {
+    }
+
+    if (!+myId || !+writerId) {
       return next(createError(400, '유효하지 않은 입력값'));
-    } else if (+myId === +writerId) {
+    }
+
+    if (+myId === +writerId) {
       return next(createError(400, '본인 구독 불가'));
     }
 
@@ -368,8 +379,8 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
 
     await user.addFollowees(myId);
 
-    res.json({ result: true, message: '구독 완료' });
+    return res.json({ result: true, message: '구독 완료' });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };

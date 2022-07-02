@@ -1,6 +1,6 @@
-import * as multer from 'multer';
-import * as fs from 'fs';
-import * as sharp from 'sharp';
+const multer = require('multer');
+const fs = require('fs');
+const sharp = require('sharp');
 const multerS3 = require('multer-s3-transform');
 const aws = require('aws-sdk');
 
@@ -25,17 +25,17 @@ const upload = multer({
       {
         id: 'resized',
         // @ts-ignore
-        key: async function (req, file, cb) {
+        async key(_req, file, cb) {
           const ext = file.originalname.split('.')[1];
 
           if (!['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico'].includes(ext)) {
             return cb(new Error('이미지 파일 확장자만 업로드 가능'));
           }
 
-          cb(null, `${Date.now()}.${ext}`);
+          return cb(null, `${Date.now()}.${ext}`);
         },
         // @ts-ignore
-        transform: function (req, file, cb) {
+        transform(req, file, cb) {
           cb(null, sharp().resize({ width: 300 }));
         },
       },
@@ -60,7 +60,7 @@ const download = async (filename: string) => {
     })
     .promise();
 
-  fs.writeFileSync('./static/' + filename, Body);
+  fs.writeFileSync(`./static/${filename}`, Body);
 };
 
 module.exports = { upload, deleteImg, download };

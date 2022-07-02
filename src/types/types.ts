@@ -25,4 +25,10 @@ namespace Types {
     status: number;
     success: boolean;
   }
+
+  export interface MulterFile {
+    file?: {
+      transforms?: { key?: string }[];
+    };
+  }
 }

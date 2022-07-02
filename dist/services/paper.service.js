@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updatePost = exports.updatePoint = exports.createPost = exports.findPostInfo = exports.findPost = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+/* eslint-disable */
+const { Op } = require('sequelize');
 const { Paper, User, Comment } = require('../../models');
-const sequelize_1 = require("sequelize");
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
     return await Paper.findAll({
-        where: { title: { [sequelize_1.Op.like]: `%${keyword}%` } },
+        where: { title: { [Op.like]: `%${keyword}%` } },
         order: [['createdAt', 'DESC']],
     });
 };
