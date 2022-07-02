@@ -71,7 +71,6 @@ const signup = async (req, res, next) => {
       await Validatorsinup.validateAsync(req.body);
 
     const rows = await userService.signup(email, nickname, password);
-    console.log(rows);
     if (rows === false) {
       return res.status(200).send({
         result: false,
@@ -82,23 +81,20 @@ const signup = async (req, res, next) => {
       });
     }
 
-    /** 
-    const userche = await User.findAll({
-      where: { email },
-    });
-    console.log(userche);
+    // const userche = await User.findAll({
+    //   where: { email },
+    // });
+    // console.log(userche);
 
-    게정복구 아직 미정!!
-    else if (userche) {
-      await User.restore({
-        where: { email },
-        parnoid : false // 일시삭제 검색가능
-      });
-      return res.status(200).send({
-        result2: true,
-      });
-    }
-    */
+    // 게정복구 아직 미정!!
+    // if (userche) {
+    //   await User.restore({
+    //     where: { email },
+    //   });
+    //   return res.status(200).send({
+    //     result2: true,
+    //   });
+    // }
   } catch (error) {
     console.log(error);
     next(error);
@@ -196,7 +192,6 @@ const myprofile_correction = async (req, res, next) => {
   try {
     const { user } = res.locals;
     const profileImage = req.file?.key;
-    console.log(profileImage);
     const { nickname, introduction } = req.body;
 
     const profileimg = await userService.myprofile_correction(

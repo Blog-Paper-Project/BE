@@ -4,8 +4,8 @@
   "description": "blog",
   "main": "app.js",
   "scripts": {
-    "test": "NODE_ENV=test jest dist/specs/*.spec.js --forceExit",
-    "start": "nodemon app"
+    "test": "jest",
+    "start": "nodemon sever.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "@types/multer-s3": "^3.0.0",
     "@types/node": "^18.0.0",
     "@types/validator": "^13.7.3",
+    "cross-env": "^7.0.3",
     "jest": "^28.1.2",
     "nodemon": "^2.0.18",
     "prettier": "^2.7.1",

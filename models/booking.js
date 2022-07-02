@@ -8,6 +8,7 @@ module.exports = class Booking extends Sequelize.Model {
           primaryKey: true,
           type: Sequelize.INTEGER,
           allowNull: false,
+          autoIncrement: true,
         },
 
         date: {
