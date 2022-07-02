@@ -136,13 +136,13 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 // 상세 페이지 이미지 첨부
 export const createImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const file = req.file as { key?: string };
-
-    if (!file) {
+    const file = req.file as { transforms?: { key?: string }[] };
+    console.log(file);
+    if (!file?.transforms) {
       return next(createError(400, '이미지 등록 오류 발생'));
     }
 
-    res.json({ result: true, imageUrl: file.key });
+    res.json({ result: true, imageUrl: file.transforms[0].key });
   } catch (err) {
     next(err);
   }

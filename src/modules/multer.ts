@@ -1,6 +1,7 @@
 import * as multer from 'multer';
 import * as fs from 'fs';
-import * as multerS3 from 'multer-s3';
+import * as sharp from 'sharp';
+const multerS3 = require('multer-s3-transform');
 const aws = require('aws-sdk');
 
 require('dotenv').config();
@@ -15,19 +16,30 @@ const s3 = new aws.S3();
 
 const upload = multer({
   storage: multerS3({
-    s3: s3,
+    s3,
     bucket: process.env.S3_BUCKET || '',
     acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE,
-    key: async function (req: any, file: { originalname: string }, cb: Function) {
-      const ext = file.originalname.split('.')[1];
+    shouldTransform: true,
+    transforms: [
+      {
+        id: 'resized',
+        // @ts-ignore
+        key: async function (req, file, cb) {
+          const ext = file.originalname.split('.')[1];
 
-      if (!['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico'].includes(ext)) {
-        return cb(new Error('이미지 파일 확장자만 업로드 가능'));
-      }
+          if (!['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico'].includes(ext)) {
+            return cb(new Error('이미지 파일 확장자만 업로드 가능'));
+          }
 
-      cb(null, `${Date.now()}.${ext}`);
-    },
+          cb(null, `${Date.now()}.${ext}`);
+        },
+        // @ts-ignore
+        transform: function (req, file, cb) {
+          cb(null, sharp().resize({ width: 300 }));
+        },
+      },
+    ],
   }),
 });
 
