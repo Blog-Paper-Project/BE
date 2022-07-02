@@ -1,11 +1,11 @@
 // 회원가입
 ###
-POST http://3.38.210.196/user/signup
+POST http://3.38.183.152/user/signup
 Content-Type: application/json
 
 {
-  "email": "test1234@naver.com",
-  "nickname": "공백크",
+  "email": "test1235@naver.com",
+  "nickname": "공백크5",
   "password" : "12345678",
   "confirmPassword" : "12345678"
 }
@@ -22,7 +22,7 @@ POST http://3.38.183.152/user/login
 Content-Type: application/json
 
 {
-  "email": "test1234@naver.com",
+  "email": "test1235@naver.com",
   "password" : "12345678"
 }
 
@@ -99,3 +99,24 @@ Content-Type: application/json
 {
   "password": "123789"
 }
+
+
+// 리뷰 작성
+###
+post http://127.0.0.1:8000/api/review/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1Njc0OTc3NH0.RXuxbCKzzg3_069CBZlInTrTr891upF6yIdfii11ZEA
+Content-Type: application/json
+
+{
+  "review": "아주 ",
+  "rate": 5
+
+}
+
+
+// 리뷰 조회
+###
+GET  http://127.0.0.1:8000/api/review/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1Njc0NDg1Mn0.K7GJM8SL36MDeEC5s0vjtZYS7HYnBhP2uyFvB45kCXI
+Content-Type: application/json
+
