@@ -7,6 +7,7 @@ const Comment = require('./comment');
 const Tag = require('./tag');
 const Booking = require('./booking');
 const Leaf = require('./leaf');
+const Review = require('./review');
 
 const db = {};
 
@@ -25,6 +26,7 @@ db.Comment = Comment;
 db.Tag = Tag;
 db.Booking = Booking;
 db.Leaf = Leaf;
+db.Review = Review;
 
 User.init(sequelize);
 Paper.init(sequelize);
@@ -32,6 +34,7 @@ Comment.init(sequelize);
 Tag.init(sequelize);
 Booking.init(sequelize);
 Leaf.init(sequelize);
+Review.init(sequelize);
 
 User.associate(db);
 Paper.associate(db);
@@ -39,5 +42,6 @@ Comment.associate(db);
 Tag.associate(db);
 Booking.associate(db);
 Leaf.associate(db);
+Review.associate(db);
 
 module.exports = db;

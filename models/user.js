@@ -112,5 +112,8 @@ module.exports = class User extends Sequelize.Model {
       through: leafs,
       onDelete: 'cascade',
     });
+    db.User.hasMany(db.Review, {
+      foreignKey: 'userId',
+    });
   }
 };
