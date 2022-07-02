@@ -5,6 +5,7 @@ import * as paperService from '../services/paper.service';
 import { validatePaper, validateComment } from '../modules/validate_paper';
 const { Paper } = require('../../models');
 
+// 메인 페이지 조회 & 게시글 검색
 export const readMain = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { keyword } = req.query as { keyword: string };
@@ -37,6 +38,7 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
+// 개인 페이지 조회
 export const readBlog = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
@@ -57,14 +59,14 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
+// 미니 프로필 조회
 export const readMiniProfile = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // const userId = res.locals?.user?.userId;
-    const userId = 1; // 임시로 로그인 기능 제거
+    const userId = res.locals?.user?.userId;
 
     if (!userId) {
       return next(createError(401, '유저 인증 실패'));
@@ -82,6 +84,7 @@ export const readMiniProfile = async (
   }
 };
 
+// 상세 페이지 조회
 export const readPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId, postId } = req.params;
@@ -102,10 +105,10 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
+// 상세 페이지 작성
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const userId = res.locals?.user?.userId;
-    const userId = 1; // 임시로 로그인 인증 기능 제거
+    const userId = res.locals?.user?.userId;
     const { title, contents } = req.body;
 
     if (!userId) {
@@ -130,14 +133,12 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-// 이미지 첨부
+// 상세 페이지 이미지 첨부
 export const createImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const userId = res.locals?.user?.userId;
-    // const userId = 1; // 임시로 로그인 인증 기능 제거
     const file = req.file as { key?: string };
 
-    if (!file.key) {
+    if (!file) {
       return next(createError(400, '이미지 등록 오류 발생'));
     }
 
@@ -147,6 +148,7 @@ export const createImage = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+// 상세 페이지 수정
 export const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
@@ -177,6 +179,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
   }
 };
 
+// 상세 페이지 삭제
 export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
@@ -202,6 +205,7 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
   }
 };
 
+// 댓글 작성
 export const createComment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
@@ -232,6 +236,7 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
   }
 };
 
+// 댓글 수정
 export const updateComment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
@@ -271,6 +276,7 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
   }
 };
 
+// 댓글 삭제
 export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
@@ -298,6 +304,7 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
   }
 };
 
+// 좋아요 등록 및 취소
 export const createLike = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
@@ -331,6 +338,7 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
   }
 };
 
+// 구독 등록 및 취소
 export const createSubs = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const myId = res.locals?.user?.userId;

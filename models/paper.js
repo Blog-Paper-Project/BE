@@ -36,11 +36,16 @@ module.exports = class Paper extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.Paper.belongsTo(db.User, { as: 'Users', foreignKey: 'userId' });
+    db.Paper.belongsTo(db.User, {
+      as: 'Users',
+      foreignKey: 'userId',
+      onDelete: 'cascade',
+    });
     db.Paper.belongsToMany(db.User, {
       foreignKey: 'postId',
       as: 'Likes',
       through: 'likes',
+      onDelete: 'cascade',
     });
     db.Paper.hasMany(db.Comment, { foreignKey: 'postId', onDelete: 'cascade' });
     db.Paper.hasMany(db.Tag, { foreignKey: 'postId' });

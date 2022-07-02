@@ -6,6 +6,7 @@ const date_1 = require("../modules/date");
 const paperService = require("../services/paper.service");
 const validate_paper_1 = require("../modules/validate_paper");
 const { Paper } = require('../../models');
+// 메인 페이지 조회 & 게시글 검색
 const readMain = async (req, res, next) => {
     try {
         const { keyword } = req.query;
@@ -30,6 +31,7 @@ const readMain = async (req, res, next) => {
     }
 };
 exports.readMain = readMain;
+// 개인 페이지 조회
 const readBlog = async (req, res, next) => {
     try {
         const { userId } = req.params;
@@ -47,10 +49,10 @@ const readBlog = async (req, res, next) => {
     }
 };
 exports.readBlog = readBlog;
+// 미니 프로필 조회
 const readMiniProfile = async (req, res, next) => {
     try {
-        // const userId = res.locals?.user?.userId;
-        const userId = 1; // 임시로 로그인 기능 제거
+        const userId = res.locals?.user?.userId;
         if (!userId) {
             return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
         }
@@ -65,6 +67,7 @@ const readMiniProfile = async (req, res, next) => {
     }
 };
 exports.readMiniProfile = readMiniProfile;
+// 상세 페이지 조회
 const readPost = async (req, res, next) => {
     try {
         const { userId, postId } = req.params;
@@ -82,10 +85,10 @@ const readPost = async (req, res, next) => {
     }
 };
 exports.readPost = readPost;
+// 상세 페이지 작성
 const createPost = async (req, res, next) => {
     try {
-        // const userId = res.locals?.user?.userId;
-        const userId = 1; // 임시로 로그인 인증 기능 제거
+        const userId = res.locals?.user?.userId;
         const { title, contents } = req.body;
         if (!userId) {
             return next((0, custom_error_1.createError)(401, '유저 인증 실패'));
@@ -104,13 +107,11 @@ const createPost = async (req, res, next) => {
     }
 };
 exports.createPost = createPost;
-// 이미지 첨부
+// 상세 페이지 이미지 첨부
 const createImage = async (req, res, next) => {
     try {
-        // const userId = res.locals?.user?.userId;
-        // const userId = 1; // 임시로 로그인 인증 기능 제거
         const file = req.file;
-        if (!file.key) {
+        if (!file) {
             return next((0, custom_error_1.createError)(400, '이미지 등록 오류 발생'));
         }
         res.json({ result: true, imageUrl: file.key });
@@ -120,6 +121,7 @@ const createImage = async (req, res, next) => {
     }
 };
 exports.createImage = createImage;
+// 상세 페이지 수정
 const updatePost = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
@@ -144,6 +146,7 @@ const updatePost = async (req, res, next) => {
     }
 };
 exports.updatePost = updatePost;
+// 상세 페이지 삭제
 const deletePost = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
@@ -165,6 +168,7 @@ const deletePost = async (req, res, next) => {
     }
 };
 exports.deletePost = deletePost;
+// 댓글 작성
 const createComment = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
@@ -190,6 +194,7 @@ const createComment = async (req, res, next) => {
     }
 };
 exports.createComment = createComment;
+// 댓글 수정
 const updateComment = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
@@ -218,6 +223,7 @@ const updateComment = async (req, res, next) => {
     }
 };
 exports.updateComment = updateComment;
+// 댓글 삭제
 const deleteComment = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
@@ -240,6 +246,7 @@ const deleteComment = async (req, res, next) => {
     }
 };
 exports.deleteComment = deleteComment;
+// 좋아요 등록 및 취소
 const createLike = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
@@ -267,6 +274,7 @@ const createLike = async (req, res, next) => {
     }
 };
 exports.createLike = createLike;
+// 구독 등록 및 취소
 const createSubs = async (req, res, next) => {
     try {
         const myId = res.locals?.user?.userId;

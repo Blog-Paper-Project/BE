@@ -68,22 +68,25 @@ module.exports = class User extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.User.hasMany(db.Paper, { foreignKey: 'userId' });
-    db.User.hasMany(db.Comment, { foreignKey: 'userId' });
+    db.User.hasMany(db.Paper, { foreignKey: 'userId', onDelete: 'cascade' });
+    db.User.hasMany(db.Comment, { foreignKey: 'userId', onDelete: 'cascade' });
     db.User.belongsToMany(db.Paper, {
       foreignKey: 'userId',
       as: 'Likes',
       through: 'likes',
+      onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followeeId',
       as: 'Followees',
       through: 'subscriptions',
+      onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followerId',
       as: 'Followers',
       through: 'subscriptions',
+      onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'hostId',
