@@ -31,14 +31,6 @@ const inquireBooking = async (guestId) => {
 };
 exports.inquireBooking = inquireBooking;
 
-//호스트용 예약보기
-const hostInquireBooking = async (hostId) => {
-  return await Booking.findAll({
-    where: { hostId: Number(hostId) },
-  });
-};
-exports.hostInquireBooking = hostInquireBooking;
-
 //예약 수정
 const changeBooking = async (date, time, guestId) => {
   return await Booking.update(
@@ -74,6 +66,7 @@ exports.findLeaf = findLeaf;
 const cancelBooking = async (point, guestId, recipientId, hostId, giverId) => {
   await Booking.destroy({
     where: { guestId: Number(guestId), hostId: Number(hostId) },
+    order: [['createdAt', 'DESC']],
   });
   User.increment({ point: point.leaf }, { where: { userId: guestId } });
 
