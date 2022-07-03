@@ -22,17 +22,15 @@ const signup = async (email, nickname, password) => {
 exports.signup = signup;
 
 // 회원탈퇴
-const userDelete = async (user) => {
-  return await User.destroy({
-    where: { userId: user.userId },
-  });
+const userDelete = async (user, deletedAt) => {
+  return await User.update({ deletedAt }, { where: { userId: user.userId } });
 };
 exports.userDelete = userDelete;
 
 // 로그인
 const login = async (email) => {
   return await User.findOne({
-    attributes: ['nickname', 'password', 'userId', 'email'],
+    attributes: ['nickname', 'password', 'userId', 'email', 'deletedAt'],
     where: { email },
   });
 };

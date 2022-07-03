@@ -13,13 +13,13 @@ const kakaoCallback = (req, res, next) => {
   passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
     console.log('콜백~~~');
-    const userInfo = user.nickname;
+    const { nickname } = user;
     const { userId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
     result = {
       token,
-      userInfo,
+      nickname,
     };
     console.log('카카오 콜백 함수 결과', result);
     res.send({ user: result });
@@ -32,13 +32,13 @@ const naverCallback = (req, res, next) => {
   passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
     console.log('콜백~~~');
-    const userInfo = user.email;
+    const nickname = user.email;
     const { userId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
     result = {
       token,
-      userInfo,
+      nickname,
     };
     console.log('네이버 콜백 함수 결과', result);
     res.send({ user: result });
@@ -50,13 +50,13 @@ exports.naverCallback = naverCallback;
 const googleCallback = (req, res, next) => {
   passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
-    const userInfo = user.nickname;
+    const { nickname } = user;
     const { userId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
     result = {
       token,
-      userInfo,
+      nickname,
     };
     console.log('네이버 콜백 함수 결과', result);
     res.send({ user: result });
@@ -106,7 +106,8 @@ exports.signup = signup;
 const userDelete = async (req, res, next) => {
   try {
     const { user } = res.locals;
-    await userService.userDelete(user);
+    const deletedAt = new Date();
+    await userService.userDelete(user, deletedAt);
 
     res.status(200).send({
       result: true,
@@ -124,6 +125,16 @@ const login = async (req, res, next) => {
     const { email, password } = await Validatorlogin.validateAsync(req.body);
     const user = await userService.login(email);
     const passwordck = Bcrypt.compare(password, user.password);
+    const exuser = user.deletedAt;
+    console.log(exuser);
+
+    // 탈퇴한 회원
+    if (exuser) {
+      return res.status(400).send({
+        result: false,
+      });
+    }
+
     // 이메일이 틀리거나 패스워드가 틀렸을때
     if (!user || !passwordck) {
       return res.status(400).send({
@@ -187,7 +198,7 @@ exports.myprofile = myprofile;
 const myprofile_correction = async (req, res, next) => {
   try {
     const { user } = res.locals;
-    const profileImage = req.file?.transporter[0].key;
+    const profileImage = req.file?.transforms[0].key;
     const { nickname, introduction } = req.body;
 
     const profileimg = await userService.myprofile_correction(

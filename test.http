@@ -12,8 +12,8 @@ Content-Type: application/json
 
 // 회원가입 탈퇴
 ###
-DELETE  http://13.124.124.215/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE5LCJpYXQiOjE2NTY1ODU5MzF9.c_NwUfINfIuPcWBFpCKAhM4vOPvftw0mqig8fUD9ebY
+PATCH http://127.0.0.1:8000/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM5LCJpYXQiOjE2NTY4NzEzNTksImV4cCI6MTY1Njg4MjE1OX0.35AVdWO4_MquiFAZIxNeYVQPXTMDJnyRSoU8iOFMUbE
 Content-Type: application/json
 
 // 로그인
