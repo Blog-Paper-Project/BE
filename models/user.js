@@ -54,6 +54,10 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
+        deletedAt: {
+          type: Sequelize.DATE,
+          allowNull: true,
+        },
       },
       {
         sequelize,
@@ -61,7 +65,7 @@ module.exports = class User extends Sequelize.Model {
         underscored: false,
         modelName: 'User',
         tableName: 'users',
-        paranoid: true,
+        paranoid: false,
         charset: 'utf8',
         collate: 'utf8_general_ci',
       }

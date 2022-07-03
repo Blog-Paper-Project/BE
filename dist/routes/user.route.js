@@ -31,7 +31,7 @@ router.get('/login/google/callback', Usercontroller.googleCallback);
 router.post('/signup', Usercontroller.signup);
 
 // 회원탈퇴
-router.delete('/', Authmiddle, Usercontroller.userDelete);
+router.patch('/', Authmiddle, Usercontroller.userDelete);
 
 // 로그인
 router.post('/login', Usercontroller.login);
