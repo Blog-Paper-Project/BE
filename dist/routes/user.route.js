@@ -18,7 +18,7 @@ router.get('/login/naver', isNotLoggedIn, passport.authenticate('naver'));
 
 router.get('/login/naver/callback', Usercontroller.naverCallback);
 
-//구글 로그인 버튼 클릭시 구글 페이지로 이동하는 역할
+//구글 로그인
 router.get(
   '/login/google',
   isNotLoggedIn,
