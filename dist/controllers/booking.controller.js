@@ -47,10 +47,6 @@ const changeBooking = async (req, res) => {
   const time = req.body.time;
   console.log(res.locals.user);
 
-  if (guestId != userId) {
-    return res.status(400);
-  }
-
   try {
     await bookingService.changeBooking(date, time, guestId);
 
