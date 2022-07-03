@@ -2,9 +2,9 @@ const Bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const userService = require('../services/user.service');
+const passport = require('passport');
 const Validatorsinup = require('../middleware/signup.validator');
 const Validatorlogin = require('../middleware/login.validator');
-const User = require('../../models/user');
 
 require('dotenv').config();
 
@@ -130,13 +130,9 @@ const login = async (req, res, next) => {
         result: false,
       });
     }
-    const token = jwt.sign(
-      { userId: user.userId },
-      process.env.SECRET_KEY
-      // {
-      // expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
-      // }
-    );
+    const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
+      expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+    });
     res.status(200).send({
       result: true,
       nickname: user.nickname,
@@ -191,7 +187,7 @@ exports.myprofile = myprofile;
 const myprofile_correction = async (req, res, next) => {
   try {
     const { user } = res.locals;
-    const profileImage = req.file?.key;
+    const profileImage = req.file?.transporter[0].key;
     const { nickname, introduction } = req.body;
 
     const profileimg = await userService.myprofile_correction(
