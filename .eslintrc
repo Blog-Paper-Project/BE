@@ -15,5 +15,5 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
-  "ignorePatterns": ["node_modules/", "dist/", ".eslintrc.js", "models/", "app.js"]
+  "ignorePatterns": ["node_modules/", "dist/", "models/"]
 }
