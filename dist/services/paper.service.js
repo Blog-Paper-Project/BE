@@ -67,8 +67,8 @@ const findPostInfo = async (postId) => {
 };
 exports.findPostInfo = findPostInfo;
 // 게시글 작성
-const createPost = async (title, contents, userId) => {
-    return await Paper.create({ title, contents, userId });
+const createPost = async (title, contents, thumbnail, userId) => {
+    return await Paper.create({ title, contents, thumbnail, userId });
 };
 exports.createPost = createPost;
 // 포인트 지급
@@ -77,8 +77,8 @@ const updatePoint = async (userId) => {
 };
 exports.updatePoint = updatePoint;
 // 게시글 수정
-const updatePost = async (title, contents, userId, postId) => {
-    return await Paper.update({ title, contents }, { where: { userId, postId } });
+const updatePost = async (title, contents, thumbnail, userId, postId) => {
+    return await Paper.update({ title, contents, thumbnail }, { where: { userId, postId } });
 };
 exports.updatePost = updatePost;
 // 게시글 삭제

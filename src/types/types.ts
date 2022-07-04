@@ -3,7 +3,8 @@ namespace Types {
     postId: number;
     title: string;
     contents: string;
-    category: string[];
+    thumbnail: string;
+    category: string;
     createdAt: Date;
     updatedAt: Date;
     userId: number;
