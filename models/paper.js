@@ -18,6 +18,10 @@ module.exports = class Paper extends Sequelize.Model {
           type: Sequelize.TEXT,
           allowNull: false,
         },
+        thumbnail: {
+          type: Sequelize.STRING(50),
+          allowNull: true,
+        },
         category: {
           type: Sequelize.STRING(140),
           allowNull: true,

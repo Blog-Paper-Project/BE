@@ -18,9 +18,9 @@ const readMain = async (req, res, next) => {
         let papers = await paperService.findAllPosts();
         papers = papers // 1주일 간 좋아요를 많이 받은 게시글 순으로 정렬
             .map((paper) => {
-            const { postId, userId, title, Likes } = paper;
+            const { postId, userId, title, thumbnail, Likes } = paper;
             const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
-            return { postId, userId, title, likes };
+            return { postId, userId, title, thumbnail, likes };
         })
             .sort((a, b) => b.likes - a.likes);
         const popularUsers = await paperService.findBestUsers();
@@ -36,7 +36,7 @@ const readBlog = async (req, res, next) => {
     try {
         const { userId } = req.params;
         if (!+userId) {
-            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
         const user = await paperService.findUserInfo(userId);
         if (!user) {
@@ -54,7 +54,7 @@ const readMiniProfile = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
         if (!userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
         const user = await paperService.findMiniInfo(userId);
         if (!user) {
@@ -71,8 +71,11 @@ exports.readMiniProfile = readMiniProfile;
 const readPost = async (req, res, next) => {
     try {
         const { userId, postId } = req.params;
-        if (!+userId || !+postId) {
-            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
+        if (!+userId) {
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+        }
+        if (!+postId) {
+            return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
         }
         const paper = await paperService.findPostInfo(postId);
         if (!paper) {
@@ -89,15 +92,15 @@ exports.readPost = readPost;
 const createPost = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
-        const { title, contents } = req.body;
+        const { title, contents, thumbnail } = req.body;
         if (!userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
-        const paper = await paperService.createPost(title, contents, userId);
+        const paper = await paperService.createPost(title, contents, thumbnail, userId);
         if (!paper) {
-            return next((0, custom_error_1.default)(400, '게시글 생성 실패'));
+            return next((0, custom_error_1.default)(400, 'Paper Not Created'));
         }
         await paperService.updatePoint(userId);
         return res.json({ paper });
@@ -112,7 +115,7 @@ const createImage = async (req, res, next) => {
     try {
         const { file } = req;
         if (!file?.transforms) {
-            return next((0, custom_error_1.default)(400, '이미지 등록 오류 발생'));
+            return next((0, custom_error_1.default)(400, 'Image Not Uploaded'));
         }
         return res.json({ result: true, imageUrl: file.transforms[0]?.key });
     }
@@ -125,19 +128,19 @@ exports.createImage = createImage;
 const updatePost = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
-        const { title, contents } = req.body;
+        const { title, contents, thumbnail } = req.body;
         const { postId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
-        if (!+userId || !+postId) {
-            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
+        if (!+postId) {
+            return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
-        const paper = await paperService.updatePost(title, contents, userId, postId);
+        const paper = await paperService.updatePost(title, contents, thumbnail, userId, postId);
         if (!paper[0]) {
-            return next((0, custom_error_1.default)(400, '게시글 수정 실패'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         return res.json({ result: true, title, contents });
     }
@@ -152,10 +155,10 @@ const deletePost = async (req, res, next) => {
         const userId = res.locals?.user?.userId;
         const { postId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
         if (!+postId) {
-            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
+            return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
         }
         const paper = await paperService.destroyPost(userId, postId);
         if (!paper) {
@@ -175,10 +178,10 @@ const createComment = async (req, res, next) => {
         const { postId } = req.params;
         const { text } = req.body;
         if (!userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
-        if (!text) {
-            return next((0, custom_error_1.default)(400, '내용을 입력해주세요'));
+        if (!+postId) {
+            return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
         }
         const schema = (0, validate_paper_1.validateComment)();
         await schema.validateAsync({ text });
@@ -201,10 +204,10 @@ const updateComment = async (req, res, next) => {
         const { postId, commentId } = req.params;
         const { text } = req.body;
         if (!+userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
-        if (!text) {
-            return next((0, custom_error_1.default)(400, '내용을 입력해주세요'));
+        if (!+postId || !+commentId) {
+            return next((0, custom_error_1.default)(400, 'Invalid PostId or CommentId'));
         }
         const schema = (0, validate_paper_1.validateComment)();
         await schema.validateAsync({ text });
@@ -214,7 +217,7 @@ const updateComment = async (req, res, next) => {
         }
         const updatedComment = await paperService.updateComment(text, commentId, userId, postId);
         if (!updatedComment[0]) {
-            return next((0, custom_error_1.default)(404, 'Not Found 혹은 변경사항 없음'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         return res.json({ result: true, text });
     }
@@ -229,15 +232,14 @@ const deleteComment = async (req, res, next) => {
         const userId = res.locals?.user?.userId;
         const { postId, commentId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
-        const paper = await paperService.findPost(postId);
-        if (!paper) {
-            return next((0, custom_error_1.default)(404, 'Not Found!'));
+        if (!+postId || !+commentId) {
+            return next((0, custom_error_1.default)(400, 'Invalid PostId or CommentId'));
         }
         const deletedComment = await paperService.destroyComment(commentId, userId, postId);
         if (!deletedComment) {
-            return next((0, custom_error_1.default)(404, 'Not Found'));
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         return res.json({ result: true });
     }
@@ -252,22 +254,25 @@ const createLike = async (req, res, next) => {
         const userId = res.locals?.user?.userId;
         const { postId } = req.params;
         if (!userId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+        }
+        if (!+postId) {
+            return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
         }
         const paper = await paperService.findPost(postId);
         if (!paper) {
             return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
         if (userId === paper.userId) {
-            return next((0, custom_error_1.default)(400, '본인 게시글에 추천 불가'));
+            return next((0, custom_error_1.default)(400, 'Self-Like Forbidden'));
         }
         const liked = await paper.getLikes({ where: { userId } });
         if (liked.length) {
             await paper.removeLikes(userId);
-            return res.json({ result: true, message: '좋아요 취소' });
+            return res.json({ result: true, message: 'Like Canceled' });
         }
         await paper.addLikes(userId);
-        return res.json({ result: true, message: '좋아요 완료' });
+        return res.json({ result: true, message: 'Like Done' });
     }
     catch (err) {
         return next(err);
@@ -280,13 +285,13 @@ const createSubs = async (req, res, next) => {
         const myId = res.locals?.user?.userId;
         const { userId: writerId } = req.params;
         if (!myId) {
-            return next((0, custom_error_1.default)(401, '유저 인증 실패'));
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
-        if (!+myId || !+writerId) {
-            return next((0, custom_error_1.default)(400, '유효하지 않은 입력값'));
+        if (!+writerId) {
+            return next((0, custom_error_1.default)(400, `Invalid WriterId : ${writerId}`));
         }
         if (+myId === +writerId) {
-            return next((0, custom_error_1.default)(400, '본인 구독 불가'));
+            return next((0, custom_error_1.default)(400, 'Self-Subs Forbidden'));
         }
         const user = await paperService.findUser(writerId);
         if (!user) {
@@ -295,10 +300,10 @@ const createSubs = async (req, res, next) => {
         const subbed = await user.getFollowees({ where: { userId: myId } });
         if (subbed.length) {
             await user.removeFollowees(myId);
-            return res.json({ result: true, message: '구독 취소' });
+            return res.json({ result: true, message: 'Subs Canceled' });
         }
         await user.addFollowees(myId);
-        return res.json({ result: true, message: '구독 완료' });
+        return res.json({ result: true, message: 'Subs Done' });
     }
     catch (err) {
         return next(err);
