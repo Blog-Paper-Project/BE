@@ -1,32 +1,20 @@
 const express = require('express');
-const app = express();
-const Http = require('http');
-const http = Http.createServer(app);
-const webSocket = require('./dist/modules/socket');
-const passportConfig = require('./dist/modules/social');
-const passport = require('passport');
-const expressSession = require('express-session');
-require('dotenv').config();
-
-webSocket(http);
-
-const port = process.env.PORT;
-
-const db = require('./models');
-
 const cors = require('cors');
 const morgan = require('morgan');
+const passport = require('passport');
+const expressSession = require('express-session');
+const passportConfig = require('./dist/modules/social');
+require('dotenv').config();
+
+const app = express();
+
 const UserRouter = require('./dist/routes/user.route');
-const paperRouter = require('./dist/routes/paper.route');
+const PaperRouter = require('./dist/routes/paper.route');
 const BookingRouter = require('./dist/routes/booking.route');
 const ReviewRouter = require('./dist/routes/review.route');
 
-db.sequelize
-  .sync({ force: false, logging: false })
-  .then(() => console.log('🟢 db 연결 성공'))
-  .catch(console.error);
-
 passportConfig();
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -44,28 +32,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/user', UserRouter);
-app.use('/api/paper/', paperRouter);
+app.use('/api/paper/', PaperRouter);
 app.use('/api/booking', BookingRouter);
 app.use('/api/review', ReviewRouter);
 
-app.get('/', (req, res, next) => {
+app.get('/', (req, res) => {
   res.send('Paper-Project');
 });
 
-app.use((req, res, next) => {
-  res.sendStatus(404);
+app.use((req, res) => {
+  res.status(404).send('Page Not Found!');
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   const { status, message } = err;
 
   res.status(status || 500).json({ result: false, message });
 });
-
-if (process.env.NODE_ENV !== 'test') {
-  http.listen(port, () => {
-    console.log('🟢', '서버연결');
-  });
-}
 
 module.exports = app;

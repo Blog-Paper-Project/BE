@@ -3,9 +3,22 @@ const app = require('../../app');
 
 require('dotenv').config();
 
-const token = process.env.JEST_TOKEN || ' ';
+let token;
 let postId;
 let commentId;
+
+describe('로그인 후 토큰 발급', () => {
+  it('로그인', (done) => {
+    request(app)
+      .post('/user/login')
+      .send({ email: 'testbot@naver.com', password: 'test1234' })
+      .then((res) => {
+        token = 'Bearer ' + res.body.token;
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+});
 
 describe('페이지 조회 테스트', () => {
   it('메인 페이지 조회', (done) => {
@@ -31,15 +44,6 @@ describe('페이지 조회 테스트', () => {
       .get('/api/paper/users/1')
       .then((res) => {
         expect(res.status).toBe(200);
-        done();
-      });
-  });
-
-  it('개인 페이지 조회(404)', (done) => {
-    request(app)
-      .get('/api/paper/users/999')
-      .then((res) => {
-        expect(res.status).toBe(404);
         done();
       });
   });
@@ -113,7 +117,7 @@ describe('게시글 테스트', () => {
 describe('댓글 테스트', () => {
   it('댓글 작성', (done) => {
     request(app)
-      .post('/api/paper/2/comments')
+      .post('/api/paper/1/comments')
       .send({ text: '성공인가?' })
       .set('Authorization', token)
       .then((res) => {
@@ -127,7 +131,7 @@ describe('댓글 테스트', () => {
 
   it('댓글 수정', (done) => {
     request(app)
-      .patch(`/api/paper/2/comments/${commentId}`)
+      .patch(`/api/paper/1/comments/${commentId}`)
       .send({ text: '수정 성공?' })
       .set('Authorization', token)
       .then((res) => {
@@ -139,7 +143,7 @@ describe('댓글 테스트', () => {
 
   it('댓글 삭제', (done) => {
     request(app)
-      .delete(`/api/paper/2/comments/${commentId}`)
+      .delete(`/api/paper/1/comments/${commentId}`)
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);
@@ -151,17 +155,17 @@ describe('댓글 테스트', () => {
 describe('좋아요 & 구독 테스트', () => {
   it('좋아요', (done) => {
     request(app)
-      .post(`/api/paper/4/likes`)
+      .post(`/api/paper/1/likes`)
       .set('Authorization', token)
       .then((res) => {
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(200);
         done();
       });
   });
 
   it('구독', (done) => {
     request(app)
-      .post(`/api/paper/users/2/subscription`)
+      .post(`/api/paper/users/1/subscription`)
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);
