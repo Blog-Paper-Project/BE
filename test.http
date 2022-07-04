@@ -10,15 +10,25 @@ Content-Type: application/json
   "confirmPassword" : "12345678"
 }
 
-// 회원가입 탈퇴
+// 회원탈퇴
 ###
 PATCH http://127.0.0.1:8000/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM5LCJpYXQiOjE2NTY4NzEzNTksImV4cCI6MTY1Njg4MjE1OX0.35AVdWO4_MquiFAZIxNeYVQPXTMDJnyRSoU8iOFMUbE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1Njg5ODM2MiwiZXhwIjoxNjU2OTA5MTYyfQ.MPBjcGbHuOuaNBrmpOWyacYSa0U7ybVxqDSu5ImpIKI
 Content-Type: application/json
+
+// 회원복구
+###
+PATCH http://127.0.0.1:8000/user/restore
+Content-Type: application/json
+
+{
+  "email": "test1235@naver.com",
+  "password" : "12345678"
+}
 
 // 로그인
 ###
-POST http://13.124.124.215/user/login
+POST http://127.0.0.1:8000/user/login
 Content-Type: application/json
 
 {
