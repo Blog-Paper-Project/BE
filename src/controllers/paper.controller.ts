@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import createError from '../modules/custom_error';
 import calcOneWeek from '../modules/date';
-import * as paperService from '../services/paper.service';
+import * as PaperService from '../services/paper.service';
 import { validatePaper, validateComment } from '../modules/validate_paper';
 
 const { Paper } = require('../../models');
@@ -13,12 +13,12 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
 
     if (keyword) {
       // 키워드를 입력하면 최신 순으로 결과 출력
-      const papers = await paperService.findPostsBy(keyword);
+      const papers = await PaperService.findPostsBy(keyword);
 
       return res.json({ papers });
     }
 
-    let papers = await paperService.findAllPosts();
+    let papers = await PaperService.findAllPosts();
 
     papers = papers // 1주일 간 좋아요를 많이 받은 게시글 순으로 정렬
       .map((paper: Types.Paper) => {
@@ -31,7 +31,7 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
       })
       .sort((a: Types.LikesCount, b: Types.LikesCount) => b.likes - a.likes);
 
-    const popularUsers = await paperService.findBestUsers();
+    const popularUsers = await PaperService.findBestUsers();
 
     return res.json({ papers, popularUsers });
   } catch (err) {
@@ -48,7 +48,7 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(401, 'Unauthorized!'));
     }
 
-    const user = await paperService.findUserInfo(userId);
+    const user = await PaperService.findUserInfo(userId);
 
     if (!user) {
       return next(createError(404, 'Not Found!'));
@@ -73,7 +73,7 @@ export const readMiniProfile = async (
       return next(createError(401, 'Unauthorized!'));
     }
 
-    const user = await paperService.findMiniInfo(userId);
+    const user = await PaperService.findMiniInfo(userId);
 
     if (!user) {
       return next(createError(404, 'Not Found!'));
@@ -98,7 +98,7 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
-    const paper = await paperService.findPostInfo(postId);
+    const paper = await PaperService.findPostInfo(postId);
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
@@ -124,13 +124,13 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 
     await schema.validateAsync({ title, contents });
 
-    const paper = await paperService.createPost(title, contents, thumbnail, userId);
+    const paper = await PaperService.createPost(title, contents, thumbnail, userId);
 
     if (!paper) {
       return next(createError(400, 'Paper Not Created'));
     }
 
-    await paperService.updatePoint(userId);
+    await PaperService.updatePoint(userId);
 
     return res.json({ paper });
   } catch (err) {
@@ -172,7 +172,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
 
     await schema.validateAsync({ title, contents });
 
-    const paper = await paperService.updatePost(
+    const paper = await PaperService.updatePost(
       title,
       contents,
       thumbnail,
@@ -204,7 +204,7 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
       return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
-    const paper = await paperService.destroyPost(userId, postId);
+    const paper = await PaperService.destroyPost(userId, postId);
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
@@ -241,7 +241,7 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
       return next(createError(404, 'Not Found!'));
     }
 
-    const comment = await paperService.createComment(text, userId, postId);
+    const comment = await PaperService.createComment(text, userId, postId);
 
     return res.json({ result: true, comment });
   } catch (err) {
@@ -268,13 +268,13 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
 
     await schema.validateAsync({ text });
 
-    const paper = await paperService.findPost(postId);
+    const paper = await PaperService.findPost(postId);
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
     }
 
-    const updatedComment = await paperService.updateComment(
+    const updatedComment = await PaperService.updateComment(
       text,
       commentId,
       userId,
@@ -305,7 +305,7 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
       return next(createError(400, 'Invalid PostId or CommentId'));
     }
 
-    const deletedComment = await paperService.destroyComment(commentId, userId, postId);
+    const deletedComment = await PaperService.destroyComment(commentId, userId, postId);
 
     if (!deletedComment) {
       return next(createError(404, 'Not Found!'));
@@ -331,7 +331,7 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
       return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
-    const paper = await paperService.findPost(postId);
+    const paper = await PaperService.findPost(postId);
 
     if (!paper) {
       return next(createError(404, 'Not Found!'));
@@ -375,7 +375,7 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
       return next(createError(400, 'Self-Subs Forbidden'));
     }
 
-    const user = await paperService.findUser(writerId);
+    const user = await PaperService.findUser(writerId);
 
     if (!user) {
       return next(createError(404, 'Not Found!'));

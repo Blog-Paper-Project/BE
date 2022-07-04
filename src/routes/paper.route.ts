@@ -1,5 +1,5 @@
 import * as express from 'express';
-import * as paperController from '../controllers/paper.controller';
+import * as PaperController from '../controllers/paper.controller';
 // eslint-disable-next-line
 const auth = require('../middleware/auth');
 const { upload } = require('../modules/multer');
@@ -7,42 +7,42 @@ const { upload } = require('../modules/multer');
 const router = express.Router();
 
 // 메인 페이지 조회 & 게시글 검색
-router.get('/', paperController.readMain);
+router.get('/', PaperController.readMain);
 
 // 개인 페이지 조회
-router.get('/users/:userId', paperController.readBlog);
+router.get('/users/:userId', PaperController.readBlog);
 
 // 미니 프로필 조회
-router.get('/miniprofile', auth, paperController.readMiniProfile);
+router.get('/miniprofile', auth, PaperController.readMiniProfile);
 
 // 상세 페이지 조회
-router.get('/users/:userId/:postId', paperController.readPost);
+router.get('/users/:userId/:postId', PaperController.readPost);
 
 // 상세 페이지 작성
-router.post('/', auth, paperController.createPost);
+router.post('/', auth, PaperController.createPost);
 
 // 상세 페이지 이미지 첨부
-router.post('/image', auth, upload.single('image'), paperController.createImage);
+router.post('/image', auth, upload.single('image'), PaperController.createImage);
 
 // 상세 페이지 수정
-router.patch('/:postId', auth, paperController.updatePost);
+router.patch('/:postId', auth, PaperController.updatePost);
 
 // 상세 페이지 삭제
-router.delete('/:postId', auth, paperController.deletePost);
+router.delete('/:postId', auth, PaperController.deletePost);
 
 // 댓글 작성
-router.post('/:postId/comments', auth, paperController.createComment);
+router.post('/:postId/comments', auth, PaperController.createComment);
 
 // 댓글 수정
-router.patch('/:postId/comments/:commentId', auth, paperController.updateComment);
+router.patch('/:postId/comments/:commentId', auth, PaperController.updateComment);
 
 // 댓글 삭제
-router.delete('/:postId/comments/:commentId', auth, paperController.deleteComment);
+router.delete('/:postId/comments/:commentId', auth, PaperController.deleteComment);
 
 // 좋아요 등록 및 취소
-router.post('/:postId/likes', auth, paperController.createLike);
+router.post('/:postId/likes', auth, PaperController.createLike);
 
 // 구독 등록 및 취소
-router.post('/users/:userId/subscription', auth, paperController.createSubs);
+router.post('/users/:userId/subscription', auth, PaperController.createSubs);
 
 export = router;
