@@ -130,3 +130,39 @@ GET  http://3.38.183.152/api/review/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1Njc0NDg1Mn0.K7GJM8SL36MDeEC5s0vjtZYS7HYnBhP2uyFvB45kCXI
 Content-Type: application/json
 
+
+//예약 신청
+###
+POST http://localhost:8000/api/booking/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTY1NjkyNzc2NCwiZXhwIjoxNjU2OTM4NTY0fQ.KwmZ9rJW7m8cblCLiMiN6Kn1kj5-cOHSgTjNtpPkRNU
+Content-Type: application/json
+
+{
+    "date" : "2022-07-05: 13:30:00",
+    "time" : "2022-07-06: 14:00:00",
+    "leaf" : 1
+}
+
+// 예약 보기
+###
+GET http://localhost:8000/api/booking/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTY1NjkyNzc2NCwiZXhwIjoxNjU2OTM4NTY0fQ.KwmZ9rJW7m8cblCLiMiN6Kn1kj5-cOHSgTjNtpPkRNU
+Content-Type: application/json
+
+
+// 예약수정
+###
+PATCH http://localhost:8000/api/booking/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTY1NjkyNzc2NCwiZXhwIjoxNjU2OTM4NTY0fQ.KwmZ9rJW7m8cblCLiMiN6Kn1kj5-cOHSgTjNtpPkRNU
+Content-Type: application/json
+
+ {
+    "date" : "2022-07-13 12:00:00",
+    "time" : "2022-07-14 16:00:00"
+}
+
+//예약삭제
+###
+DELETE http://localhost:8000/api/booking/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTY1NjkyNzc2NCwiZXhwIjoxNjU2OTM4NTY0fQ.KwmZ9rJW7m8cblCLiMiN6Kn1kj5-cOHSgTjNtpPkRNU
+Content-Type: application/json
