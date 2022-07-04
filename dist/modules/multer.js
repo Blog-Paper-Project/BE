@@ -23,7 +23,7 @@ const upload = multer({
                 id: 'resized',
                 // @ts-ignore
                 key: (req, file, cb) => {
-                    const ext = file.originalname.split('.')[1];
+                    const ext = file.originalname.split('.').pop();
                     if (!['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico'].includes(ext)) {
                         return cb(new Error('이미지 파일 확장자만 업로드 가능'));
                     }

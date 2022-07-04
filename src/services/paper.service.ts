@@ -65,8 +65,13 @@ export const findPostInfo = async (postId: string) => {
 };
 
 // 게시글 작성
-export const createPost = async (title: string, contents: string, userId: number) => {
-  return await Paper.create({ title, contents, userId });
+export const createPost = async (
+  title: string,
+  contents: string,
+  thumbnail: string,
+  userId: number
+) => {
+  return await Paper.create({ title, contents, thumbnail, userId });
 };
 
 // 포인트 지급
@@ -78,10 +83,14 @@ export const updatePoint = async (userId: number) => {
 export const updatePost = async (
   title: string,
   contents: string,
+  thumbnail: string,
   userId: string,
   postId: string
 ) => {
-  return await Paper.update({ title, contents }, { where: { userId, postId } });
+  return await Paper.update(
+    { title, contents, thumbnail },
+    { where: { userId, postId } }
+  );
 };
 
 // 게시글 삭제

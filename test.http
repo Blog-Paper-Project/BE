@@ -113,12 +113,12 @@ Content-Type: application/json
 
 // 리뷰 작성
 ###
-post http://127.0.0.1:8000/api/review/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1Njc0OTc3NH0.RXuxbCKzzg3_069CBZlInTrTr891upF6yIdfii11ZEA
+post http://3.38.183.152/api/review/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM5LCJpYXQiOjE2NTY3NTI1NDN9.IRunVrnuiocJLEHf6vchShC09Xb20H8Vp0cHJ8DeiTo
 Content-Type: application/json
 
 {
-  "review": "아주 ",
+  "review": "good!! ",
   "rate": 5
 
 }
@@ -126,7 +126,7 @@ Content-Type: application/json
 
 // 리뷰 조회
 ###
-GET  http://127.0.0.1:8000/api/review/1
+GET  http://3.38.183.152/api/review/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY1Njc0NDg1Mn0.K7GJM8SL36MDeEC5s0vjtZYS7HYnBhP2uyFvB45kCXI
 Content-Type: application/json
 

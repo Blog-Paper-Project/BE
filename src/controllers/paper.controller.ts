@@ -22,12 +22,12 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
 
     papers = papers // 1주일 간 좋아요를 많이 받은 게시글 순으로 정렬
       .map((paper: Types.Paper) => {
-        const { postId, userId, title, Likes } = paper;
+        const { postId, userId, title, thumbnail, Likes } = paper;
         const likes = Likes.filter(
           (like) => new Date(like.createdAt) > calcOneWeek()
         ).length;
 
-        return { postId, userId, title, likes };
+        return { postId, userId, title, thumbnail, likes };
       })
       .sort((a: Types.LikesCount, b: Types.LikesCount) => b.likes - a.likes);
 
@@ -45,7 +45,7 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
     const { userId } = req.params;
 
     if (!+userId) {
-      return next(createError(400, '유효하지 않은 입력값'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
     const user = await paperService.findUserInfo(userId);
@@ -70,7 +70,7 @@ export const readMiniProfile = async (
     const userId = res.locals?.user?.userId;
 
     if (!userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
     const user = await paperService.findMiniInfo(userId);
@@ -90,8 +90,12 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
   try {
     const { userId, postId } = req.params;
 
-    if (!+userId || !+postId) {
-      return next(createError(400, '유효하지 않은 입력값'));
+    if (!+userId) {
+      return next(createError(401, 'Unauthorized!'));
+    }
+
+    if (!+postId) {
+      return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
     const paper = await paperService.findPostInfo(postId);
@@ -110,20 +114,20 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
-    const { title, contents } = req.body;
+    const { title, contents, thumbnail } = req.body;
 
     if (!userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
     const schema = validatePaper();
 
     await schema.validateAsync({ title, contents });
 
-    const paper = await paperService.createPost(title, contents, userId);
+    const paper = await paperService.createPost(title, contents, thumbnail, userId);
 
     if (!paper) {
-      return next(createError(400, '게시글 생성 실패'));
+      return next(createError(400, 'Paper Not Created'));
     }
 
     await paperService.updatePoint(userId);
@@ -140,7 +144,7 @@ export const createImage = async (req: Request, res: Response, next: NextFunctio
     const { file } = req as Types.MulterFile;
 
     if (!file?.transforms) {
-      return next(createError(400, '이미지 등록 오류 발생'));
+      return next(createError(400, 'Image Not Uploaded'));
     }
 
     return res.json({ result: true, imageUrl: file.transforms[0]?.key });
@@ -153,25 +157,31 @@ export const createImage = async (req: Request, res: Response, next: NextFunctio
 export const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
-    const { title, contents } = req.body;
+    const { title, contents, thumbnail } = req.body;
     const { postId } = req.params;
 
     if (!userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
-    if (!+userId || !+postId) {
-      return next(createError(400, '유효하지 않은 입력값'));
+    if (!+postId) {
+      return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
     const schema = validatePaper();
 
     await schema.validateAsync({ title, contents });
 
-    const paper = await paperService.updatePost(title, contents, userId, postId);
+    const paper = await paperService.updatePost(
+      title,
+      contents,
+      thumbnail,
+      userId,
+      postId
+    );
 
     if (!paper[0]) {
-      return next(createError(400, '게시글 수정 실패'));
+      return next(createError(404, 'Not Found!'));
     }
 
     return res.json({ result: true, title, contents });
@@ -187,11 +197,11 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
     const { postId } = req.params;
 
     if (!userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
     if (!+postId) {
-      return next(createError(400, '유효하지 않은 입력값'));
+      return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
     const paper = await paperService.destroyPost(userId, postId);
@@ -214,11 +224,11 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
     const { text } = req.body;
 
     if (!userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
-    if (!text) {
-      return next(createError(400, '내용을 입력해주세요'));
+    if (!+postId) {
+      return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
     const schema = validateComment();
@@ -247,11 +257,11 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
     const { text } = req.body;
 
     if (!+userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
-    if (!text) {
-      return next(createError(400, '내용을 입력해주세요'));
+    if (!+postId || !+commentId) {
+      return next(createError(400, 'Invalid PostId or CommentId'));
     }
 
     const schema = validateComment();
@@ -272,7 +282,7 @@ export const updateComment = async (req: Request, res: Response, next: NextFunct
     );
 
     if (!updatedComment[0]) {
-      return next(createError(404, 'Not Found 혹은 변경사항 없음'));
+      return next(createError(404, 'Not Found!'));
     }
 
     return res.json({ result: true, text });
@@ -288,19 +298,17 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
     const { postId, commentId } = req.params;
 
     if (!userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
-    const paper = await paperService.findPost(postId);
-
-    if (!paper) {
-      return next(createError(404, 'Not Found!'));
+    if (!+postId || !+commentId) {
+      return next(createError(400, 'Invalid PostId or CommentId'));
     }
 
     const deletedComment = await paperService.destroyComment(commentId, userId, postId);
 
     if (!deletedComment) {
-      return next(createError(404, 'Not Found'));
+      return next(createError(404, 'Not Found!'));
     }
 
     return res.json({ result: true });
@@ -316,7 +324,11 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
     const { postId } = req.params;
 
     if (!userId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
+    }
+
+    if (!+postId) {
+      return next(createError(400, `Invalid PostId : ${postId}`));
     }
 
     const paper = await paperService.findPost(postId);
@@ -326,7 +338,7 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
     }
 
     if (userId === paper.userId) {
-      return next(createError(400, '본인 게시글에 추천 불가'));
+      return next(createError(400, 'Self-Like Forbidden'));
     }
 
     const liked = await paper.getLikes({ where: { userId } });
@@ -334,12 +346,12 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
     if (liked.length) {
       await paper.removeLikes(userId);
 
-      return res.json({ result: true, message: '좋아요 취소' });
+      return res.json({ result: true, message: 'Like Canceled' });
     }
 
     await paper.addLikes(userId);
 
-    return res.json({ result: true, message: '좋아요 완료' });
+    return res.json({ result: true, message: 'Like Done' });
   } catch (err) {
     return next(err);
   }
@@ -352,15 +364,15 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
     const { userId: writerId } = req.params;
 
     if (!myId) {
-      return next(createError(401, '유저 인증 실패'));
+      return next(createError(401, 'Unauthorized!'));
     }
 
-    if (!+myId || !+writerId) {
-      return next(createError(400, '유효하지 않은 입력값'));
+    if (!+writerId) {
+      return next(createError(400, `Invalid WriterId : ${writerId}`));
     }
 
     if (+myId === +writerId) {
-      return next(createError(400, '본인 구독 불가'));
+      return next(createError(400, 'Self-Subs Forbidden'));
     }
 
     const user = await paperService.findUser(writerId);
@@ -374,12 +386,12 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
     if (subbed.length) {
       await user.removeFollowees(myId);
 
-      return res.json({ result: true, message: '구독 취소' });
+      return res.json({ result: true, message: 'Subs Canceled' });
     }
 
     await user.addFollowees(myId);
 
-    return res.json({ result: true, message: '구독 완료' });
+    return res.json({ result: true, message: 'Subs Done' });
   } catch (err) {
     return next(err);
   }
