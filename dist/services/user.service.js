@@ -27,6 +27,11 @@ const userDelete = async (user, deletedAt) => {
 };
 exports.userDelete = userDelete;
 
+// 회원복구
+const user_restore = async (email, deletedAt) => {
+  return await User.update({ deletedAt }, { where: { email } });
+};
+exports.user_restore = user_restore;
 // 로그인
 const login = async (email) => {
   return await User.findOne({

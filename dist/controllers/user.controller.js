@@ -80,21 +80,6 @@ const signup = async (req, res, next) => {
         result: true,
       });
     }
-
-    // const userche = await User.findAll({
-    //   where: { email },
-    // });
-    // console.log(userche);
-
-    // 게정복구 아직 미정!!
-    // if (userche) {
-    //   await User.restore({
-    //     where: { email },
-    //   });
-    //   return res.status(200).send({
-    //     result2: true,
-    //   });
-    // }
   } catch (error) {
     console.log(error);
     next(error);
@@ -119,12 +104,40 @@ const userDelete = async (req, res, next) => {
 };
 exports.userDelete = userDelete;
 
+// 회원복구
+const user_restore = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const deletedAt = null;
+
+    const user = await userService.login(email);
+    const passwordck = await Bcrypt.compare(password, user.password);
+
+    // 이메일이 틀리거나 패스워드가 틀렸을때
+    if (!user || !passwordck) {
+      return res.status(400).send({
+        result: false,
+      });
+    }
+
+    await userService.user_restore(email, deletedAt);
+    res.status(200).send({
+      result: true,
+      msg: '회원복구 완료',
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+exports.user_restore = user_restore;
+
 // 로그인
 const login = async (req, res, next) => {
   try {
     const { email, password } = await Validatorlogin.validateAsync(req.body);
     const user = await userService.login(email);
-    const passwordck = Bcrypt.compare(password, user.password);
+    const passwordck = await Bcrypt.compare(password, user.password);
     const exuser = user.deletedAt;
     console.log(exuser);
 
@@ -132,6 +145,7 @@ const login = async (req, res, next) => {
     if (exuser) {
       return res.status(400).send({
         result: false,
+        msg: '탈퇴한 회원입니다',
       });
     }
 

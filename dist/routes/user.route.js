@@ -33,6 +33,9 @@ router.post('/signup', Usercontroller.signup);
 // 회원탈퇴
 router.patch('/', Authmiddle, Usercontroller.userDelete);
 
+// 회원복구
+router.patch('/restore', Usercontroller.user_restore);
+
 // 로그인
 router.post('/login', Usercontroller.login);
 
