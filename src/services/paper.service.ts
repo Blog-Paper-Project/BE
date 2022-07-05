@@ -80,18 +80,18 @@ export const updateImage = async (postId: number, images: string[]) => {
   const originalImages = await Image.findAll({ where: { postId }, raw: true });
   if (originalImages.length) {
     const replaced = originalImages.filter(
-      (img: { imageUrl: string }) => !images.includes(img.imageUrl)
+      (img: { url: string }) => !images.includes(img.url)
     );
 
     for (let item of replaced) {
-      await deleteImg(item.imageUrl);
+      await deleteImg(item.url);
       await Image.destroy({ where: { imageId: item.imageId } });
     }
   }
 
   return await Image.update(
     { postId: postId },
-    { where: { imageUrl: { [Op.in]: images } } },
+    { where: { url: { [Op.in]: images } } },
     { updateOnDuplicate: true }
   );
 };
@@ -102,8 +102,8 @@ export const updatePoint = async (userId: number) => {
 };
 
 // 이미지 생성
-export const createImage = async (imageUrl: string) => {
-  await Image.create({ imageUrl });
+export const createImage = async (url: string) => {
+  await Image.create({ url });
 };
 
 // 게시글 수정
@@ -126,7 +126,7 @@ export const destroyPost = async (userId: number, postId: string) => {
   const paper = await Paper.findOne({ where: { userId, postId } });
 
   for (let image of images) {
-    await deleteImg(image.imageUrl);
+    await deleteImg(image.url);
   }
 
   await deleteImg(paper.thumbnail);

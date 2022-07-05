@@ -202,7 +202,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
     if (thumbnail) {
       images.push(thumbnail);
     }
-    // 이부분 수정 필요!!!
+
     await PaperService.updateImage(+postId, images);
 
     return res.json({ result: true, title, contents });

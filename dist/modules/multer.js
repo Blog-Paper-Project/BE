@@ -24,7 +24,7 @@ const upload = multer({
                 // @ts-ignore
                 key: (req, file, cb) => {
                     const ext = file.originalname.split('.').pop();
-                    if (!['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico'].includes(ext)) {
+                    if (!['png', 'jpg', 'jpeg', 'gif', 'bmp'].includes(ext)) {
                         return cb(new Error('이미지 파일 확장자만 업로드 가능'));
                     }
                     return cb(null, `${Date.now()}.${ext}`);

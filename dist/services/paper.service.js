@@ -76,13 +76,13 @@ exports.createPost = createPost;
 const updateImage = async (postId, images) => {
     const originalImages = await Image.findAll({ where: { postId }, raw: true });
     if (originalImages.length) {
-        const replaced = originalImages.filter((img) => !images.includes(img.imageUrl));
+        const replaced = originalImages.filter((img) => !images.includes(img.url));
         for (let item of replaced) {
-            await deleteImg(item.imageUrl);
+            await deleteImg(item.url);
             await Image.destroy({ where: { imageId: item.imageId } });
         }
     }
-    return await Image.update({ postId: postId }, { where: { imageUrl: { [Op.in]: images } } }, { updateOnDuplicate: true });
+    return await Image.update({ postId: postId }, { where: { url: { [Op.in]: images } } }, { updateOnDuplicate: true });
 };
 exports.updateImage = updateImage;
 // 포인트 지급
@@ -91,8 +91,8 @@ const updatePoint = async (userId) => {
 };
 exports.updatePoint = updatePoint;
 // 이미지 생성
-const createImage = async (imageUrl) => {
-    await Image.create({ imageUrl });
+const createImage = async (url) => {
+    await Image.create({ url });
 };
 exports.createImage = createImage;
 // 게시글 수정
@@ -105,7 +105,7 @@ const destroyPost = async (userId, postId) => {
     const images = await Image.findAll({ where: { postId } }, { raw: true });
     const paper = await Paper.findOne({ where: { userId, postId } });
     for (let image of images) {
-        await deleteImg(image.imageUrl);
+        await deleteImg(image.url);
     }
     await deleteImg(paper.thumbnail);
     return await paper.destroy();
