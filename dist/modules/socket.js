@@ -29,7 +29,7 @@ module.exports = (server) => {
 
     socket.on('message', (data) => {
       socket.to(roomID).emit('message', data, nickname);
-      console.log(data);
+      console.log(data, roomID);
     });
 
     socket.on('disconnect', () => {
