@@ -1,15 +1,16 @@
 const Sequelize = require('sequelize');
 
-module.exports = class Tag extends Sequelize.Model {
+module.exports = class Image extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        tagId: {
+        imageId: {
           primaryKey: true,
           type: Sequelize.INTEGER,
           allowNull: false,
+          autoIncrement: true,
         },
-        tagName: {
+        imageUrl: {
           type: Sequelize.STRING(100),
           allowNull: false,
         },
@@ -18,8 +19,8 @@ module.exports = class Tag extends Sequelize.Model {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: 'Tag',
-        tableName: 'tags',
+        modelName: 'Image',
+        tableName: 'images',
         paranoid: false,
         charset: 'utf8mb4',
         collate: 'utf8mb4_general_ci',
@@ -27,10 +28,9 @@ module.exports = class Tag extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.Tag.belongsTo(db.Paper, {
+    db.Image.belongsTo(db.Paper, {
       as: 'Posts',
-      foreignKey: 'postId',
-      onDelete: 'cascade',
+      foreignKey: { name: 'postId', allowNull: true, onDelete: 'cascade' },
     });
   }
 };
