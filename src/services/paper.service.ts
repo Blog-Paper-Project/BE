@@ -1,6 +1,7 @@
 /* eslint-disable */
 const { Op } = require('sequelize');
-const { Paper, User, Comment } = require('../../models');
+const { Paper, User, Comment, Image } = require('../../models');
+const { deleteImg } = require('../modules/multer');
 
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
@@ -74,9 +75,35 @@ export const createPost = async (
   return await Paper.create({ title, contents, thumbnail, userId });
 };
 
+// 이미지 & 썸네일 게시글 번호 등록
+export const updateImage = async (postId: number, images: string[]) => {
+  const originalImages = await Image.findAll({ where: { postId }, raw: true });
+  if (originalImages.length) {
+    const replaced = originalImages.filter(
+      (img: { imageUrl: string }) => !images.includes(img.imageUrl)
+    );
+
+    for (let item of replaced) {
+      await deleteImg(item.imageUrl);
+      await Image.destroy({ where: { imageId: item.imageId } });
+    }
+  }
+
+  return await Image.update(
+    { postId: postId },
+    { where: { imageUrl: { [Op.in]: images } } },
+    { updateOnDuplicate: true }
+  );
+};
+
 // 포인트 지급
 export const updatePoint = async (userId: number) => {
   await User.increment({ point: +1 }, { where: { userId } });
+};
+
+// 이미지 생성
+export const createImage = async (imageUrl: string) => {
+  await Image.create({ imageUrl });
 };
 
 // 게시글 수정
@@ -93,9 +120,18 @@ export const updatePost = async (
   );
 };
 
-// 게시글 삭제
+// 게시글 & 썸네일 & 이미지 삭제
 export const destroyPost = async (userId: number, postId: string) => {
-  return await Paper.destroy({ where: { userId, postId } });
+  const images = await Image.findAll({ where: { postId } }, { raw: true });
+  const paper = await Paper.findOne({ where: { userId, postId } });
+
+  for (let image of images) {
+    await deleteImg(image.imageUrl);
+  }
+
+  await deleteImg(paper.thumbnail);
+
+  return await paper.destroy();
 };
 
 // 댓글 작성

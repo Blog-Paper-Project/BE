@@ -102,6 +102,11 @@ const createPost = async (req, res, next) => {
         if (!paper) {
             return next((0, custom_error_1.default)(400, 'Paper Not Created'));
         }
+        const images = contents.match(/[0-9]{13}.[a-z]{3,4}/g) || [];
+        if (thumbnail) {
+            images.push(thumbnail);
+        }
+        await PaperService.updateImage(paper.postId, images);
         await PaperService.updatePoint(userId);
         return res.json({ paper });
     }
@@ -117,7 +122,11 @@ const createImage = async (req, res, next) => {
         if (!file?.transforms) {
             return next((0, custom_error_1.default)(400, 'Image Not Uploaded'));
         }
-        return res.json({ result: true, imageUrl: file.transforms[0]?.key });
+        const imageUrl = file.transforms[0]?.key;
+        if (imageUrl) {
+            await PaperService.createImage(imageUrl);
+        }
+        return res.json({ result: true, imageUrl });
     }
     catch (err) {
         return next(err);
@@ -142,6 +151,12 @@ const updatePost = async (req, res, next) => {
         if (!paper[0]) {
             return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
+        const images = contents.match(/[0-9]{13}.[a-z]{3,4}/g) || [];
+        if (thumbnail) {
+            images.push(thumbnail);
+        }
+        // 이부분 수정 필요!!!
+        await PaperService.updateImage(+postId, images);
         return res.json({ result: true, title, contents });
     }
     catch (err) {

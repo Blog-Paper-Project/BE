@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updatePost = exports.updatePoint = exports.createPost = exports.findPostInfo = exports.findPost = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createPost = exports.findPostInfo = exports.findPost = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
 /* eslint-disable */
 const { Op } = require('sequelize');
-const { Paper, User, Comment } = require('../../models');
+const { Paper, User, Comment, Image } = require('../../models');
+const { deleteImg } = require('../modules/multer');
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
     return await Paper.findAll({
@@ -71,19 +72,43 @@ const createPost = async (title, contents, thumbnail, userId) => {
     return await Paper.create({ title, contents, thumbnail, userId });
 };
 exports.createPost = createPost;
+// 이미지 & 썸네일 게시글 번호 등록
+const updateImage = async (postId, images) => {
+    const originalImages = await Image.findAll({ where: { postId }, raw: true });
+    if (originalImages.length) {
+        const replaced = originalImages.filter((img) => !images.includes(img.imageUrl));
+        for (let item of replaced) {
+            await deleteImg(item.imageUrl);
+            await Image.destroy({ where: { imageId: item.imageId } });
+        }
+    }
+    return await Image.update({ postId: postId }, { where: { imageUrl: { [Op.in]: images } } }, { updateOnDuplicate: true });
+};
+exports.updateImage = updateImage;
 // 포인트 지급
 const updatePoint = async (userId) => {
     await User.increment({ point: +1 }, { where: { userId } });
 };
 exports.updatePoint = updatePoint;
+// 이미지 생성
+const createImage = async (imageUrl) => {
+    await Image.create({ imageUrl });
+};
+exports.createImage = createImage;
 // 게시글 수정
 const updatePost = async (title, contents, thumbnail, userId, postId) => {
     return await Paper.update({ title, contents, thumbnail }, { where: { userId, postId } });
 };
 exports.updatePost = updatePost;
-// 게시글 삭제
+// 게시글 & 썸네일 & 이미지 삭제
 const destroyPost = async (userId, postId) => {
-    return await Paper.destroy({ where: { userId, postId } });
+    const images = await Image.findAll({ where: { postId } }, { raw: true });
+    const paper = await Paper.findOne({ where: { userId, postId } });
+    for (let image of images) {
+        await deleteImg(image.imageUrl);
+    }
+    await deleteImg(paper.thumbnail);
+    return await paper.destroy();
 };
 exports.destroyPost = destroyPost;
 // 댓글 작성
