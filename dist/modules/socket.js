@@ -23,13 +23,14 @@ module.exports = (server) => {
       } else {
         socket.join(roomID);
       }
-      console.log(rooms.get(roomID)?.size);
+      console.log(rooms);
       io.to(roomID).emit('user-connected', nickname, socket.rooms);
     });
 
     socket.on('message', (data) => {
       socket.to(roomID).emit('message', data, nickname);
-      console.log(data, roomID);
+      console.log(roomID);
+      console.log(data);
     });
 
     socket.on('disconnect', () => {
