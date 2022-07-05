@@ -16,7 +16,7 @@ const task = new AsyncTask(
     });
     // eslint-disable-next-line
     for await (const image of images) {
-      await deleteImg(image.imageUrl);
+      await deleteImg(image.url);
       await image.destroy();
     }
   },

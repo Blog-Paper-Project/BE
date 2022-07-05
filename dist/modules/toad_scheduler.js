@@ -13,7 +13,7 @@ const task = new AsyncTask('Delete Unused Images', async () => {
     });
     // eslint-disable-next-line
     for await (const image of images) {
-        await deleteImg(image.imageUrl);
+        await deleteImg(image.url);
         await image.destroy();
     }
 }, (err) => {
