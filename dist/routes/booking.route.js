@@ -10,7 +10,7 @@ router.post('/:userId', auth, bookingController.createBooking);
 router.get('/:userId', auth, bookingController.inquireBooking);
 
 //예약 수정
-router.patch('/:userId', auth, bookingController.changeBooking);
+router.patch('/:userId', auth, bookingController.amendBooking);
 
 //얘약 취소
 router.delete('/:userId', auth, bookingController.cancelBooking);

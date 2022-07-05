@@ -16,10 +16,8 @@ module.exports = (server) => {
     let roomID;
     let nickname;
     socket.on('join-room', (payload) => {
-      console.log(payload);
       roomID = payload.roomId;
       nickname = payload.nick;
-      console.log(rooms.get(roomID)?.size === 1);
       if (rooms.get(roomID)?.size === 2) {
         return io.to(roomID).emit('fail-join');
       } else {
@@ -31,7 +29,7 @@ module.exports = (server) => {
 
     socket.on('message', (data) => {
       socket.to(roomID).emit('message', data, nickname);
-      console.log(socket.rooms);
+      console.log(data);
     });
 
     socket.on('disconnect', () => {
