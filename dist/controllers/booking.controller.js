@@ -6,18 +6,23 @@ const createBooking = async (req, res) => {
   const userId = req.params.userId;
   const { date, time, leaf } = req.body;
   const guestId = res.locals.user.userId;
-  console.log(userId, date, time, leaf, guestId);
+  const hostId = req.params.userId;
+  console.log(userId, date, time, leaf, guestId, hostId);
 
   if (!date || !time === '') {
     return res.status(400).send({ result: false });
+  } else if (userId == guestId) {
+    return res.status(400).send({ result: false });
   }
+
   try {
     const booking_result = await bookingService.createBooking(
       userId,
       date,
       time,
       guestId,
-      leaf
+      leaf,
+      hostId
     );
     return res.status(200).json({ booking_result, result: true });
   } catch (error) {
@@ -40,24 +45,24 @@ const inquireBooking = async (req, res) => {
 exports.inquireBooking = inquireBooking;
 
 // 예약 수정
-const changeBooking = async (req, res) => {
+const amendBooking = async (req, res) => {
   const userId = res.locals.user.userId;
   const guestId = res.locals.user.userId;
+  const hostId = req.params.userId;
   const date = req.body.date;
   const time = req.body.time;
-  console.log(res.locals.user);
+  const bookingList = await bookingService.checkBooking(guestId, hostId);
+  const bookingId = bookingList[0].bookingId;
+  console.log(bookingList);
 
   try {
-    await bookingService.changeBooking(date, time, guestId);
-
-    const booking_result = await bookingService.findBooking(guestId);
-
+    const booking_result = await bookingService.changeBooking(date, time, bookingId);
     res.status(200).json({ booking_result, result: true });
   } catch (error) {
     console.log(error);
   }
 };
-exports.changeBooking = changeBooking;
+exports.amendBooking = amendBooking;
 
 // 예약 취소
 const cancelBooking = async (req, res) => {
@@ -65,20 +70,23 @@ const cancelBooking = async (req, res) => {
   const giverId = res.locals.user.userId;
   const recipientId = req.params.userId;
   const hostId = req.params.userId;
+  //console.log(guestId, hostId, recipientId);
+  const pointList = await bookingService.findLeaf(giverId, guestId);
+  const point = pointList[1].leaf;
+  const bookingList = await bookingService.checkBooking(guestId, hostId);
+  const booking = bookingList[0].bookingId;
+  console.log(booking, point);
 
   try {
-    const pointList = await bookingService.findLeaf(giverId, guestId);
-    const point = pointList[1].leaf;
-
     const booking_result = await bookingService.cancelBooking(
+      booking,
       point,
       guestId,
       recipientId,
-      hostId,
       giverId
     );
 
-    res.status(200).json({ booking_result, result: true });
+    res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
   }

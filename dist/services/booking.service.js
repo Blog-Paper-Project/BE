@@ -1,11 +1,11 @@
-const exp = require('constants');
 const { User, Booking, Leaf } = require('../../models');
 
 //예약 신청
-const createBooking = async (userId, date, time, guestId, leaf) => {
+const createBooking = async (userId, date, time, guestId, leaf, hostId) => {
+  console.log(userId, date, time, guestId, leaf);
   await User.decrement({ point: `${leaf}` }, { where: { userId: guestId } });
 
-  await User.increment({ point: `${leaf}` }, { where: { userId } });
+  await User.increment({ popularity: `${leaf}` }, { where: { userId: hostId } });
 
   await Leaf.create({
     leaf,
@@ -27,31 +27,24 @@ exports.createBooking = createBooking;
 const inquireBooking = async (guestId) => {
   return await Booking.findAll({
     where: { guestId: Number(guestId) },
+    order: [['createdAt', 'DESC']],
   });
 };
 exports.inquireBooking = inquireBooking;
 
 //예약 수정
-const changeBooking = async (date, time, guestId) => {
-  return await Booking.update(
+const changeBooking = async (date, time, bookingId) => {
+  console.log(date, time, bookingId);
+  await Booking.update(
     {
       date,
       time,
     },
-    {
-      where: { guestId: Number(guestId) },
-    }
+    { where: { bookingId: Number(bookingId) } }
   );
+  return await Booking.findByPk(bookingId);
 };
 exports.changeBooking = changeBooking;
-
-// 예약수정 : 수정값 보여주기
-const findBooking = async (guestId) => {
-  return await Booking.findAll({
-    where: { guestId: Number(guestId) },
-  });
-};
-exports.findBooking = findBooking;
 
 //얘약 취소 : 나뭇잎 찾기
 const findLeaf = async (giverId) => {
@@ -63,14 +56,27 @@ const findLeaf = async (giverId) => {
 exports.findLeaf = findLeaf;
 
 //예약취소 : 취소 후 나뭇잎 반환
-const cancelBooking = async (point, guestId, recipientId, hostId, giverId) => {
-  await Booking.destroy({
-    where: { guestId: Number(guestId), hostId: Number(hostId) },
+const checkBooking = async (guestId, hostId) => {
+  return await Booking.findAll({
+    where: {
+      guestId: Number(guestId),
+      hostId: Number(hostId),
+    },
     order: [['createdAt', 'DESC']],
   });
-  User.increment({ point: point.leaf }, { where: { userId: guestId } });
+};
+exports.checkBooking = checkBooking;
 
-  User.decrement({ point: point.leaf }, { where: { userId: recipientId } });
+const cancelBooking = async (booking, point, guestId, recipientId, giverId) => {
+  await Booking.destroy({
+    where: {
+      bookingId: Number(booking),
+    },
+    limit: 1,
+  });
+  User.increment({ point: point }, { where: { userId: guestId } });
+
+  User.decrement({ popularity: point }, { where: { userId: recipientId } });
 
   return await Leaf.create({
     leaf: point,

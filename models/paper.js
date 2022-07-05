@@ -52,6 +52,7 @@ module.exports = class Paper extends Sequelize.Model {
       onDelete: 'cascade',
     });
     db.Paper.hasMany(db.Comment, { foreignKey: 'postId', onDelete: 'cascade' });
-    db.Paper.hasMany(db.Tag, { foreignKey: 'postId' });
+    db.Paper.hasMany(db.Tag, { foreignKey: 'postId', onDelete: 'cascade' });
+    db.Paper.hasMany(db.Image, { foreignKey: 'postId', onDelete: 'cascade' });
   }
 };
