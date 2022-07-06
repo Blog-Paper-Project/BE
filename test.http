@@ -4,7 +4,7 @@ POST http://13.124.124.215/user/signup
 Content-Type: application/json
 
 {
-  "email": "test1235@naver.com",
+  "email": "mna800@naver.com",
   "nickname": "공백크5",
   "password" : "12345678",
   "confirmPassword" : "12345678"
@@ -32,8 +32,8 @@ POST http://127.0.0.1:8000/user/login
 Content-Type: application/json
 
 {
-  "email": "test1235@naver.com",
-  "password" : "12345678"
+  "email": "mna800@naver.com",
+  "password" : "123789"
 }
 
 // 카카오 로그인
@@ -82,8 +82,7 @@ Content-Type: application/json
 
 // 이메일 인증
 ###
-POST http://13.124.124.215/user/emailauth
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
+POST http://127.0.0.1:8000/user/emailauth
 Content-Type: application/json
 
 {
@@ -92,18 +91,43 @@ Content-Type: application/json
 
 // 이메일 인증 체크
 ###
-POST http://13.124.124.215/user/check-emailauth
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
+POST http://127.0.0.1:8000/user/check-emailauth
 Content-Type: application/json
 
 {
-  "emailAuth": "9635"
+  "emailAuth": "2390"
 }
 
 // 비밀번호 재설정 
 ###
-PATCH http://13.124.124.215/user/change-password
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTY1NjU5MjQwOCwiZXhwIjoxNjU2NjAzMjA4fQ.M4oh7-naCSR5CdUMdy-WdqGAefUj3rOII-yLXY3AO8c
+PATCH http://127.0.0.1:8000/user/change-password
+Content-Type: application/json
+
+{
+  "email" : "mna800@naver.com",
+  "password": "123789"
+}
+
+// 이메일 인증 (로그인 시)
+###
+POST http://127.0.0.1:8000/user/login/emailauth
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImlhdCI6MTY1NzA5NDI1NSwiZXhwIjoxNjU3MTA1MDU1fQ.2sPim7tanSTSTdqAGxu0r4uSaG8Cq2rCcsnP08cIaBo
+Content-Type: application/json
+
+// 이메일 인증 체크 (로그인 시)
+###
+POST http://127.0.0.1:8000/user/login/check-emailauth
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImlhdCI6MTY1NzA5NDI1NSwiZXhwIjoxNjU3MTA1MDU1fQ.2sPim7tanSTSTdqAGxu0r4uSaG8Cq2rCcsnP08cIaBo
+Content-Type: application/json
+
+{
+  "emailAuth": "6762"
+}
+
+// 비밀번호 재설정 (로그인 시)
+###
+PATCH http://127.0.0.1:8000/user/login/change-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImlhdCI6MTY1NzA5NDI1NSwiZXhwIjoxNjU3MTA1MDU1fQ.2sPim7tanSTSTdqAGxu0r4uSaG8Cq2rCcsnP08cIaBo
 Content-Type: application/json
 
 {

@@ -54,12 +54,21 @@ router.patch(
 );
 
 // 이메일 인증
-router.post('/emailauth', Authmiddle, Usercontroller.emailauth);
+router.post('/emailauth', Usercontroller.emailauth);
 
 // 이메일 인증 체크
-router.post('/check-emailauth', Authmiddle, Usercontroller.check_emaliauth);
+router.post('/check-emailauth', Usercontroller.check_emaliauth);
 
 // 사용자 비밀번호 재설정
-router.patch('/change-password', Authmiddle, Usercontroller.change_password);
+router.patch('/change-password', Usercontroller.change_password);
+
+// 이메일 인증 (로그인 시)
+router.post('/login/emailauth', Authmiddle, Usercontroller.login_emailauth);
+
+// 이메일 인증 체크(로그인 시)
+router.post('/login/check-emailauth', Authmiddle, Usercontroller.login_check_emaliauth);
+
+// 사용자 비밀번호 재설정(로그인 시)
+router.patch('/login/change-password', Authmiddle, Usercontroller.login_change_password);
 
 module.exports = router;
