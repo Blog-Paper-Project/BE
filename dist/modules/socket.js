@@ -45,7 +45,7 @@ module.exports = (server) => {
         time: data.time,
         count: checkCounts(room),
       });
-      console.log(`${name} : ${message} (총 ${checkCounts(room)}명)`);
+      console.log(`${name} : ${data} (총 ${checkCounts(room)}명)`);
     });
 
     socket.on('disconnect', () => {
