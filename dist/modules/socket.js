@@ -37,11 +37,12 @@ module.exports = (server) => {
       console.log(`${name}님이 참가했습니다. (총 ${checkCounts(room)}명)`);
     });
 
-    socket.on('message', (message) => {
+    socket.on('message', (data) => {
       io.to(room).emit('update', {
         type: 'message',
         name,
-        message,
+        message: data.message,
+        time: data.time,
         count: checkCounts(room),
       });
       console.log(`${name} : ${message} (총 ${checkCounts(room)}명)`);
