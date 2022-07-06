@@ -39,6 +39,8 @@ router.patch('/restore', Usercontroller.user_restore);
 // 로그인
 router.post('/login', Usercontroller.login);
 
+router.post('/refresh', Usercontroller.refresh);
+
 // 이메일 || 닉네임 중복검사
 router.post('/idcheck/:id', isNotLoggedIn, Usercontroller.duplicate);
 

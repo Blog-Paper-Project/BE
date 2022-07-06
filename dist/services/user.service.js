@@ -32,6 +32,7 @@ const user_restore = async (email, deletedAt) => {
   return await User.update({ deletedAt }, { where: { email } });
 };
 exports.user_restore = user_restore;
+
 // 로그인
 const login = async (email) => {
   return await User.findOne({
@@ -40,6 +41,21 @@ const login = async (email) => {
   });
 };
 exports.login = login;
+
+// refresh_token 저장
+const refresh_token = async (email, refresh_token) => {
+  await User.update({ refresh_token }, { where: { email } });
+};
+exports.refresh_token = refresh_token;
+
+// refresh_token 으로 아이디 찾기
+const refresh_token_check = async (refresh_token) => {
+  return User.findOne({
+    attributes: ['userId'],
+    where: { refresh_token },
+  });
+};
+exports.refresh_token_check = refresh_token_check;
 
 // 이메일 || 닉네임 중복검사
 const duplicate = async (id) => {
@@ -58,7 +74,7 @@ exports.duplicate = duplicate;
 const myprofile = async (user) => {
   return await User.findOne({
     where: { userId: user.userId },
-    attributes: { exclude: ['password'] },
+    attributes: { exclude: ['password', 'refresh_token'] },
   });
 };
 exports.myprofile = myprofile;
@@ -74,7 +90,7 @@ const myprofile_correction = async (user, profileImage, nickname, introduction) 
 
   return await User.findOne({
     where: { userId: user.userId },
-    attributes: { exclude: ['password'] },
+    attributes: { exclude: ['password', 'refresh_token'] },
   });
 };
 exports.myprofile_correction = myprofile_correction;

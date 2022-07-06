@@ -13,16 +13,32 @@ const kakaoCallback = (req, res, next) => {
   passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
 
-    const { nickname } = user;
-    const { userId } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+    try {
+      const access_token = jwt.sign(
+        { userId: user.userId },
+        process.env.ACCESS_TOKEN_KEY,
+        {
+          expiresIn: 7200, //60초 * 60분 * 2시 이므로, 3시간 유효한 토큰 발급
+        }
+      );
+      const refresh_token = jwt.sign(
+        { userId: user.userId },
+        process.env.REFRESH_TOKEN_KEY,
+        {
+          expiresIn: 36000, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+        }
+      );
 
-    result = {
-      token,
-      nickname,
-    };
-    console.log('카카오 콜백 함수 결과', result);
-    res.send({ user: result });
+      res.status(200).send({
+        result: true,
+        access_token,
+        refresh_token,
+        nickname: user.nickname,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   })(req, res, next);
 };
 exports.kakaoCallback = kakaoCallback;
@@ -32,16 +48,32 @@ const naverCallback = (req, res, next) => {
   passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
 
-    const nickname = user.email;
-    const { userId } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+    try {
+      const access_token = jwt.sign(
+        { userId: user.userId },
+        process.env.ACCESS_TOKEN_KEY,
+        {
+          expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+        }
+      );
+      const refresh_token = jwt.sign(
+        { userId: user.userId },
+        process.env.REFRESH_TOKEN_KEY,
+        {
+          expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+        }
+      );
 
-    result = {
-      token,
-      nickname,
-    };
-    console.log('네이버 콜백 함수 결과', result);
-    res.send({ user: result });
+      res.status(200).send({
+        result: true,
+        access_token,
+        refresh_token,
+        nickname: user.email,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   })(req, res, next);
 };
 exports.naverCallback = naverCallback;
@@ -50,16 +82,32 @@ exports.naverCallback = naverCallback;
 const googleCallback = (req, res, next) => {
   passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
-    const { nickname } = user;
-    const { userId } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+    try {
+      const access_token = jwt.sign(
+        { userId: user.userId },
+        process.env.ACCESS_TOKEN_KEY,
+        {
+          expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+        }
+      );
+      const refresh_token = jwt.sign(
+        { userId: user.userId },
+        process.env.REFRESH_TOKEN_KEY,
+        {
+          expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+        }
+      );
 
-    result = {
-      token,
-      nickname,
-    };
-    console.log('구글 콜백 함수 결과', result);
-    res.send({ user: result });
+      res.status(200).send({
+        result: true,
+        access_token,
+        refresh_token,
+        nickname: user.nickname,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   })(req, res, next);
 };
 exports.googleCallback = googleCallback;
@@ -155,13 +203,24 @@ const login = async (req, res, next) => {
         result: false,
       });
     }
-    const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
-      expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+    const access_token = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+      expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
     });
+    const refresh_token = jwt.sign(
+      { userId: user.userId },
+      process.env.REFRESH_TOKEN_KEY,
+      {
+        expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+      }
+    );
+
+    await userService.refresh_token(email, refresh_token);
+
     res.status(200).send({
       result: true,
       nickname: user.nickname,
-      token,
+      access_token,
+      refresh_token,
     });
   } catch (error) {
     console.log(error);
@@ -169,6 +228,31 @@ const login = async (req, res, next) => {
   }
 };
 exports.login = login;
+
+// refresh 토큰을 기반으로 access 토큰
+const refresh = async (req, res, next) => {
+  try {
+    const { refresh_token } = req.body;
+
+    if (!refresh_token) {
+      return res.sendStatus(401);
+    }
+
+    const user = await userService.refresh_token_check(refresh_token);
+    console.log(user.userId);
+    const access_token = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+      expiresIn: 20,
+    });
+
+    res.status(200).send({
+      access_token,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+exports.refresh = refresh;
 
 // 이메일 || 닉네임 중복검사
 const duplicate = async (req, res, next) => {
@@ -311,7 +395,6 @@ exports.change_password = change_password;
 const login_emailauth = async (req, res, next) => {
   try {
     const { user } = res.locals;
-    console.log(user.email);
     // 인증메일 (번호)
     const emailAuth = Math.floor(Math.random() * 10000);
 

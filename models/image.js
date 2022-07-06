@@ -10,7 +10,7 @@ module.exports = class Image extends Sequelize.Model {
           allowNull: false,
           autoIncrement: true,
         },
-        imageUrl: {
+        Url: {
           type: Sequelize.STRING(100),
           allowNull: false,
         },
