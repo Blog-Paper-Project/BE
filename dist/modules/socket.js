@@ -7,36 +7,61 @@ module.exports = (server) => {
     },
   });
 
-  const sids = io.sockets.adapter.sids;
-  const rooms = io.sockets.adapter.rooms;
+
+  const checkCounts = (room) => io.sockets.adapter.rooms.get(room)?.size || 0;
 
   io.on('connection', (socket) => {
-    console.log('연결됐습니다.', socket.id, socket.rooms);
+    console.log('연결됐습니다.');
+    let { name, room } = socket;
 
-    let roomID;
-    let nickname;
-    socket.on('join-room', (payload) => {
-      roomID = payload.roomId;
-      nickname = payload.nick;
-      if (rooms.get(roomID)?.size === 2) {
-        return io.to(roomID).emit('fail-join');
-      } else {
-        socket.join(roomID);
-      }
-      console.log(rooms);
-      io.to(roomID).emit('user-connected', nickname, socket.rooms);
+    socket.emit('search', {
+      rooms: [
+        ...new Set(
+          [...io.sockets.adapter.sids.values()].map((data) => [...data][1])
+        ),
+      ],
     });
-
-    socket.on('message', (data) => {
-      io.to(roomID).emit('message', data, nickname);
-      console.log(roomID);
-      console.log(data);
+  
+    socket.on('newUser', (data) => {
+      name = data.name;
+      room = data.room;
+  
+      socket.join(room);
+  
+      console.log([
+        ...new Set(
+          [...io.sockets.adapter.sids.values()].map((data) => [...data][1])
+        ),
+      ]);
+  
+      io.to(room).emit('update', {
+        type: 'connect',
+        name,
+        count: checkCounts(room),
+      });
+      console.log(`${name}님이 참가했습니다. (총 ${checkCounts(room)}명)`);
     });
-
+  
+    socket.on('message', (message) => {
+      io.to(room).emit('update', {
+        type: 'message',
+        name,
+        message,
+        count: checkCounts(room),
+      });
+      console.log(`${name} : ${message} (총 ${checkCounts(room)}명)`);
+    });
+  
     socket.on('disconnect', () => {
-      console.log('클라이언트 접속 해제', socket.id);
-      io.leave(roomID);
-      socket.to(roomID).emit('leave', `${nickname}님이 퇴장했습니다.`);
+      socket.leave(room);
+  
+      io.to(room).emit('update', {
+        type: 'disconnect',
+        name,
+        count: checkCounts(room),
+      });
+      console.log(`${name}님이 나갔습니다. (총 ${checkCounts(room)}명)`);
     });
+  
   });
 };
