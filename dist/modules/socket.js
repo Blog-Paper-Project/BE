@@ -7,33 +7,28 @@ module.exports = (server) => {
     },
   });
 
-
   const checkCounts = (room) => io.sockets.adapter.rooms.get(room)?.size || 0;
 
   io.on('connection', (socket) => {
-    console.log('연결됐습니다.');
+    console.log('연결됐습니다');
     let { name, room } = socket;
 
     socket.emit('search', {
       rooms: [
-        ...new Set(
-          [...io.sockets.adapter.sids.values()].map((data) => [...data][1])
-        ),
+        ...new Set([...io.sockets.adapter.sids.values()].map((data) => [...data][1])),
       ],
     });
-  
+
     socket.on('newUser', (data) => {
       name = data.name;
       room = data.room;
-  
+
       socket.join(room);
-  
+
       console.log([
-        ...new Set(
-          [...io.sockets.adapter.sids.values()].map((data) => [...data][1])
-        ),
+        ...new Set([...io.sockets.adapter.sids.values()].map((data) => [...data][1])),
       ]);
-  
+
       io.to(room).emit('update', {
         type: 'connect',
         name,
@@ -41,7 +36,7 @@ module.exports = (server) => {
       });
       console.log(`${name}님이 참가했습니다. (총 ${checkCounts(room)}명)`);
     });
-  
+
     socket.on('message', (message) => {
       io.to(room).emit('update', {
         type: 'message',
@@ -51,10 +46,10 @@ module.exports = (server) => {
       });
       console.log(`${name} : ${message} (총 ${checkCounts(room)}명)`);
     });
-  
+
     socket.on('disconnect', () => {
       socket.leave(room);
-  
+
       io.to(room).emit('update', {
         type: 'disconnect',
         name,
@@ -62,6 +57,5 @@ module.exports = (server) => {
       });
       console.log(`${name}님이 나갔습니다. (총 ${checkCounts(room)}명)`);
     });
-  
   });
 };
