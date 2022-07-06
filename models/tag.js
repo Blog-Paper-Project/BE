@@ -8,6 +8,7 @@ module.exports = class Tag extends Sequelize.Model {
           primaryKey: true,
           type: Sequelize.INTEGER,
           allowNull: false,
+          autoIncrement: true,
         },
         name: {
           type: Sequelize.STRING(100),
