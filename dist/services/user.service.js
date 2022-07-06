@@ -80,25 +80,61 @@ const myprofile_correction = async (user, profileImage, nickname, introduction) 
 exports.myprofile_correction = myprofile_correction;
 
 // 이메일 인증
-const emailauth = async (user, emailAuth) => {
-  await User.update({ emailAuth }, { where: { userId: user.userId } });
+const emailauth = async (email, emailAuth) => {
+  await User.update({ emailAuth, email }, { where: { email } });
 };
 exports.emailauth = emailauth;
 
 // 이메일 인증 체크
-const check_emaliauth = async (user) => {
+const check_emaliauth = async (emailAuth) => {
   return await User.findOne({
-    where: { userId: user.userId },
+    where: { emailAuth },
     attributes: ['emailAuth'],
   });
 };
 exports.check_emaliauth = check_emaliauth;
 
+// 이메일 인증 삭제
+const delet_check_emaliauth = async (emailAuth) => {
+  await User.update({ emailAuth: null }, { where: { emailAuth } });
+};
+exports.delet_check_emaliauth = delet_check_emaliauth;
+
 // 비밀번호 변경
-const change_password = async (user, password) => {
+const change_password = async (email, password) => {
+  const salt = await Bcrypt.genSalt();
+  const pwhash = await Bcrypt.hash(password, salt);
+
+  await User.update({ password: pwhash }, { where: { email } });
+};
+exports.change_password = change_password;
+
+// 이메일 인증 (로그인 시)
+const login_emailauth = async (user, emailAuth) => {
+  await User.update({ emailAuth }, { where: { userId: user.userId } });
+};
+exports.login_emailauth = login_emailauth;
+
+// 이메일 인증 체크 (로그인 시)
+const login_check_emaliauth = async (user) => {
+  return await User.findOne({
+    where: { userId: user.userId },
+    attributes: ['emailAuth'],
+  });
+};
+exports.login_check_emaliauth = login_check_emaliauth;
+
+// 이메일 인증 삭제
+const login_delet_check_emaliauth = async (user) => {
+  await User.update({ emailAuth: null }, { where: { userId: user.userId } });
+};
+exports.login_delet_check_emaliauth = login_delet_check_emaliauth;
+
+// 비밀번호 변경 (로그인 시)
+const login_change_password = async (user, password) => {
   const salt = await Bcrypt.genSalt();
   const pwhash = await Bcrypt.hash(password, salt);
 
   await User.update({ password: pwhash }, { where: { userId: user.userId } });
 };
-exports.change_password = change_password;
+exports.login_change_password = login_change_password;
