@@ -11,12 +11,12 @@ export const findPostsBy = async (keyword: string) => {
   });
 };
 
-// 좋아요 정보를 포함한 모든 게시글 검색
+// 모든 게시글과 좋아요 검색
 export const findAllPosts = async () => {
   return await Paper.findAll({ include: { model: User, as: 'Likes' } });
 };
 
-// 인기도 순으로 유저 정렬 및 검색
+// 인기도 순으로 유저 10명 검색
 export const findBestUsers = async () => {
   return await User.findAll({
     order: [['popularity', 'DESC']],
@@ -30,7 +30,7 @@ export const findUser = async (userId: string) => {
   return await User.findOne({ where: { userId } });
 };
 
-// 특정 유저 정보와 관련 구독 내역 검색
+// 특정 유저와 구독 검색
 export const findMiniInfo = async (userId: number) => {
   return await User.findOne({
     where: { userId },
@@ -39,7 +39,7 @@ export const findMiniInfo = async (userId: number) => {
   });
 };
 
-// 특정 유저 정보와 관련 게시글 검색
+// 특정 유저와 게시글 검색
 export const findUserInfo = async (userId: string) => {
   return await User.findOne({
     where: { userId },
@@ -54,13 +54,14 @@ export const findPost = async (postId: string) => {
   return await Paper.findOne({ where: { postId } });
 };
 
-// 특정 게시글 정보와 관련 유저, 댓글 검색
+// 특정 게시글 정보와 관련 유저, 댓글, 좋아요 검색
 export const findPostInfo = async (postId: string) => {
   return await Paper.findOne({
     where: { postId },
     include: [
       { model: Comment },
       { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
+      { model: User, as: 'Likes' },
     ],
   });
 };
@@ -75,7 +76,7 @@ export const createPost = async (
   return await Paper.create({ title, contents, thumbnail, userId });
 };
 
-// 이미지 & 썸네일 게시글 번호 등록
+// 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
 export const updateImage = async (postId: number, images: string[]) => {
   const originalImages = await Image.findAll({ where: { postId }, raw: true });
   if (originalImages.length) {
@@ -96,7 +97,7 @@ export const updateImage = async (postId: number, images: string[]) => {
   );
 };
 
-// 포인트 지급
+// 글 작성 포인트 지급
 export const updatePoint = async (userId: number) => {
   await User.increment({ point: +1 }, { where: { userId } });
 };
@@ -111,7 +112,7 @@ export const updatePost = async (
   title: string,
   contents: string,
   thumbnail: string,
-  userId: string,
+  userId: number,
   postId: string
 ) => {
   return await Paper.update(
@@ -120,7 +121,7 @@ export const updatePost = async (
   );
 };
 
-// 게시글 & 썸네일 & 이미지 삭제
+// 게시글과 이미지 삭제
 export const destroyPost = async (userId: number, postId: string) => {
   const images = await Image.findAll({ where: { postId } }, { raw: true });
   const paper = await Paper.findOne({ where: { userId, postId } });
@@ -135,7 +136,7 @@ export const destroyPost = async (userId: number, postId: string) => {
 };
 
 // 댓글 작성
-export const createComment = async (text: string, userId: string, postId: string) => {
+export const createComment = async (text: string, userId: number, postId: string) => {
   return await Comment.create({
     text,
     userId,
