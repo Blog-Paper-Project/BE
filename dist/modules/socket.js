@@ -10,7 +10,7 @@ module.exports = (server) => {
   const checkCounts = (room) => io.sockets.adapter.rooms.get(room)?.size || 0;
 
   io.on('connection', (socket) => {
-    console.log('연결됐습니다');
+    console.log('연결됐습니다!');
     let { name, room } = socket;
 
     socket.emit('search', {
