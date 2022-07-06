@@ -28,14 +28,14 @@ module.exports = (server) => {
     });
 
     socket.on('message', (data) => {
-      socket.to(roomID).emit('message', data, nickname);
+      io.to(roomID).emit('message', data, nickname);
       console.log(roomID);
       console.log(data);
     });
 
     socket.on('disconnect', () => {
       console.log('클라이언트 접속 해제', socket.id);
-      socket.leave(roomID);
+      io.leave(roomID);
       socket.to(roomID).emit('leave', `${nickname}님이 퇴장했습니다.`);
     });
   });
