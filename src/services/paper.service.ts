@@ -44,7 +44,7 @@ export const findUserInfo = async (userId: string) => {
   return await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-    include: { model: Paper, attributes: ['postId', 'title', 'contents', 'createdAt'] },
+    include: { model: Paper },
     order: [[Paper, 'createdAt', 'DESC']],
   });
 };
