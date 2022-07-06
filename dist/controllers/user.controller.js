@@ -12,7 +12,7 @@ require('dotenv').config();
 const kakaoCallback = (req, res, next) => {
   passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
-    console.log('콜백~~~');
+
     const { nickname } = user;
     const { userId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
@@ -31,7 +31,7 @@ exports.kakaoCallback = kakaoCallback;
 const naverCallback = (req, res, next) => {
   passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
-    console.log('콜백~~~');
+
     const nickname = user.email;
     const { userId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
@@ -58,7 +58,7 @@ const googleCallback = (req, res, next) => {
       token,
       nickname,
     };
-    console.log('네이버 콜백 함수 결과', result);
+    console.log('구글 콜백 함수 결과', result);
     res.send({ user: result });
   })(req, res, next);
 };
@@ -233,12 +233,11 @@ exports.myprofile_correction = myprofile_correction;
 // 이메일 인증
 const emailauth = async (req, res, next) => {
   try {
-    const { user } = res.locals;
     const { email } = req.body;
     // 인증메일 (번호)
     const emailAuth = Math.floor(Math.random() * 10000);
 
-    await userService.emailauth(user, emailAuth);
+    await userService.emailauth(email, emailAuth);
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -271,15 +270,16 @@ exports.emailauth = emailauth;
 // 이메일 인증 체크
 const check_emaliauth = async (req, res, next) => {
   try {
-    const { user } = res.locals;
     const { emailAuth } = req.body;
-    const text = await userService.check_emaliauth(user);
+    const text = await userService.check_emaliauth(emailAuth);
+    await userService.delet_check_emaliauth(emailAuth);
+    console.log(text.emailAuth);
     if (Number(emailAuth) === text.emailAuth) {
-      res.status(200).send({
+      return res.status(200).send({
         result: true,
       });
-      return;
     }
+
     res.status(400).send({
       result: false,
     });
@@ -293,10 +293,9 @@ exports.check_emaliauth = check_emaliauth;
 // 비밀번호 변경
 const change_password = async (req, res, next) => {
   try {
-    const { user } = res.locals;
-    const { password } = req.body;
+    const { email, password } = req.body;
 
-    await userService.change_password(user, password);
+    await userService.change_password(email, password);
 
     res.status(200).send({
       result: true,
@@ -307,3 +306,83 @@ const change_password = async (req, res, next) => {
   }
 };
 exports.change_password = change_password;
+
+// 이메일 인증 (로그인 시)
+const login_emailauth = async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    console.log(user.email);
+    // 인증메일 (번호)
+    const emailAuth = Math.floor(Math.random() * 10000);
+
+    await userService.login_emailauth(user, emailAuth);
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS,
+      },
+    });
+
+    let info = await transporter.sendMail({
+      from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
+      to: user.email,
+      subject: '[Paper] 인증번호가 도착했습니다.',
+      text: `${emailAuth}`,
+    });
+
+    res.status(200).json({
+      result: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+exports.login_emailauth = login_emailauth;
+
+// 이메일 인증 체크(로그인 시)
+const login_check_emaliauth = async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    const { emailAuth } = req.body;
+    const text = await userService.login_check_emaliauth(user);
+    await userService.login_delet_check_emaliauth(user);
+    if (Number(emailAuth) === text.emailAuth) {
+      res.status(200).send({
+        result: true,
+      });
+      return;
+    }
+
+    res.status(400).send({
+      result: false,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+exports.login_check_emaliauth = login_check_emaliauth;
+
+// 비밀번호 변경(로그인 시)
+const login_change_password = async (req, res, next) => {
+  try {
+    const { user } = res.locals;
+    const { password } = req.body;
+
+    await userService.login_change_password(user, password);
+
+    res.status(200).send({
+      result: true,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+exports.login_change_password = login_change_password;
