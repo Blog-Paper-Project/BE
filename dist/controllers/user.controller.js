@@ -18,14 +18,14 @@ const kakaoCallback = (req, res, next) => {
         { userId: user.userId },
         process.env.ACCESS_TOKEN_KEY,
         {
-          expiresIn: 7200, //60초 * 60분 * 2시 이므로, 3시간 유효한 토큰 발급
+          expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
         }
       );
       const refresh_token = jwt.sign(
         { userId: user.userId },
         process.env.REFRESH_TOKEN_KEY,
         {
-          expiresIn: 36000, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+          expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
         }
       );
 
@@ -241,7 +241,7 @@ const refresh = async (req, res, next) => {
     const user = await userService.refresh_token_check(refresh_token);
     console.log(user.userId);
     const access_token = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
-      expiresIn: 20,
+      expiresIn: 10800,
     });
 
     res.status(200).send({
