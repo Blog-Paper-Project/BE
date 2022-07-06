@@ -92,13 +92,13 @@ exports.readPost = readPost;
 const createPost = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
-        const { title, contents, thumbnail } = req.body;
+        const { title, contents, thumbnail, tags, category } = req.body;
         if (!userId) {
             return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
-        const paper = await PaperService.createPost(title, contents, thumbnail, userId);
+        const paper = await PaperService.createPost(title, contents, thumbnail, userId, category || '');
         if (!paper) {
             return next((0, custom_error_1.default)(400, 'Paper Not Created'));
         }
@@ -106,6 +106,7 @@ const createPost = async (req, res, next) => {
         if (thumbnail) {
             images.push(thumbnail);
         }
+        await PaperService.createTags(paper.postId, tags);
         await PaperService.updateImage(paper.postId, images);
         await PaperService.updatePoint(userId);
         return res.json({ paper });
@@ -137,7 +138,7 @@ exports.createImage = createImage;
 const updatePost = async (req, res, next) => {
     try {
         const userId = res.locals?.user?.userId;
-        const { title, contents, thumbnail } = req.body;
+        const { title, contents, thumbnail, tags, category } = req.body;
         const { postId } = req.params;
         if (!userId) {
             return next((0, custom_error_1.default)(401, 'Unauthorized!'));
@@ -147,7 +148,7 @@ const updatePost = async (req, res, next) => {
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
-        const paper = await PaperService.updatePost(title, contents, thumbnail, userId, postId);
+        const paper = await PaperService.updatePost(title, contents, thumbnail, userId, postId, category || '');
         if (!paper[0]) {
             return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
@@ -155,6 +156,7 @@ const updatePost = async (req, res, next) => {
         if (thumbnail) {
             images.push(thumbnail);
         }
+        await PaperService.updateTags(postId, tags);
         await PaperService.updateImage(+postId, images);
         return res.json({ result: true, title, contents });
     }
