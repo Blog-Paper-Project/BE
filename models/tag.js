@@ -9,7 +9,7 @@ module.exports = class Tag extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
-        tagName: {
+        name: {
           type: Sequelize.STRING(100),
           allowNull: false,
         },
