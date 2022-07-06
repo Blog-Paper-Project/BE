@@ -25,8 +25,8 @@ module.exports = () => {
           } else {
             // 기존의 User정보가 없다면 회원가입을 진행
             const newUser = await User.create({
-              email: profile.emails[0].value,
-              nickname: profile.id,
+              email: profile.id,
+              nickname: profile._json.nickname,
               snsId: profile.id,
               provider: 'naver',
               profileImage: profile._json.profile_image,
