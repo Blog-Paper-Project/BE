@@ -1,6 +1,6 @@
 /* eslint-disable */
 const { Op } = require('sequelize');
-const { Paper, User, Comment, Image } = require('../../models');
+const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
 
 // 키워드로 게시글 검색
@@ -44,7 +44,7 @@ export const findUserInfo = async (userId: string) => {
   return await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-    include: { model: Paper, attributes: ['postId', 'title', 'contents', 'createdAt'] },
+    include: { model: Paper },
     order: [[Paper, 'createdAt', 'DESC']],
   });
 };
@@ -71,9 +71,23 @@ export const createPost = async (
   title: string,
   contents: string,
   thumbnail: string,
-  userId: number
+  userId: number,
+  category: string
 ) => {
-  return await Paper.create({ title, contents, thumbnail, userId });
+  return await Paper.create({ title, contents, thumbnail, category, userId });
+};
+
+// 태그 추가
+export const createTags = async (postId: string, tags: string[]) => {
+  if (!tags || !tags.length) {
+    return;
+  }
+
+  const items = tags.map((tag) => {
+    return { postId, name: tag };
+  });
+
+  await Tag.bulkCreate(items);
 };
 
 // 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
@@ -113,12 +127,20 @@ export const updatePost = async (
   contents: string,
   thumbnail: string,
   userId: number,
-  postId: string
+  postId: string,
+  category: string
 ) => {
   return await Paper.update(
-    { title, contents, thumbnail },
+    { title, contents, thumbnail, category },
     { where: { userId, postId } }
   );
+};
+
+// 태그 수정
+export const updateTags = async (postId: string, tags: string[]) => {
+  await Tag.destroy({ where: { postId } });
+
+  return await createTags(postId, tags);
 };
 
 // 게시글과 이미지 삭제
