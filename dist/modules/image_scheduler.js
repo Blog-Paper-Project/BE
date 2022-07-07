@@ -5,7 +5,7 @@ const dayjs = require('dayjs');
 const { Op } = require('sequelize');
 const logger = require('./winston');
 const db = require('../../models');
-exports.default = cron.schedule('* * */2 * *', async () => {
+exports.default = cron.schedule('* * */3 * * *', async () => {
     try {
         const images = await db.Image.findAll({
             where: {
