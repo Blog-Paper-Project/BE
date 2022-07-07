@@ -32,7 +32,7 @@ const findUser = async (userId) => {
     return await User.findOne({ where: { userId } });
 };
 exports.findUser = findUser;
-// 특정 유저와 구독 검색
+// 특정 유저와 모든 구독 검색
 const findMiniInfo = async (userId) => {
     return await User.findOne({
         where: { userId },
@@ -56,7 +56,7 @@ const findPost = async (postId) => {
     return await Paper.findOne({ where: { postId } });
 };
 exports.findPost = findPost;
-// 특정 게시글 정보와 관련 유저, 댓글, 좋아요 검색
+// 특정 게시글과 유저, 댓글, 좋아요 검색
 const findPostInfo = async (postId) => {
     return await Paper.findOne({
         where: { postId },
@@ -104,6 +104,7 @@ const updatePoint = async (userId) => {
 exports.updatePoint = updatePoint;
 // 이미지 생성
 const createImage = async (url) => {
+    console.log(url);
     await Image.create({ url });
 };
 exports.createImage = createImage;

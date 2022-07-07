@@ -30,7 +30,7 @@ export const findUser = async (userId: string) => {
   return await User.findOne({ where: { userId } });
 };
 
-// 특정 유저와 구독 검색
+// 특정 유저와 모든 구독 검색
 export const findMiniInfo = async (userId: number) => {
   return await User.findOne({
     where: { userId },
@@ -54,7 +54,7 @@ export const findPost = async (postId: string) => {
   return await Paper.findOne({ where: { postId } });
 };
 
-// 특정 게시글 정보와 관련 유저, 댓글, 좋아요 검색
+// 특정 게시글과 유저, 댓글, 좋아요 검색
 export const findPostInfo = async (postId: string) => {
   return await Paper.findOne({
     where: { postId },
