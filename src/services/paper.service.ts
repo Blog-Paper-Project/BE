@@ -44,7 +44,12 @@ export const findUserInfo = async (userId: string) => {
   return await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-    include: { model: Paper },
+    include: {
+      model: Paper,
+
+      include: { model: Tag, attributes: ['name'] },
+    },
+
     order: [[Paper, 'createdAt', 'DESC']],
   });
 };
@@ -60,6 +65,7 @@ export const findPostInfo = async (postId: string) => {
     where: { postId },
     include: [
       { model: Comment },
+      { model: Tag, attributes: ['name'] },
       { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
       { model: User, as: 'Likes' },
     ],
