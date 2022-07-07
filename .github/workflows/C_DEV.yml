@@ -18,5 +18,5 @@ jobs:
             cd /home/ubuntu/BE
             git config --global --add safe.directory /home/ubuntu/BE
             git pull
-            npm install
+            npm install --only=prod
             pm2 restart server.js
