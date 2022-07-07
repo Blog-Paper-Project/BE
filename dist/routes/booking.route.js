@@ -19,6 +19,6 @@ router.patch('/:hostId', auth, bookingController.accpetBooking);
 //router.patch('/reject/:userId', auth, bookingController.rejectBooking);
 
 //얘약 취소
-router.delete('/:userId', auth, bookingController.cancelBooking);
+router.patch('/:userId', auth, bookingController.cancelBooking);
 
 module.exports = router;
