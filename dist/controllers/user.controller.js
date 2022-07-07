@@ -14,14 +14,14 @@ const kakaoCallback = (req, res, next) => {
     if (err) return next(err);
 
     try {
-      const access_token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: user.userId },
         process.env.ACCESS_TOKEN_KEY,
         {
           expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
         }
       );
-      const refresh_token = jwt.sign(
+      const refreshToken = jwt.sign(
         { userId: user.userId },
         process.env.REFRESH_TOKEN_KEY,
         {
@@ -31,8 +31,8 @@ const kakaoCallback = (req, res, next) => {
 
       res.status(200).send({
         result: true,
-        access_token,
-        refresh_token,
+        accessToken,
+        refreshToken,
         nickname: user.nickname,
       });
     } catch (error) {
@@ -49,14 +49,14 @@ const naverCallback = (req, res, next) => {
     if (err) return next(err);
 
     try {
-      const access_token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: user.userId },
         process.env.ACCESS_TOKEN_KEY,
         {
           expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
         }
       );
-      const refresh_token = jwt.sign(
+      const refreshToken = jwt.sign(
         { userId: user.userId },
         process.env.REFRESH_TOKEN_KEY,
         {
@@ -66,8 +66,8 @@ const naverCallback = (req, res, next) => {
 
       res.status(200).send({
         result: true,
-        access_token,
-        refresh_token,
+        accessToken,
+        refreshToken,
         nickname: user.email,
       });
     } catch (error) {
@@ -83,14 +83,14 @@ const googleCallback = (req, res, next) => {
   passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
     try {
-      const access_token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: user.userId },
         process.env.ACCESS_TOKEN_KEY,
         {
           expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
         }
       );
-      const refresh_token = jwt.sign(
+      const refreshToken = jwt.sign(
         { userId: user.userId },
         process.env.REFRESH_TOKEN_KEY,
         {
@@ -100,8 +100,8 @@ const googleCallback = (req, res, next) => {
 
       res.status(200).send({
         result: true,
-        access_token,
-        refresh_token,
+        accessToken,
+        refreshToken,
         nickname: user.nickname,
       });
     } catch (error) {
@@ -203,10 +203,10 @@ const login = async (req, res, next) => {
         result: false,
       });
     }
-    const access_token = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
       expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
     });
-    const refresh_token = jwt.sign(
+    const refreshToken = jwt.sign(
       { userId: user.userId },
       process.env.REFRESH_TOKEN_KEY,
       {
@@ -214,13 +214,13 @@ const login = async (req, res, next) => {
       }
     );
 
-    await userService.refresh_token(email, refresh_token);
+    await userService.refresh_token(email, refreshToken);
 
     res.status(200).send({
       result: true,
       nickname: user.nickname,
-      access_token,
-      refresh_token,
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     console.log(error);
@@ -232,20 +232,20 @@ exports.login = login;
 // refresh 토큰을 기반으로 access 토큰
 const refresh = async (req, res, next) => {
   try {
-    const { refresh_token } = req.body;
+    const { refreshToken } = req.body;
 
-    if (!refresh_token) {
+    if (!refreshToken) {
       return res.sendStatus(401);
     }
 
-    const user = await userService.refresh_token_check(refresh_token);
+    const user = await userService.refresh_token_check(refreshToken);
     console.log(user.userId);
-    const access_token = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
       expiresIn: 10800,
     });
 
     res.status(200).send({
-      access_token,
+      accessToken,
     });
   } catch (error) {
     console.log(error);

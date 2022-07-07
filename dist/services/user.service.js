@@ -43,16 +43,16 @@ const login = async (email) => {
 exports.login = login;
 
 // refresh_token 저장
-const refresh_token = async (email, refresh_token) => {
-  await User.update({ refresh_token }, { where: { email } });
+const refresh_token = async (email, refreshToken) => {
+  await User.update({ refreshToken }, { where: { email } });
 };
 exports.refresh_token = refresh_token;
 
 // refresh_token 으로 아이디 찾기
-const refresh_token_check = async (refresh_token) => {
+const refresh_token_check = async (refreshToken) => {
   return User.findOne({
     attributes: ['userId'],
-    where: { refresh_token },
+    where: { refreshToken },
   });
 };
 exports.refresh_token_check = refresh_token_check;

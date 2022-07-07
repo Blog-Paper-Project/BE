@@ -5,21 +5,27 @@ const { Op } = sequelize;
 const User = require('../../models/user');
 
 const task = cron.schedule(
-  '* * * 1/3 *',
+  '* * * * * *',
   async () => {
-    const user = await User.findAll({
-      where: {
-        deletedAt: {
-          [Op.ne]: null,
+    try {
+      console.log('123');
+      const user = await User.findAll({
+        where: {
+          deletedAt: {
+            [Op.ne]: null,
+          },
         },
-      },
-    });
-    // console.log(user[i].id);
-    for (let i = 0; i < user.length; i++) {
-      if (user.length != i) {
-        console.log(user[i].userId);
-        await User.destroy({ where: { userId: user[i].userId } });
+      });
+      // console.log(user[0].deletedAt);
+      for (let i = 0; i < user.length; i++) {
+        console.log(setTimeout(new Date(), user[i].deletedAt), 5000);
+        // if (user[i].deletedAt + 5000) {
+
+        //   await User.destroy({ where: { userId: user[i].userId } });
+        // }
       }
+    } catch (error) {
+      console.log(error);
     }
   },
   {

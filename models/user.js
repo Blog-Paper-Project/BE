@@ -54,7 +54,7 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        refresh_token: {
+        refreshToken: {
           type: Sequelize.TEXT,
           allowNull: true,
         },
