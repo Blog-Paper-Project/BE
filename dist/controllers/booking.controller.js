@@ -5,8 +5,8 @@ const { Leaf } = require('../../models/leaf');
 const createBooking = async (req, res) => {
   const userId = req.params.userId;
   const { date, time, leaf } = req.body;
-  const guestId = res.locals.user.userId;
-  const hostId = req.params.userId;
+  const guestId = res.locals.user.userId; // 내가 로그인한거
+  const hostId = req.params.userId; // 화상채팅 신청
   console.log(userId, date, time, leaf, guestId, hostId);
 
   if (!date || !time === '') {
@@ -61,19 +61,21 @@ exports.hostBooking = hostBooking;
 // 예약 수락
 const accpetBooking = async (req, res) => {
   const hostId = res.locals.user.userId;
-  const hostResult = await bookingService.hostInquireBooking(hostId);
-  console.log(hostResult);
-  // const guestId = guestIdList[].guestId;
-  const guestId = hostResult.map((hostResult) => hostResult.guestId);
-  const bookingId = hostResult.map((hostResult) => hostResult.bookingId);
-  console.log(hostId, guestId, bookingId);
-  // try {
-  //   const accpetBooking = await bookingService.confirmBooking(guestId, bookingId, hostId);
 
-  //   return res.status(200).json({ accpetBooking, result: true });
-  // } catch (error) {
-  //   console.log(error);
-  // }
+  const hostResult = await bookingService.hostInquireBooking(hostId);
+  // const guestId = guestIdList[].guestId;
+  // const guestId = hostResult.map((hostResult) => hostResult.guestId);
+  const bookingIdArray = hostResult.map((hostResult) => hostResult.bookingId);
+  console.log(bookingIdArray);
+  try {
+    for (let i = 0; i < bookingIdArray.length; i++) {
+      return console.log(i);
+    }
+    const accpetBooking = await bookingService.confirmBooking(hostId, bookingId);
+    return res.status(200).json({ accpetBooking, result: true });
+  } catch (error) {
+    console.log(error);
+  }
 };
 exports.accpetBooking = accpetBooking;
 
