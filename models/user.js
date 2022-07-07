@@ -54,6 +54,10 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
+        refreshToken: {
+          type: Sequelize.TEXT,
+          allowNull: true,
+        },
         deletedAt: {
           type: Sequelize.DATE,
           allowNull: true,
