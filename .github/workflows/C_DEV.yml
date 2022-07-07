@@ -18,5 +18,7 @@ jobs:
             cd /home/ubuntu/BE
             git config --global --add safe.directory /home/ubuntu/BE
             git pull
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+            nvm install 14.16.0
             npm install --only=prod
             pm2 restart server.js
