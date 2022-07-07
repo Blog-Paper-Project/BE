@@ -48,6 +48,7 @@ exports.inquireBooking = inquireBooking;
 const hostBooking = async (req, res) => {
   const hostId = res.locals.user.userId;
   console.log(hostId);
+
   try {
     const hostResult = await bookingService.hostInquireBooking(hostId);
     return res.status(200).json({ hostResult, result: true });
@@ -56,25 +57,46 @@ const hostBooking = async (req, res) => {
   }
 };
 exports.hostBooking = hostBooking;
-// 예약 수정
-const amendBooking = async (req, res) => {
-  const userId = res.locals.user.userId;
-  const guestId = res.locals.user.userId;
-  const hostId = req.params.userId;
-  const date = req.body.date;
-  const time = req.body.time;
-  const bookingList = await bookingService.checkBooking(guestId, hostId);
-  const bookingId = bookingList[0].bookingId;
-  console.log(bookingList);
 
-  try {
-    const booking_result = await bookingService.changeBooking(date, time, bookingId);
-    res.status(200).json({ booking_result, result: true });
-  } catch (error) {
-    console.log(error);
-  }
+// 예약 수락
+const accpetBooking = async (req, res) => {
+  const hostId = res.locals.user.userId;
+  const hostResult = await bookingService.hostInquireBooking(hostId);
+  console.log(hostResult);
+  // const guestId = guestIdList[].guestId;
+  const guestId = hostResult.map((hostResult) => hostResult.guestId);
+  const bookingId = hostResult.map((hostResult) => hostResult.bookingId);
+  console.log(hostId, guestId, bookingId);
+  // try {
+  //   const accpetBooking = await bookingService.confirmBooking(guestId, bookingId, hostId);
+
+  //   return res.status(200).json({ accpetBooking, result: true });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 };
-exports.amendBooking = amendBooking;
+exports.accpetBooking = accpetBooking;
+
+// const amendBooking = async (req, res) => {
+//   const userId = res.locals.user.userId;
+//   const guestId = res.locals.user.userId;
+//   const hostId = req.params.userId;
+//   const date = req.body.date;
+//   const time = req.body.time;
+//   const bookingList = await bookingService.checkBooking(guestId, hostId);
+//   const bookingId = bookingList[0].bookingId;
+//   console.log(bookingList);
+
+//   try {
+//     const booking_result = await bookingService.changeBooking(date, time, bookingId);
+//     res.status(200).json({ booking_result, result: true });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+// exports.amendBooking = amendBooking;
+
+//예약거절
 
 // 예약 취소
 const cancelBooking = async (req, res) => {
