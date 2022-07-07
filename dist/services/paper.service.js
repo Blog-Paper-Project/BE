@@ -46,7 +46,10 @@ const findUserInfo = async (userId) => {
     return await User.findOne({
         where: { userId },
         attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-        include: { model: Paper },
+        include: {
+            model: Paper,
+            include: { model: Tag, attributes: ['name'] },
+        },
         order: [[Paper, 'createdAt', 'DESC']],
     });
 };
@@ -62,6 +65,7 @@ const findPostInfo = async (postId) => {
         where: { postId },
         include: [
             { model: Comment },
+            { model: Tag, attributes: ['name'] },
             { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
             { model: User, as: 'Likes' },
         ],
@@ -104,7 +108,6 @@ const updatePoint = async (userId) => {
 exports.updatePoint = updatePoint;
 // 이미지 생성
 const createImage = async (url) => {
-    console.log(url);
     await Image.create({ url });
 };
 exports.createImage = createImage;
