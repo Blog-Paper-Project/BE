@@ -38,7 +38,7 @@ module.exports = (server) => {
     });
 
     socket.on('message', (data) => {
-      io.to(room).emit('update', {
+      socket.to(room).emit('update', {
         type: 'message',
         name,
         message: data.message,
