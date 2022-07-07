@@ -54,7 +54,12 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(404, 'Not Found!'));
     }
 
-    return res.json({ user });
+    let tags = user.Papers.map((paper: { Tags: { name: string } }) => paper.Tags)
+      .flat()
+      .map((tag: { name: string }) => tag.name);
+    tags = [...new Set(tags)];
+
+    return res.json({ user, tags });
   } catch (err) {
     return next(err);
   }

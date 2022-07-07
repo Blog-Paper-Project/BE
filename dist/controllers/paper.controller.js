@@ -42,7 +42,11 @@ const readBlog = async (req, res, next) => {
         if (!user) {
             return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
-        return res.json({ user });
+        let tags = user.Papers.map((paper) => paper.Tags)
+            .flat()
+            .map((tag) => tag.name);
+        tags = [...new Set(tags)];
+        return res.json({ user, tags });
     }
     catch (err) {
         return next(err);
