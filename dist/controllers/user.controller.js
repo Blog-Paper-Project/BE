@@ -162,6 +162,7 @@ const login = async (req, res, next) => {
       result: true,
       nickname: user.nickname,
       token,
+      userId : user.userId,
     });
   } catch (error) {
     console.log(error);
