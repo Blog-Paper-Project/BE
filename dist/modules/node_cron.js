@@ -18,8 +18,13 @@ const task = cron.schedule(
       });
 
       for (let i = 0; i < user.length; i++) {
-        const date = dayjs(user[i].deletedAt);
-        if (date.add(3, 'M').format('YYYY-MM-DD HH:mm:ss')) {
+        const stopdate = dayjs(user[i].deletedAt);
+        const startdate = dayjs(new Date());
+
+        if (
+          startdate.format('YYYY-MM-DD HH:mm:ss') ===
+          stopdate.add(3, 'M').format('YYYY-MM-DD HH:mm:ss')
+        ) {
           await User.destroy({ where: { userId: user[i].userId } });
         }
         return true;
