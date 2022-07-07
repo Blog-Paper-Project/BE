@@ -14,11 +14,11 @@ module.exports = class User extends Sequelize.Model {
         },
         email: {
           type: Sequelize.STRING(40),
-          allowNull: false,
+          allowNull: true,
         },
         nickname: {
           type: Sequelize.STRING(30),
-          allowNull: false,
+          allowNull: true,
           defaultValue: 'utf8mb4_general_ci',
         },
         profileImage: {
