@@ -5,6 +5,17 @@ const { User, Booking, Leaf } = require('../../models');
 const createBooking = async (userId, date, time, guestId, leaf, hostId) => {
   console.log(userId, date, time, guestId);
 
+  await User.decrement({ point: `${leaf}` }, { where: { userId: guestId } });
+
+  await User.increment({ popularity: `${leaf}` }, { where: { userId: hostId } });
+
+  await Leaf.create({
+    leaf,
+    remarks: '화상채팅 예약',
+    giverId: guestId,
+    recipientId: userId,
+  });
+
   await Booking.create({
     hostId: userId,
     date,
@@ -34,48 +45,18 @@ const hostInquireBooking = async (hostId) => {
 };
 exports.hostInquireBooking = hostInquireBooking;
 
-//예약 수정
-// const changeBooking = async (date, time, bookingId) => {
-//   console.log(date, time, bookingId);
-//   await Booking.update(
-//     {
-//       date,
-//       time,
-//     },
-//     { where: { bookingId: Number(bookingId) } }
-//   );
-//   return await Booking.findByPk(bookingId);
-// };
-// exports.changeBooking = changeBooking;
-
 //예약 수락
-const findGuest = async (hostId, guestId, bookingId) => {
-  return await Booking.findByPk({ where: { guestId: guestId } });
-};
-exports.findGuest = findGuest;
-
-const confirmBooking = async (guestId, hostId, bookingId) => {
+const confirmBooking = async (hostId, bookingId) => {
   await Booking.update(
     {
       accepted: true,
     },
-    { where: { hostId: hostId } }
+    { where: { bookingId: bookingId, hostId: hostId } }
   );
 
-  return await Booking.findByPk(hostId);
+  return await Booking.findByPk(bookingId);
 };
 exports.confirmBooking = confirmBooking;
-
-// await User.decrement({ point: `${leaf}` }, { where: { userId: guestId } });
-
-// await User.increment({ popularity: `${leaf}` }, { where: { userId: hostId } });
-
-// await Leaf.create({
-//   leaf,
-//   remarks: '화상채팅 예약',
-//   giverId: guestId,
-//   recipientId: hostId,
-// });
 
 //얘약 취소 : 나뭇잎 찾기
 const findLeaf = async (giverId) => {
