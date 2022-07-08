@@ -2,8 +2,8 @@ const { idText } = require('typescript');
 const { User, Booking, Leaf } = require('../../models');
 
 //예약 신청
-const createBooking = async (userId, date, time, guestId, leaf, hostId) => {
-  console.log(userId, date, time, guestId);
+const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meetingDate) => {
+  console.log(14, userId, guestId, leaf, hostId, bookingTime, meetingDate);
 
   await User.decrement({ point: `${leaf}` }, { where: { userId: guestId } });
 
@@ -13,13 +13,13 @@ const createBooking = async (userId, date, time, guestId, leaf, hostId) => {
     leaf,
     remarks: '화상채팅 예약',
     giverId: guestId,
-    recipientId: userId,
+    recipientId: hostId,
   });
 
   await Booking.create({
-    hostId: userId,
-    date,
-    time,
+    hostId,
+    date: meetingDate,
+    time: bookingTime,
     guestId,
   });
 
@@ -28,35 +28,22 @@ const createBooking = async (userId, date, time, guestId, leaf, hostId) => {
 exports.createBooking = createBooking;
 
 //게스트(신청자)예약 보기
-const inquireBooking = async (guestId) => {
+const inquireBooking = async (userId) => {
   return await Booking.findAll({
-    where: { guestId: Number(guestId) },
+    where: { guestId: Number(userId) },
     order: [['createdAt', 'DESC']],
   });
 };
 exports.inquireBooking = inquireBooking;
 
 //호스트(주최자)예약보기
-const hostInquireBooking = async (hostId) => {
+const hostInquireBooking = async (userId) => {
   return await Booking.findAll({
-    where: { hostId: Number(hostId) },
+    where: { hostId: Number(userId) },
     order: [['createdAt', 'DESC']],
   });
 };
 exports.hostInquireBooking = hostInquireBooking;
-
-//예약 수락
-const confirmBooking = async (hostId, bookingId) => {
-  await Booking.update(
-    {
-      accepted: true,
-    },
-    { where: { bookingId: bookingId, hostId: hostId } }
-  );
-
-  return await Booking.findByPk(bookingId);
-};
-exports.confirmBooking = confirmBooking;
 
 //얘약 취소 : 나뭇잎 찾기
 const findLeaf = async (giverId) => {
