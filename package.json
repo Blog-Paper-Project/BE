@@ -63,6 +63,7 @@
     "sequelize-cli": "^6.4.1",
     "sharp": "^0.30.7",
     "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.1",
     "swagger-autogen": "^2.21.4",
     "swagger-ui-express": "^4.4.0",
     "winston": "^3.8.0",
