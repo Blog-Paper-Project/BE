@@ -1,6 +1,6 @@
 /* eslint-disable */
 const { Op } = require('sequelize');
-const { Paper, User, Comment, Image } = require('../../models');
+const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
 
 // 키워드로 게시글 검색
@@ -11,12 +11,12 @@ export const findPostsBy = async (keyword: string) => {
   });
 };
 
-// 좋아요 정보를 포함한 모든 게시글 검색
+// 모든 게시글과 좋아요 검색
 export const findAllPosts = async () => {
   return await Paper.findAll({ include: { model: User, as: 'Likes' } });
 };
 
-// 인기도 순으로 유저 정렬 및 검색
+// 인기도 순으로 유저 10명 검색
 export const findBestUsers = async () => {
   return await User.findAll({
     order: [['popularity', 'DESC']],
@@ -30,7 +30,7 @@ export const findUser = async (userId: string) => {
   return await User.findOne({ where: { userId } });
 };
 
-// 특정 유저 정보와 관련 구독 내역 검색
+// 특정 유저와 모든 구독 검색
 export const findMiniInfo = async (userId: number) => {
   return await User.findOne({
     where: { userId },
@@ -39,12 +39,17 @@ export const findMiniInfo = async (userId: number) => {
   });
 };
 
-// 특정 유저 정보와 관련 게시글 검색
+// 특정 유저와 게시글 검색
 export const findUserInfo = async (userId: string) => {
   return await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-    include: { model: Paper, attributes: ['postId', 'title', 'contents', 'createdAt'] },
+    include: {
+      model: Paper,
+
+      include: { model: Tag, attributes: ['name'] },
+    },
+
     order: [[Paper, 'createdAt', 'DESC']],
   });
 };
@@ -54,13 +59,15 @@ export const findPost = async (postId: string) => {
   return await Paper.findOne({ where: { postId } });
 };
 
-// 특정 게시글 정보와 관련 유저, 댓글 검색
+// 특정 게시글과 유저, 댓글, 좋아요 검색
 export const findPostInfo = async (postId: string) => {
   return await Paper.findOne({
     where: { postId },
     include: [
       { model: Comment },
+      { model: Tag, attributes: ['name'] },
       { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
+      { model: User, as: 'Likes' },
     ],
   });
 };
@@ -70,40 +77,54 @@ export const createPost = async (
   title: string,
   contents: string,
   thumbnail: string,
-  userId: number
+  userId: number,
+  category: string
 ) => {
-  return await Paper.create({ title, contents, thumbnail, userId });
+  return await Paper.create({ title, contents, thumbnail, category, userId });
 };
 
-// 이미지 & 썸네일 게시글 번호 등록
+// 태그 추가
+export const createTags = async (postId: string, tags: string[]) => {
+  if (!tags || !tags.length) {
+    return;
+  }
+
+  const items = tags.map((tag) => {
+    return { postId, name: tag };
+  });
+
+  await Tag.bulkCreate(items);
+};
+
+// 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
 export const updateImage = async (postId: number, images: string[]) => {
   const originalImages = await Image.findAll({ where: { postId }, raw: true });
   if (originalImages.length) {
     const replaced = originalImages.filter(
-      (img: { imageUrl: string }) => !images.includes(img.imageUrl)
+      (img: { url: string }) => !images.includes(img.url)
     );
 
     for (let item of replaced) {
-      await deleteImg(item.imageUrl);
+      await deleteImg(item.url);
       await Image.destroy({ where: { imageId: item.imageId } });
     }
   }
 
   return await Image.update(
     { postId: postId },
-    { where: { imageUrl: { [Op.in]: images } } },
+    { where: { url: { [Op.in]: images } } },
     { updateOnDuplicate: true }
   );
 };
 
-// 포인트 지급
+// 글 작성 포인트 지급
 export const updatePoint = async (userId: number) => {
   await User.increment({ point: +1 }, { where: { userId } });
 };
 
 // 이미지 생성
-export const createImage = async (imageUrl: string) => {
-  await Image.create({ imageUrl });
+export const createImage = async (url: string) => {
+  await Image.create({ url });
 };
 
 // 게시글 수정
@@ -111,22 +132,30 @@ export const updatePost = async (
   title: string,
   contents: string,
   thumbnail: string,
-  userId: string,
-  postId: string
+  userId: number,
+  postId: string,
+  category: string
 ) => {
   return await Paper.update(
-    { title, contents, thumbnail },
+    { title, contents, thumbnail, category },
     { where: { userId, postId } }
   );
 };
 
-// 게시글 & 썸네일 & 이미지 삭제
+// 태그 수정
+export const updateTags = async (postId: string, tags: string[]) => {
+  await Tag.destroy({ where: { postId } });
+
+  return await createTags(postId, tags);
+};
+
+// 게시글과 이미지 삭제
 export const destroyPost = async (userId: number, postId: string) => {
   const images = await Image.findAll({ where: { postId } }, { raw: true });
   const paper = await Paper.findOne({ where: { userId, postId } });
 
   for (let image of images) {
-    await deleteImg(image.imageUrl);
+    await deleteImg(image.url);
   }
 
   await deleteImg(paper.thumbnail);
@@ -135,7 +164,7 @@ export const destroyPost = async (userId: number, postId: string) => {
 };
 
 // 댓글 작성
-export const createComment = async (text: string, userId: string, postId: string) => {
+export const createComment = async (text: string, userId: number, postId: string) => {
   return await Comment.create({
     text,
     userId,

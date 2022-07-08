@@ -1,14 +1,11 @@
 name: C_DEV
 on:
-  push:
-    branches:
-      - dev
   pull_request:
     branches:
       - dev
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Deploy
         uses: appleboy/ssh-action@master
@@ -21,6 +18,7 @@ jobs:
             cd /home/ubuntu/BE
             git config --global --add safe.directory /home/ubuntu/BE
             git pull
-            npm update
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+            nvm install 14.16.0
             npm install
             pm2 restart server.js

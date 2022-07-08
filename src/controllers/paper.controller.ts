@@ -54,7 +54,12 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(404, 'Not Found!'));
     }
 
-    return res.json({ user });
+    let tags = user.Papers.map((paper: { Tags: { name: string } }) => paper.Tags)
+      .flat()
+      .map((tag: { name: string }) => tag.name);
+    tags = [...new Set(tags)];
+
+    return res.json({ user, tags });
   } catch (err) {
     return next(err);
   }
@@ -114,7 +119,7 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
-    const { title, contents, thumbnail } = req.body;
+    const { title, contents, thumbnail, tags, category } = req.body;
 
     if (!userId) {
       return next(createError(401, 'Unauthorized!'));
@@ -124,7 +129,13 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 
     await schema.validateAsync({ title, contents });
 
-    const paper = await PaperService.createPost(title, contents, thumbnail, userId);
+    const paper = await PaperService.createPost(
+      title,
+      contents,
+      thumbnail,
+      userId,
+      category || ''
+    );
 
     if (!paper) {
       return next(createError(400, 'Paper Not Created'));
@@ -136,6 +147,7 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
       images.push(thumbnail);
     }
 
+    await PaperService.createTags(paper.postId, tags);
     await PaperService.updateImage(paper.postId, images);
     await PaperService.updatePoint(userId);
 
@@ -170,7 +182,7 @@ export const createImage = async (req: Request, res: Response, next: NextFunctio
 export const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = res.locals?.user?.userId;
-    const { title, contents, thumbnail } = req.body;
+    const { title, contents, thumbnail, tags, category } = req.body;
     const { postId } = req.params;
 
     if (!userId) {
@@ -190,7 +202,8 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
       contents,
       thumbnail,
       userId,
-      postId
+      postId,
+      category || ''
     );
 
     if (!paper[0]) {
@@ -202,7 +215,8 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
     if (thumbnail) {
       images.push(thumbnail);
     }
-    // 이부분 수정 필요!!!
+
+    await PaperService.updateTags(postId, tags);
     await PaperService.updateImage(+postId, images);
 
     return res.json({ result: true, title, contents });

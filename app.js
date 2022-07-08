@@ -6,7 +6,7 @@ const expressSession = require('express-session');
 const passportConfig = require('./dist/modules/social');
 require('./dist/modules/node_cron');
 require('dotenv').config();
-require('./dist/modules/toad_scheduler');
+require('./dist/modules/image_scheduler');
 
 const app = express();
 
