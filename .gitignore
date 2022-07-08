@@ -2,8 +2,7 @@ node_modules
 .env
 logs
 test.http
-.dockerignore
-docker-compose.yml
 Dockerfile
-tsconfig.json
+docker-compose.yml
 db
+.dockerignore
