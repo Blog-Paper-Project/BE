@@ -4,13 +4,7 @@ on:
     branches:
       - dev
 jobs:
-  run-test-code:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: npm ci
   build-image:
-    needs: run-test-code
     runs-on: ubuntu-latest
     steps:
     
