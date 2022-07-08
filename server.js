@@ -17,3 +17,4 @@ db.sequelize
 http.listen(port, () => {
   console.log('🟢 서버 연결');
 });
+// test
