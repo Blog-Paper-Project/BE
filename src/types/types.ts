@@ -3,7 +3,8 @@ namespace Types {
     postId: number;
     title: string;
     contents: string;
-    category: string[];
+    thumbnail: string;
+    category: string;
     createdAt: Date;
     updatedAt: Date;
     userId: number;
@@ -24,5 +25,11 @@ namespace Types {
   export interface CustomError extends Error {
     status: number;
     success: boolean;
+  }
+
+  export interface MulterFile {
+    file?: {
+      transforms?: { key?: string }[];
+    };
   }
 }

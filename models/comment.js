@@ -10,7 +10,7 @@ module.exports = class Comment extends Sequelize.Model {
           allowNull: false,
           autoIncrement: true,
         },
-        comment: {
+        text: {
           type: Sequelize.TEXT,
           allowNull: false,
         },
@@ -36,6 +36,7 @@ module.exports = class Comment extends Sequelize.Model {
     db.Comment.belongsTo(db.User, {
       as: 'Users',
       foreignKey: 'userId',
+      onDelete: 'cascade',
     });
   }
 };
