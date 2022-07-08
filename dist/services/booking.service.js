@@ -45,19 +45,6 @@ const hostInquireBooking = async (userId) => {
 };
 exports.hostInquireBooking = hostInquireBooking;
 
-//예약 수락
-const confirmBooking = async (hostId, bookingId) => {
-  await Booking.update(
-    {
-      accepted: true,
-    },
-    { where: { bookingId: bookingId, hostId: hostId } }
-  );
-
-  return await Booking.findByPk(bookingId);
-};
-exports.confirmBooking = confirmBooking;
-
 //얘약 취소 : 나뭇잎 찾기
 const findLeaf = async (giverId) => {
   return await Leaf.findAll({
