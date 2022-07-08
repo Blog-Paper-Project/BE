@@ -24,6 +24,7 @@ jobs:
           tags: ${{ secrets.DOCKER_NAME }}/paper:latest
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
   cd-pipeline:
     needs: build-image
     name: continuos deploy
