@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/:userId', auth, bookingController.createBooking);
 
 //게스트(예약자) 가져오기
-router.get('/guest/:userId', auth, bookingController.inquireBooking);
+router.get('/:userId', auth, bookingController.inquireBooking);
 
 // //호스트(주최자) 기져오기
 // router.get('/:hostId', auth, bookingController.hostBooking);

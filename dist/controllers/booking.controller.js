@@ -23,7 +23,6 @@ const createBooking = async (req, res) => {
     res.status(400).send({ msg: '화상 채팅 1시간 전까지만 예약가능합니다.' });
     return;
   }
-
   if (hostId == guestId) {
     return res.status(400).send({ result: false });
   }
@@ -63,20 +62,6 @@ const inquireBooking = async (req, res) => {
 };
 exports.inquireBooking = inquireBooking;
 
-//호스트(주최자) 예약조회
-// const hostBooking = async (req, res) => {
-//   const hostId = res.locals.user.userId;
-//   console.log(hostId);
-
-//   try {
-//     const hostResult = await bookingService.hostInquireBooking(hostId);
-//     return res.status(200).json({ hostResult, result: true });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-// exports.hostBooking = hostBooking;
-
 // 예약 수락
 const accpetBooking = async (req, res) => {
   const hostId = res.locals.user.userId;
@@ -97,27 +82,6 @@ const accpetBooking = async (req, res) => {
   }
 };
 exports.accpetBooking = accpetBooking;
-
-// const amendBooking = async (req, res) => {
-//   const userId = res.locals.user.userId;
-//   const guestId = res.locals.user.userId;
-//   const hostId = req.params.userId;
-//   const date = req.body.date;
-//   const time = req.body.time;
-//   const bookingList = await bookingService.checkBooking(guestId, hostId);
-//   const bookingId = bookingList[0].bookingId;
-//   console.log(bookingList);
-
-//   try {
-//     const booking_result = await bookingService.changeBooking(date, time, bookingId);
-//     res.status(200).json({ booking_result, result: true });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-// exports.amendBooking = amendBooking;
-
-//예약거절
 
 // 예약 취소
 const cancelBooking = async (req, res) => {
