@@ -38,7 +38,7 @@ app.use('/api/booking', BookingRouter);
 app.use('/api/review', ReviewRouter);
 
 app.get('/', (req, res) => {
-  res.send('Paper-Project Docker 되냐?');
+  res.send('Paper-Project 자동화 성공인가?');
 });
 
 app.use((req, res) => {
