@@ -16,7 +16,6 @@ const task = cron.schedule(
           },
         },
       });
-
       for (let i = 0; i < user.length; i++) {
         const stopdate = dayjs(user[i].deletedAt);
         const startdate = dayjs(new Date());
