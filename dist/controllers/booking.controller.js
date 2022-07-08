@@ -1,33 +1,42 @@
 const bookingService = require('../services/booking.service');
 const { Leaf } = require('../../models/leaf');
+const moment = require('moment');
+moment.tz.setDefault('Asia/Seoul');
 
 //예약 신청
 const createBooking = async (req, res) => {
-  const userId = req.params.userId;
-  const { date, time, leaf } = req.body;
-  const guestId = res.locals.user.userId; // 내가 로그인한거
-  const hostId = req.params.userId; // 화상채팅 신청
-  console.log(userId, date, time, leaf, guestId, hostId);
+  const userId = res.locals.user.userId;
+  const { leaf, guestId, start, end } = req.body;
+  const hostId = req.params.userId;
+  const bookingMoment = new moment();
+  console.log(11, bookingMoment);
+  const startMoment = moment(start);
+  console.log(12, startMoment);
+  const time = moment.duration(startMoment.diff(bookingMoment)).asMinutes();
+  console.log(time);
+  console.log(13, start, end, guestId, leaf, hostId, userId, leaf);
+  if (time < 60) {
+    res.status(400).send({ msg: '화상 채팅 1시간 전까지만 예약가능합니다.' });
+    return;
+  }
 
-  if (!date || !time === '') {
-    return res.status(400).send({ result: false });
-  } else if (userId == guestId) {
+  if (hostId == guestId) {
     return res.status(400).send({ result: false });
   }
 
-  try {
-    const booking_result = await bookingService.createBooking(
-      userId,
-      date,
-      time,
-      guestId,
-      leaf,
-      hostId
-    );
-    return res.status(200).json({ result: true });
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   const booking_result = await bookingService.createBooking(
+  //     userId,
+  //     guestId,
+  //     leaf,
+  //     hostId,
+  //     start,
+  //     end
+  //   );
+  //   return res.status(200).json({ result: true });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 };
 exports.createBooking = createBooking;
 
