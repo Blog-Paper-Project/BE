@@ -62,4 +62,6 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd /home/ubuntu/BE/
-            docker-compose pull && docker-compose up -d
+            ${{ secrets.HOST}} docker-compose -p ${{ secrets.DOCKER_NAME }}/paper:test -f docker-compose.yml up -d
+            
+
