@@ -22,7 +22,9 @@ module.exports = (server) => {
     socket.on('newUser', (data) => {
       name = data.name;
       room = data.room;
-
+      if (checkCounts(room) >= 2) {
+        return io.emit('roomfull');
+      }
       socket.join(room);
 
       console.log([
@@ -45,7 +47,7 @@ module.exports = (server) => {
         time: data.time,
         count: checkCounts(room),
       });
-      console.log(`${nick} : ${data.message} (총 ${checkCounts(room)}명)`);
+      console.log(`${data.nick} : ${data.message} (총 ${checkCounts(room)}명)`);
     });
 
     socket.on('disconnect', () => {
