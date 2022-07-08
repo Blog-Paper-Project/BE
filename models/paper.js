@@ -18,6 +18,10 @@ module.exports = class Paper extends Sequelize.Model {
           type: Sequelize.TEXT,
           allowNull: false,
         },
+        thumbnail: {
+          type: Sequelize.STRING(50),
+          allowNull: true,
+        },
         category: {
           type: Sequelize.STRING(140),
           allowNull: true,
@@ -36,13 +40,19 @@ module.exports = class Paper extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.Paper.belongsTo(db.User, { as: 'Users', foreignKey: 'userId' });
+    db.Paper.belongsTo(db.User, {
+      as: 'Users',
+      foreignKey: 'userId',
+      onDelete: 'cascade',
+    });
     db.Paper.belongsToMany(db.User, {
       foreignKey: 'postId',
-      through: 'likes',
       as: 'Likes',
+      through: 'likes',
+      onDelete: 'cascade',
     });
     db.Paper.hasMany(db.Comment, { foreignKey: 'postId', onDelete: 'cascade' });
-    db.Paper.hasMany(db.Tag, { foreignKey: 'postId' });
+    db.Paper.hasMany(db.Tag, { foreignKey: 'postId', onDelete: 'cascade' });
+    db.Paper.hasMany(db.Image, { foreignKey: 'postId', onDelete: 'cascade' });
   }
 };

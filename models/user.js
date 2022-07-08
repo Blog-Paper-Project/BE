@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
-const booking = require('./booking.js');
+const bookings = require('./booking');
+const leafs = require('./leaf');
 
 module.exports = class User extends Sequelize.Model {
   static init(sequelize) {
@@ -13,11 +14,11 @@ module.exports = class User extends Sequelize.Model {
         },
         email: {
           type: Sequelize.STRING(40),
-          allowNull: false,
+          allowNull: true,
         },
         nickname: {
           type: Sequelize.STRING(30),
-          allowNull: false,
+          allowNull: true,
           defaultValue: 'utf8mb4_general_ci',
         },
         profileImage: {
@@ -53,6 +54,14 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
+        refreshToken: {
+          type: Sequelize.TEXT,
+          allowNull: true,
+        },
+        deletedAt: {
+          type: Sequelize.DATE,
+          allowNull: true,
+        },
       },
       {
         sequelize,
@@ -60,39 +69,62 @@ module.exports = class User extends Sequelize.Model {
         underscored: false,
         modelName: 'User',
         tableName: 'users',
-        paranoid: true,
+        paranoid: false,
         charset: 'utf8',
         collate: 'utf8_general_ci',
       }
     );
   }
   static associate(db) {
-    db.User.hasMany(db.Paper, { foreignKey: 'userId' });
-    db.User.hasMany(db.Comment, { foreignKey: 'userId' });
+    db.User.hasMany(db.Paper, { foreignKey: 'userId', onDelete: 'cascade' });
+    db.User.hasMany(db.Comment, { foreignKey: 'userId', onDelete: 'cascade' });
     db.User.belongsToMany(db.Paper, {
       foreignKey: 'userId',
       as: 'Likes',
       through: 'likes',
+      onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
-      foreignKey: 'followingId',
+      foreignKey: 'followeeId',
       as: 'Followees',
       through: 'subscriptions',
+      onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followerId',
       as: 'Followers',
       through: 'subscriptions',
+      onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'hostId',
       as: 'host',
-      through: booking,
+      through: bookings,
+      onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'guestId',
       as: 'guest',
-      through: booking,
+      through: bookings,
+      onDelete: 'cascade',
+    });
+    db.User.belongsToMany(db.User, {
+      foreignKey: 'giverId',
+      as: 'giver',
+      through: leafs,
+      onDelete: 'cascade',
+    });
+    db.User.belongsToMany(db.User, {
+      foreignKey: 'recipientId',
+      as: 'recipient',
+      through: leafs,
+      onDelete: 'cascade',
+    });
+    db.User.hasMany(db.Review, {
+      foreignKey: 'userId',
+    });
+    db.User.hasMany(db.Review, {
+      foreignKey: 'userId',
     });
   }
 };

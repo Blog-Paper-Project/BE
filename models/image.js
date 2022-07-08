@@ -1,40 +1,36 @@
 const Sequelize = require('sequelize');
 
-module.exports = class Booking extends Sequelize.Model {
+module.exports = class Image extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        bookingId: {
+        imageId: {
           primaryKey: true,
           type: Sequelize.INTEGER,
           allowNull: false,
           autoIncrement: true,
         },
-        date: {
-          type: Sequelize.STRING,
+        url: {
+          type: Sequelize.STRING(100),
           allowNull: false,
-        },
-        time: {
-          type: Sequelize.STRING,
-          allowNull: false,
-        },
-        accepted: {
-          type: Sequelize.BOOLEAN,
-          allowNull: false,
-          defaultValue: false,
         },
       },
       {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: 'Booking',
-        tableName: 'bookings',
+        modelName: 'Image',
+        tableName: 'images',
         paranoid: false,
         charset: 'utf8mb4',
         collate: 'utf8mb4_general_ci',
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.Image.belongsTo(db.Paper, {
+      as: 'Posts',
+      foreignKey: { name: 'postId', allowNull: true, onDelete: 'cascade' },
+    });
+  }
 };

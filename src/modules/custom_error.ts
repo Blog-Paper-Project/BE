@@ -1,9 +1,11 @@
-export function createError(
+import logger from './winston';
+
+export default function createError(
   status: number,
   message: string,
   userId: number | null = null
 ) {
-  // logger.error(`${userId} - ${message}`);
+  logger.error(`${userId} - ${message}`);
 
   const error = <Types.CustomError>new Error(message);
 
