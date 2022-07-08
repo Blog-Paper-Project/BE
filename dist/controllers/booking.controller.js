@@ -1,4 +1,5 @@
 const bookingService = require('../services/booking.service');
+const dayjs = require('dayjs');
 const { Leaf } = require('../../models/leaf');
 const moment = require('moment');
 moment.tz.setDefault('Asia/Seoul');
@@ -8,13 +9,16 @@ const createBooking = async (req, res) => {
   const userId = res.locals.user.userId;
   const { leaf, guestId, start, end } = req.body;
   const hostId = req.params.userId;
-  const bookingMoment = new moment();
-  console.log(11, bookingMoment);
-  const startMoment = moment(start);
-  console.log(12, startMoment);
+  const bookingMoment = new dayjs();
+  const startMoment = dayjs(start);
   const time = moment.duration(startMoment.diff(bookingMoment)).asMinutes();
-  console.log(time);
-  console.log(13, start, end, guestId, leaf, hostId, userId, leaf);
+
+  const meetingMoment = dayjs(start);
+  const meetingDate = dayjs(meetingMoment).format('YYYY.MM.DD');
+  const meetingTime = dayjs(start).format('HH:mm:ss');
+  const endTime = dayjs(end).format('HH:mm:ss');
+  const bookingTime = `${meetingTime} - ${endTime}`;
+
   if (time < 60) {
     res.status(400).send({ msg: '화상 채팅 1시간 전까지만 예약가능합니다.' });
     return;
@@ -24,29 +28,35 @@ const createBooking = async (req, res) => {
     return res.status(400).send({ result: false });
   }
 
-  // try {
-  //   const booking_result = await bookingService.createBooking(
-  //     userId,
-  //     guestId,
-  //     leaf,
-  //     hostId,
-  //     start,
-  //     end
-  //   );
-  //   return res.status(200).json({ result: true });
-  // } catch (error) {
-  //   console.log(error);
-  // }
+  try {
+    const booking_result = await bookingService.createBooking(
+      userId,
+      guestId,
+      leaf,
+      hostId,
+      bookingTime,
+      meetingDate
+    );
+    return res.status(200).json({ result: true });
+  } catch (error) {
+    console.log(error);
+  }
 };
 exports.createBooking = createBooking;
 
-//게스트(신청자)예약 조회
+//예약 조회
 const inquireBooking = async (req, res) => {
-  const guestId = res.locals.user.userId;
-  console.log(guestId);
+  const userId = res.locals.user.userId;
+  console.log(userId);
+
   try {
-    const inquireResult = await bookingService.inquireBooking(guestId);
-    return res.status(200).json({ inquireResult, result: true });
+    if (userId !== undefined) {
+      const inquireResult = await bookingService.inquireBooking(userId);
+      return res.status(200).json({ inquireResult, result: true });
+    } else {
+      const hostResult = await bookingService.hostInquireBooking(userId);
+      return res.status(200).json({ hostResult, result: true });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -54,18 +64,18 @@ const inquireBooking = async (req, res) => {
 exports.inquireBooking = inquireBooking;
 
 //호스트(주최자) 예약조회
-const hostBooking = async (req, res) => {
-  const hostId = res.locals.user.userId;
-  console.log(hostId);
+// const hostBooking = async (req, res) => {
+//   const hostId = res.locals.user.userId;
+//   console.log(hostId);
 
-  try {
-    const hostResult = await bookingService.hostInquireBooking(hostId);
-    return res.status(200).json({ hostResult, result: true });
-  } catch (error) {
-    console.log(error);
-  }
-};
-exports.hostBooking = hostBooking;
+//   try {
+//     const hostResult = await bookingService.hostInquireBooking(hostId);
+//     return res.status(200).json({ hostResult, result: true });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+// exports.hostBooking = hostBooking;
 
 // 예약 수락
 const accpetBooking = async (req, res) => {
