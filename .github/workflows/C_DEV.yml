@@ -4,31 +4,25 @@ on:
     branches:
       - dev
 jobs:
-  
   build-image:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
+      - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      -
-        name: Build and push
+      - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/paper:latest
-      -
-        name: Image digest
+          tags: ${{ secrets.DOCKER_NAME }}/paper:latest
+      - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   cd-pipeline:
     needs: build-image
@@ -43,8 +37,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: "docker-compose.yaml"
-          target: "/home/ubuntu/"
+          source: 'docker-compose.yaml'
+          target: '/home/ubuntu/'
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
@@ -52,4 +46,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          script: "docker-compose pull && docker-compose up -d"
+          script: 'docker-compose pull && docker-compose up -d'
