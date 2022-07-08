@@ -20,7 +20,8 @@ const task = cron.schedule(
       for (let i = 0; i < user.length; i++) {
         const stopdate = dayjs(user[i].deletedAt);
         const startdate = dayjs(new Date());
-
+        console.log(startdate.format('YYYY-MM-DD HH:mm:ss'));
+        console.log(stopdate.add(3, 'M').format('YYYY-MM-DD HH:mm:ss'));
         if (
           startdate.format('YYYY-MM-DD HH:mm:ss') ===
           stopdate.add(3, 'M').format('YYYY-MM-DD HH:mm:ss')
