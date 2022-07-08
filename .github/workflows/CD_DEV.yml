@@ -38,7 +38,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: 'docker-compose.yml'
+          source: 'docker-compose.yaml'
           target: '/home/ubuntu/BE'
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
@@ -48,5 +48,5 @@ jobs:
           key: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: 
-            'docker-compose -f <docker-compose.yml> logs '
+            'docker-compose -f <docker-compose.yaml> logs '
             'docker-compose pull && docker-compose up -d'
