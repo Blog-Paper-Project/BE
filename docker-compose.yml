@@ -4,6 +4,7 @@ services:
   notes:
     build:
       context: .
+    image: mna200/paper:test
     ports:
       - 8000:8000
     environment:
