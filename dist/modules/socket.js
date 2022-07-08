@@ -40,12 +40,12 @@ module.exports = (server) => {
     socket.on('message', (data) => {
       socket.to(room).emit('update', {
         type: 'message',
-        name,
+        nick: data.nick,
         message: data.message,
         time: data.time,
         count: checkCounts(room),
       });
-      console.log(`${name} : ${data.message} (총 ${checkCounts(room)}명)`);
+      console.log(`${nick} : ${data.message} (총 ${checkCounts(room)}명)`);
     });
 
     socket.on('disconnect', () => {
