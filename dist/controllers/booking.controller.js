@@ -6,6 +6,7 @@ const { start } = require('repl');
 const { nextTick } = require('process');
 //const db = require('../../config');
 moment.tz.setDefault('Asia/Seoul');
+const db = require('../../config');
 
 //예약 신청
 const createBooking = async (req, res) => {
@@ -25,7 +26,7 @@ const createBooking = async (req, res) => {
   const endTime = dayjs(end).format('HH:mm:ss');
   const bookingTime = `${meetingTime} - ${endTime}`;
 
-  //b.query(sqlSelectCnt);
+  db.query(sqlSelectCnt);
 
   if (time < 180) {
     res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약가능합니다.' });
