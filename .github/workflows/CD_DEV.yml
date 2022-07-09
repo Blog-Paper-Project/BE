@@ -30,11 +30,13 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          push: true
-          tags: ${{ secrets.DOCKER_NAME }}/paper:test
+          file : /home/ubuntu/BE/Dockerfile
           script : |
             touch .env
             echo "${{ secrets.ENV_VARS }}" >> .env
+          push: true
+          tags: ${{ secrets.DOCKER_NAME }}/paper:test
+          
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
