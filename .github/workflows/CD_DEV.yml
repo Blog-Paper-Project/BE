@@ -68,5 +68,5 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd /home/ubuntu/BE/
-            docker rm -f $(docker ps -aq) && docker image rm -f $(docker image ls -q)
+            docker-compose down --rmi all
             docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker-compose up -d
