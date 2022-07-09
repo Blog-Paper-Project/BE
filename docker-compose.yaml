@@ -8,28 +8,28 @@ services:
     ports:
       - 8000:8000
     environment:
-      - SEVER_PORT=8000
-      - AWS_ACCESS_KEY_ID=AKIAV2BJ4UJRQMBRGKDF
-      - AWS_SECRET_ACCESS_KEY=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
-      - AWS_REGION=ap-northeast-2
-      - S3_BUCKET=hanghae-mini-project
-      - S3_URL=https://hanghae-mini-project.s3.ap-northeast-2.amazonaws.com/
-      - SEQUELIZE_NAME=root
-      - SEQUELIZE_DATABASE=paper
-      - SEQUELIZE_PASSWORD=ztas151615
-      - SEQUELIZE_HOST=database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com
-      - SECRET_KEY=blog_Paper
-      - ACCESS_TOKEN_KEY=Paper
-      - REFRESH_TOKEN_KEY=Papers
-      - NODEMAILER_USER=mna7805@gmail.com
-      - NODEMAILER_PASS=ajnitrolelwhjkcz
-      - NODEMAILER_HOST=smtp.gmail.com
-      - NODEMAILER_PORT=587
-      - NODEMAILER_SERVICE=gmail
-      - KAKAO_REST_API=e5a559c65da6081afd5a18b2a2445eb8
-      - NAVER_ID=stvp0AaZDQpJdE8hkVIu NAVER_SECRET=vkz9oS04zv
-      - GOOGLE_ID=2097071383-f98pdnllgigjlj28i3kdcib44p0c3a2u.apps.googleusercontent.com
-      - GOOGLE_SECRET=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
+      - SEVER_PORT=8000\n
+      - AWS_ACCESS_KEY_ID=AKIAV2BJ4UJRQMBRGKDF\n
+      - AWS_SECRET_ACCESS_KEY=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\n
+      - AWS_REGION=ap-northeast-2\n
+      - S3_BUCKET=hanghae-mini-project\n
+      - S3_URL=https://hanghae-mini-project.s3.ap-northeast-2.amazonaws.com/\n
+      - SEQUELIZE_NAME=root\n
+      - SEQUELIZE_DATABASE=paper\n
+      - SEQUELIZE_PASSWORD=ztas151615\n
+      - SEQUELIZE_HOST=database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com database-1.ctqwwyyctbbp.ap-northeast-2.rds.amazonaws.com\n
+      - SECRET_KEY=blog_Paper\n
+      - ACCESS_TOKEN_KEY=Paper\n
+      - REFRESH_TOKEN_KEY=Papers\n
+      - NODEMAILER_USER=mna7805@gmail.com\n
+      - NODEMAILER_PASS=ajnitrolelwhjkcz\n
+      - NODEMAILER_HOST=smtp.gmail.com\n
+      - NODEMAILER_PORT=587\n
+      - NODEMAILER_SERVICE=gmail\n
+      - KAKAO_REST_API=e5a559c65da6081afd5a18b2a2445eb8\n
+      - NAVER_ID=stvp0AaZDQpJdE8hkVIu NAVER_SECRET=vkz9oS04zv\n
+      - GOOGLE_ID=2097071383-f98pdnllgigjlj28i3kdcib44p0c3a2u.apps.googleusercontent.com\n
+      - GOOGLE_SECRET=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\n
     volumes:
       - /app/node_modules
       - ./:/app
