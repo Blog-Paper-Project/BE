@@ -38,7 +38,7 @@ app.use('/api/booking', BookingRouter);
 app.use('/api/review', ReviewRouter);
 
 app.get('/', (req, res) => {
-  res.send('Paper-Project 진짜 쇼발');
+  res.send('Paper-Project 진짜 ');
 });
 
 app.use((req, res) => {
