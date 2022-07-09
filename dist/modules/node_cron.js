@@ -6,7 +6,7 @@ const dayjs = require('dayjs');
 const User = require('../../models/user');
 
 const task = cron.schedule(
-  '* * * * * *',
+  '* 1 * * * *',
   async () => {
     try {
       const user = await User.findAll({
