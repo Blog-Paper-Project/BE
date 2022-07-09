@@ -29,12 +29,13 @@ jobs:
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
+        
         env:
-            KAKAO_REST_API: "${{ secrets.KAKAO_REST_API }}"
-            NAVER_ID: "${{ secrets.NAVER_ID }}"
-            NAVER_SECRET: "${{ secrets.NAVER_SECRET }}"
-            GOOGLE_ID: "${{ secrets.GOOGLE_ID }}"
-            GOOGLE_SECRET: "${{ secrets.GOOGLE_SECRET }}"
+            KAKAO_REST_API: ${{ secrets.KAKAO_REST_API }}
+            NAVER_ID: ${{ secrets.NAVER_ID }}
+            NAVER_SECRET: ${{ secrets.NAVER_SECRET }}
+            GOOGLE_ID: ${{ secrets.GOOGLE_ID }}
+            GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
         
         with:
           push: true
