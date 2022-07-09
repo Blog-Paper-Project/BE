@@ -44,7 +44,7 @@ const createBooking = async (req, res) => {
       bookingTime,
       meetingDate
     );
-    return res.status(200).json({ result: true });
+    return res.status(200).json({ booking_result, result: true });
   } catch (error) {
     console.log(error);
   }
@@ -86,33 +86,32 @@ exports.inquireBooking = inquireBooking;
 // };
 // exports.rejectBooking = rejectBooking;
 
-// 예약 취소
+// 게스트 예약 취소
 const cancelBooking = async (req, res) => {
-  const guestId = res.locals.user.userId;
+  //필요한것 : 예약번호, 게스트아이디, 유저아이디, 나뭇잎갯수
+  const userId = res.locals.user.userId;
+  const guestId = userId;
   const giverId = res.locals.user.userId;
-  const recipientId = req.params.userId;
-  const hostId = req.params.userId;
+  const bookingId = req.params.bookingId;
 
-  const pointList = await bookingService.findLeaf(giverId, guestId);
-  const pointdArray = pointList.map((pointList) => pointList.leaf, pointList.giverId);
-  console.log(pointdArray);
-  // const point = pointList[1].leaf;
-  // const bookingList = await bookingService.checkBooking(guestId, hostId);
-  // const booking = bookingList[0].bookingId;
-  // console.log(booking, point);
+  const leafList = await bookingService.findLeaf(giverId);
+  const leaf = leafList.map((v) => v.leaf);
 
-  // try {
-  //   const booking_result = await bookingService.cancelBooking(
-  //     booking,
-  //     point,
-  //     guestId,
-  //     recipientId,
-  //     giverId
-  //   );
+  const host = await bookingService.findHost(bookingId);
+  const hostId = host.map((v) => v.bookingId);
 
-  //   res.status(200).json({ result: true });
-  // } catch (error) {
-  //   console.log(error);
-  // }
+  console.log(bookingId, guestId, giverId, leaf, hostId);
+  try {
+    const booking_result = await bookingService.cancelBooking(
+      bookingId,
+      guestId,
+      giverId,
+      leaf,
+      hostId
+    );
+    res.status(200).json({ result: true });
+  } catch (error) {
+    console.log(error);
+  }
 };
 exports.cancelBooking = cancelBooking;
