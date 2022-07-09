@@ -39,6 +39,15 @@ module.exports = (server) => {
       console.log(`${name}님이 참가했습니다. (총 ${checkCounts(room)}명)`);
     });
 
+    socket.on('leaveRoom', () => {
+      socket.leave(room);
+      io.to(room).emit('update', {
+        type: 'leavRoom',
+        name,
+        count: checkCounts(room),
+      });
+    });
+
     socket.on('callUser', ({ userToCall, signalData, from, name }) => {
       io.to(userToCall).emit('callUser', { signal: signalData, from, name });
     }); // 화상채팅
