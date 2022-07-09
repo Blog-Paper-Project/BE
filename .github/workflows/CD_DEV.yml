@@ -31,7 +31,7 @@ jobs:
         uses: docker/build-push-action@v2
         
         with:
-          file: /BE/Dockerfile
+          file: /app/Dockerfile
           secrets: | 
             "KAKAO_REST_API=${{ secrets.KAKAO_REST_API }}"
             "NAVER_ID=${{ secrets.NAVER_ID }}"
