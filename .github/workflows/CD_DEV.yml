@@ -11,11 +11,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@master
-
-      - name: create env file
-        run: |
-          touch .env
-          echo "${{ secrets.ENV_VARS }}" >> .env
+        
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -36,6 +32,9 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
+          script : |
+            touch .env
+            echo "${{ secrets.ENV_VARS }}" >> .env
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
@@ -63,4 +62,5 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd /home/ubuntu/BE/
-            docker-compose pull && docker-compose up -d
+            docker rm -f $(docker ps -aq) && docker image rm -f $(docker image ls -q)
+            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker run -it -p 8000:8000 ${{ secrets.DOCKER_NAME }}/paper:test
