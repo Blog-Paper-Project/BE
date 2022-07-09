@@ -1,0 +1,15 @@
+version: '3'
+services:
+  mysql:
+    image: "7e7e458be53c"
+    ports:
+      - "3307:3306"    
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: paper
+    expose:
+      - "3306"
+    volumes:
+      - /var/lib/mysql/
+  
