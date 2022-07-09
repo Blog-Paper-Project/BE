@@ -1,5 +1,5 @@
 
-FROM keymetrics/pm2:latest-alpine
+FROM node:14-alpine
 
 WORKDIR /app
 
