@@ -15,5 +15,4 @@ services:
       - /app/node_modules
       - ./:/app
     command: |
-      pm2 stop server.js
       pm2 start server.js
