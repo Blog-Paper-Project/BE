@@ -2,7 +2,7 @@ name: ci-cd-pipeline
 on:
   push:
         branches:
-                - dev
+            - dev
                 
 jobs:
   build-image:
