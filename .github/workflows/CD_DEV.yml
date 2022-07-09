@@ -1,30 +1,26 @@
 name: ci-cd-pipeline
+
 on:
-  pull_request:
-        branches:
-                - dev
-                
+  push:
+    branches:
+      - dev
+
 jobs:
   build-image:
     runs-on: ubuntu-latest
     steps:
-    
       - name: checkout
         uses: actions/checkout@master
-
-      - name: create env file
-        run: |
-          touch .env
-          echo "${{ secrets.ENV_VARS }}" >> .env
+        
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-        
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        
+
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -34,8 +30,12 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
+          script : |
+            touch .env
+            echo "${{ secrets.ENV_VARS }}" >> .env
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
+          
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
@@ -63,6 +63,5 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd /home/ubuntu/BE/
-            docker-compose pull && docker-compose up -d
-            
-
+            docker rm -f $(docker ps -aq) && docker image rm -f $(docker image ls -q)
+            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker run -i -p 8000:8000 ${{ secrets.DOCKER_NAME }}/paper:test
