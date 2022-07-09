@@ -13,4 +13,4 @@ RUN npm install pm2 -g
 
 COPY . .
 
-CMD ["node" , "server.js"]
+CMD ["pm2-runtime" , "start" , "server.js"]
