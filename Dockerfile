@@ -1,9 +1,9 @@
 
-FROM node:14-alpine
+FROM keymetrics/pm2:latest-alpine
 
 WORKDIR /app
 
-COPY ["package.json", "package-lock.json*","./"]
+COPY ["package.json", "package-lock.json*", "pm2.json","./"]
 
 RUN npm install
 
@@ -11,4 +11,4 @@ RUN npm install pm2 -g
 
 COPY . .
 
-CMD ["pm2-runtime","start","server.js"]
+CMD ["pm2-runtime","start","pm2.json"]
