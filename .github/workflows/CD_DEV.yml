@@ -32,7 +32,7 @@ jobs:
         with:
           script : |
             touch .env
-            echo "${{ secrets.ENV_VARS }}" >> .env
+            echo "${{ secrets.SEQUELIZE_PASSWORD }}" >> .env
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
           
