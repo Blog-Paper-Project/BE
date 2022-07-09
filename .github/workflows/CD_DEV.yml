@@ -31,8 +31,13 @@ jobs:
         uses: docker/build-push-action@v2
         
         with:
-          run: |
-            echo SEQUELIZE_PASSWORD = ${{ secrets.SEQUELIZE_PASSWORD }} >> .env
+          file: /BE/Dockerfile
+          secrets: | 
+            "KAKAO_REST_API = ${{ secrets.KAKAO_REST_API }}"
+            "NAVER_ID = ${{ secrets.NAVER_ID }}"
+            "NAVER_SECRET = ${{ secrets.NAVER_SECRET }}"
+            "GOOGLE_ID = ${{ secrets.GOOGLE_ID }}"
+            "GOOGLE_SECRET = ${{ secrets.GOOGLE_SECRET }}"
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
           
