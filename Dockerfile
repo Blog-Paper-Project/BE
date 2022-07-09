@@ -3,11 +3,11 @@ FROM keymetrics/pm2:latest-alpine
 
 WORKDIR /app
 
-COPY ["package.json", "package-lock.json*", "pm2.json","./"]
+COPY ["package.json", "pm2.json", "package-lock.json*","./"]
 
 RUN npm install
 
-RUN npm install --production
+RUN npm install pm2 -g
 
 COPY . .
 
