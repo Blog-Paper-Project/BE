@@ -32,8 +32,7 @@ jobs:
         
         with:
           script : |
-            touch .env 
-            echo "죽여그냥" >> .env
+            echo "${{ secrets.SEQUELIZE_PASSWORD }}" >> .env
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
           
