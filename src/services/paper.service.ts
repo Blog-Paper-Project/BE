@@ -6,7 +6,12 @@ const { deleteImg } = require('../modules/multer');
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
   return await Paper.findAll({
-    where: { title: { [Op.like]: `%${keyword}%` } },
+    where: {
+      [Op.or]: [
+        { title: { [Op.like]: `%${keyword}%` } },
+        { contents: { [Op.like]: `%${keyword}%` } },
+      ],
+    },
     order: [['createdAt', 'DESC']],
   });
 };
