@@ -1,5 +1,6 @@
 const { idText } = require('typescript');
 const { User, Booking, Leaf } = require('../../models');
+const { getAttributes } = require('../../models/booking');
 
 //예약 신청
 const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meetingDate) => {
@@ -45,7 +46,7 @@ const hostInquireBooking = async (userId) => {
 };
 exports.hostInquireBooking = hostInquireBooking;
 
-//얘약 취소 : 나뭇잎 찾기
+//나뭇잎 찾기
 const findLeaf = async (giverId) => {
   return await Leaf.findAll({
     where: { giverId },
@@ -53,6 +54,13 @@ const findLeaf = async (giverId) => {
   });
 };
 exports.findLeaf = findLeaf;
+
+const findHost = async (bookingId) => {
+  return await Booking.findAll({
+    where: { bookingId: bookingId },
+  });
+};
+exports.findHost = findHost;
 
 //예약취소 : 취소 후 나뭇잎 반환
 const checkBooking = async (guestId, hostId) => {
@@ -66,22 +74,20 @@ const checkBooking = async (guestId, hostId) => {
 };
 exports.checkBooking = checkBooking;
 
-const cancelBooking = async (booking, point, guestId, recipientId, giverId) => {
+const cancelBooking = async (bookingId, guestId, hostId, giverId, leaf) => {
+  console.log(bookingId, guestId, hostId, giverId, leaf);
   await Booking.destroy({
     where: {
-      bookingId: Number(booking),
+      bookingId: bookingId,
     },
-    limit: 1,
   });
-  User.increment({ point: point }, { where: { userId: guestId } });
-
-  User.decrement({ popularity: point }, { where: { userId: recipientId } });
-
+  User.increment({ point: Number(...leaf) }, { where: { userId: Number(...hostId) } });
+  User.decrement({ popularity: Number(...leaf) }, { where: { userId: guestId } });
   return await Leaf.create({
-    leaf: point,
+    leaf: Number(...leaf),
     remarks: '화상채팅 취소',
-    giverId: recipientId,
-    recipientId: giverId,
+    giverId: Number(...hostId),
+    recipientId: guestId,
   });
 };
 exports.cancelBooking = cancelBooking;
