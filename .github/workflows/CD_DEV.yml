@@ -31,8 +31,8 @@ jobs:
         uses: docker/build-push-action@v2
         
         with:
-          script : |
-            echo "${{ secrets.SEQUELIZE_PASSWORD }}" >> .env
+          run: |
+            echo SEQUELIZE_PASSWORD = ${{ secrets.SEQUELIZE_PASSWORD }} >> .env
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
           
