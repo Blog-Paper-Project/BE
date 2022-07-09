@@ -14,4 +14,4 @@ services:
     volumes:
       - /app/node_modules
       - ./:/app
-    command: nodemon --legacy-watch server.js
+    command: node server.js
