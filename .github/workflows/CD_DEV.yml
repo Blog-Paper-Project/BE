@@ -36,7 +36,7 @@ jobs:
             NAVER_SECRET: ${{ secrets.NAVER_SECRET }}
             GOOGLE_ID: ${{ secrets.GOOGLE_ID }}
             GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
-        
+            IMAGE_TAG: test
         with:
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
