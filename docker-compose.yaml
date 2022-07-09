@@ -14,4 +14,4 @@ services:
     volumes:
       - /app/node_modules
       - ./:/app
-    command: node server.js
+    command: pm2 start server.js
