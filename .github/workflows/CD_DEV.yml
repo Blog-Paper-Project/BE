@@ -46,7 +46,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: 'docker-compose.yaml'
           target: '/home/ubuntu/BE/'
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
