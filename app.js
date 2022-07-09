@@ -39,7 +39,7 @@ app.use('/api/booking', BookingRouter);
 app.use('/api/review', ReviewRouter);
 
 app.get('/', (req, res) => {
-  res.send('Paper-Project');
+  res.send('Paper-Project 성공?');
 });
 
 app.use((req, res) => {
