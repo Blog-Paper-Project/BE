@@ -1,6 +1,5 @@
 const { idText } = require('typescript');
 const { User, Booking, Leaf } = require('../../models');
-const { getAttributes } = require('../../models/booking');
 
 //예약 신청
 const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meetingDate) => {
