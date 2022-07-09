@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@master
-        
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -29,18 +29,18 @@ jobs:
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
-        
+
         env:
-            KAKAO_REST_API: ${{ secrets.KAKAO_REST_API }}
-            NAVER_ID: ${{ secrets.NAVER_ID }}
-            NAVER_SECRET: ${{ secrets.NAVER_SECRET }}
-            GOOGLE_ID: ${{ secrets.GOOGLE_ID }}
-            GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
-            IMAGE_TAG: test
+          KAKAO_REST_API: ${{ secrets.KAKAO_REST_API }}
+          NAVER_ID: ${{ secrets.NAVER_ID }}
+          NAVER_SECRET: ${{ secrets.NAVER_SECRET }}
+          GOOGLE_ID: ${{ secrets.GOOGLE_ID }}
+          GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+          IMAGE_TAG: test
         with:
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
-          
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
@@ -69,4 +69,4 @@ jobs:
           script: |
             cd /home/ubuntu/BE/
             docker rm -f $(docker ps -aq) && docker image rm -f $(docker image ls -q)
-            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker run -i -p 8000:8000 ${{ secrets.DOCKER_NAME }}/paper:test
+            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker-compose up -d
