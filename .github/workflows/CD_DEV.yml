@@ -61,4 +61,4 @@ jobs:
           script: |
             cd /home/ubuntu/BE/
             docker-compose down --rmi all
-            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker-compose --env-file /home/ubuntu/BE/.env up -d
+            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker-compose --env-file /home/ubuntu/.env up -d
