@@ -15,4 +15,4 @@ services:
       - /app/node_modules
       - ./:/app
     command: |
-      node server.js
+      pm2-runtime start server.js
