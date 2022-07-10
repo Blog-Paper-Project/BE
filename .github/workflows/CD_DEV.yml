@@ -31,16 +31,6 @@ jobs:
     name: continuos deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: copy file via ssh password
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          source: 'docker-compose.yaml'
-          target: '/home/ubuntu/'
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
@@ -51,4 +41,4 @@ jobs:
           script: |
             cd /home/ubuntu/
             docker rm -f $(docker ps -aq) && docker image rm -f $(docker image ls -q)
-            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker run --env-file /home/ubuntu/BE/.env -i -p 8000:8000 ${{ secrets.DOCKER_NAME }}/paper:test
+            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker run --env-file /home/ubuntu/.env -i -p 8000:8000 ${{ secrets.DOCKER_NAME }}/paper:test
