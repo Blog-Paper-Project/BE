@@ -42,7 +42,7 @@ router.post('/login', Usercontroller.login);
 router.post('/refresh', Usercontroller.refresh);
 
 // 이메일 || 닉네임 중복검사
-router.post('/idcheck/:id', isNotLoggedIn, Usercontroller.duplicate);
+router.post('/idcheck', isNotLoggedIn, Usercontroller.duplicate);
 
 // 마이프로필 조회
 router.get('/myprofile', Authmiddle, Usercontroller.myprofile);
