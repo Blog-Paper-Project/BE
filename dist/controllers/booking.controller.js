@@ -26,20 +26,20 @@ const createBooking = async (req, res) => {
 
   //db query
 
-  const existLeaf = 'SELECT * FROM users WHERE point < 10';
-  const bookingCnt = 'select count(1) from bookings where guestId=';
-  //DB예약 쿼리
-  const sql =
-    'INSERT INTO BOOKING (`bookingTime`, `meetingDate`, `hostId`,`guestId`,`leaf`) VALUES(?,?,?,?,?)';
-  const sqlSelectCnt = 'SELECT COUNT(1) FROM bookings where guestId = ';
-  const datas = [startTime, endTime, hostId, guestId];
+  // const existLeaf = 'SELECT * FROM users WHERE point < 10';
+  // const bookingCnt = 'select count(1) from bookings where guestId=';
+  // //DB예약 쿼리
+  // const sql =
+  //   'INSERT INTO BOOKING (`bookingTime`, `meetingDate`, `hostId`,`guestId`,`leaf`) VALUES(?,?,?,?,?)';
+  // const sqlSelectCnt = 'SELECT COUNT(1) FROM bookings where guestId = ';
+  // const datas = [startTime, endTime, hostId, guestId];
 
   db.query(sql, sqlSelectCnt, (err, data) => {
     console.log(sql);
   });
 
-   if (time < 180) {
-   res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약가능합니다.' });
+  if (time < 180) {
+    res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약가능합니다.' });
     return;
   }
   if (hostId == guestId) {
