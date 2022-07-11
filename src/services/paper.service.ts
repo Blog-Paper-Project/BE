@@ -51,12 +51,19 @@ export const findUserInfo = async (userId: string) => {
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
     include: {
       model: Paper,
-
       include: { model: Tag, attributes: ['name'] },
     },
-
     order: [[Paper, 'createdAt', 'DESC']],
   });
+};
+
+// 개인 페이지 카테고리 수정
+export const updateCategory = async (
+  userId: string,
+  category: string,
+  newCategory: string
+) => {
+  return await Paper.update({ category: newCategory }, { where: { userId, category } });
 };
 
 // 특정 게시글 검색

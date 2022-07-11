@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+/* eslint-disable */
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
@@ -58,6 +59,11 @@ const findUserInfo = async (userId) => {
     });
 };
 exports.findUserInfo = findUserInfo;
+// 개인 페이지 카테고리 수정
+const updateCategory = async (userId, category, newCategory) => {
+    return await Paper.update({ category: newCategory }, { where: { userId, category } });
+};
+exports.updateCategory = updateCategory;
 // 특정 게시글 검색
 const findPost = async (postId) => {
     return await Paper.findOne({ where: { postId } });
