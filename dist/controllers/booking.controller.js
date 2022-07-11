@@ -38,27 +38,27 @@ const createBooking = async (req, res) => {
     console.log(sql);
   });
 
-  // if (time < 180) {
-  //   res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약가능합니다.' });
-  //   return;
-  // }
-  // if (hostId == guestId) {
-  //   return res.status(400).send({ result: false });
-  // }
+   if (time < 180) {
+   res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약가능합니다.' });
+    return;
+  }
+  if (hostId == guestId) {
+    return res.status(400).send({ result: false });
+  }
 
-  // try {
-  //   const booking_result = await bookingService.createBooking(
-  //     userId,
-  //     guestId,
-  //     leaf,
-  //     hostId,
-  //     bookingTime,
-  //     meetingDate
-  //   );
-  //   return res.status(200).json({ booking_result, result: true });
-  // } catch (error) {
-  //   console.log(error);
-  // }
+  try {
+    const booking_result = await bookingService.createBooking(
+      userId,
+      guestId,
+      leaf,
+      hostId,
+      bookingTime,
+      meetingDate
+    );
+    return res.status(200).json({ booking_result, result: true });
+  } catch (error) {
+    console.log(error);
+  }
 };
 exports.createBooking = createBooking;
 
