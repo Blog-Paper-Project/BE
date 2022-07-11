@@ -267,6 +267,7 @@ const duplicate = async (req, res, next) => {
       });
       return;
     }
+
     res.status(200).send({
       result: true,
     });
@@ -313,7 +314,6 @@ const myprofile_correction = async (req, res, next) => {
         .status(400)
         .send({ ValidationError: '한글,숫자, 알파벳 대소문자로 입력해주세요' });
     }
-
     const profileimg = await userService.myprofile_correction(
       user,
       profileImage,

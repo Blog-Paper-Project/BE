@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMiniProfile = exports.readBlog = exports.readMain = void 0;
+exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMiniProfile = exports.updateCategory = exports.readBlog = exports.readMain = void 0;
 const custom_error_1 = require("../modules/custom_error");
-const date_1 = require("../modules/date");
 const PaperService = require("../services/paper.service");
 const validate_paper_1 = require("../modules/validate_paper");
 const { Paper } = require('../../models');
@@ -11,18 +10,10 @@ const readMain = async (req, res, next) => {
     try {
         const { keyword } = req.query;
         if (keyword) {
-            // 키워드를 입력하면 최신 순으로 결과 출력
             const papers = await PaperService.findPostsBy(keyword);
             return res.json({ papers });
         }
-        let papers = await PaperService.findAllPosts();
-        papers = papers // 1주일 간 좋아요를 많이 받은 게시글 순으로 정렬
-            .map((paper) => {
-            const { postId, userId, title, thumbnail, Likes } = paper;
-            const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
-            return { postId, userId, title, thumbnail, likes };
-        })
-            .sort((a, b) => b.likes - a.likes);
+        const papers = await PaperService.findAllPosts();
         const popularUsers = await PaperService.findBestUsers();
         return res.json({ papers, popularUsers });
     }
@@ -38,21 +29,42 @@ const readBlog = async (req, res, next) => {
         if (!+userId) {
             return next((0, custom_error_1.default)(401, 'Unauthorized!'));
         }
-        const user = await PaperService.findUserInfo(userId);
+        const [user, categories, tags] = await PaperService.findUserInfo(userId);
         if (!user) {
             return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
-        let tags = user.Papers.map((paper) => paper.Tags)
-            .flat()
-            .map((tag) => tag.name);
-        tags = [...new Set(tags)];
-        return res.json({ user, tags });
+        return res.json({ user, categories, tags });
     }
     catch (err) {
         return next(err);
     }
 };
 exports.readBlog = readBlog;
+// 개인 페이지 카테고리 수정
+const updateCategory = async (req, res, next) => {
+    try {
+        const { userId: bloggerId, category } = req.params;
+        const { newCategory } = req.body;
+        const userId = res.locals?.user?.userId;
+        if (!userId) {
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+        }
+        if (userId !== +bloggerId) {
+            return next((0, custom_error_1.default)(403, 'Access Forbidden'));
+        }
+        const schema = (0, validate_paper_1.validateCategory)();
+        await schema.validateAsync({ category, newCategory });
+        const result = await PaperService.updateCategory(userId, category, newCategory);
+        if (!result[0]) {
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
+        }
+        return res.json({ result: true });
+    }
+    catch (err) {
+        return next(err);
+    }
+};
+exports.updateCategory = updateCategory;
 // 미니 프로필 조회
 const readMiniProfile = async (req, res, next) => {
     try {
@@ -102,7 +114,7 @@ const createPost = async (req, res, next) => {
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
-        const paper = await PaperService.createPost(title, contents, thumbnail, userId, category || '');
+        const paper = await PaperService.createPost(title, contents, thumbnail, userId, category);
         if (!paper) {
             return next((0, custom_error_1.default)(400, 'Paper Not Created'));
         }

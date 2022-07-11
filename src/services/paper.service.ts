@@ -3,6 +3,8 @@ const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
 
+const { calcOneWeek } = require('../modules/date');
+
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
   return await Paper.findAll({
@@ -16,16 +18,31 @@ export const findPostsBy = async (keyword: string) => {
   });
 };
 
-// 모든 게시글과 좋아요 검색
+// 1주일간 좋아요 순으로 게시글 11개 검색
 export const findAllPosts = async () => {
-  return await Paper.findAll({ include: { model: User, as: 'Likes' } });
+  const papers = await Paper.findAll({
+    limit: 11,
+    include: { model: User, as: 'Likes' },
+  });
+  const papersByLike = papers
+    .map((paper: Types.Paper) => {
+      const { postId, userId, title, thumbnail, Likes } = paper;
+      const likes = Likes.filter(
+        (like) => new Date(like.createdAt) > calcOneWeek()
+      ).length;
+
+      return { postId, userId, title, thumbnail, likes };
+    })
+    .sort((a: Types.LikesCount, b: Types.LikesCount) => b.likes - a.likes);
+
+  return papersByLike;
 };
 
-// 인기도 순으로 유저 10명 검색
+// 인기도 순으로 유저 18명 검색
 export const findBestUsers = async () => {
   return await User.findAll({
     order: [['popularity', 'DESC']],
-    limit: 10,
+    limit: 18,
     attributes: ['userId', 'nickname', 'profileImage', 'popularity'],
   });
 };
@@ -46,17 +63,34 @@ export const findMiniInfo = async (userId: number) => {
 
 // 특정 유저와 게시글 검색
 export const findUserInfo = async (userId: string) => {
-  return await User.findOne({
+  const user = await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
     include: {
       model: Paper,
-
       include: { model: Tag, attributes: ['name'] },
     },
-
     order: [[Paper, 'createdAt', 'DESC']],
   });
+
+  let categories = user?.Papers.map((paper: { category: string }) => paper.category);
+  let tags = user?.Papers.map((paper: { Tags: { name: string } }) => paper.Tags)
+    .flat()
+    .map((tag: { name: string }) => tag.name);
+
+  categories = [...new Set(categories)];
+  tags = [...new Set(tags)];
+
+  return [user, categories, tags];
+};
+
+// 개인 페이지 카테고리 수정
+export const updateCategory = async (
+  userId: string,
+  category: string,
+  newCategory: string
+) => {
+  return await Paper.update({ category: newCategory }, { where: { userId, category } });
 };
 
 // 특정 게시글 검색
