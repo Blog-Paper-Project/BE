@@ -2,6 +2,25 @@ const { idText } = require('typescript');
 const { User, Booking, Leaf } = require('../../models');
 const { findAll } = require('../../models/booking');
 
+//예약시간 조회
+const findRev = async (hostId, bookingTime, meetingDate) => {
+  return await Booking.findAll({
+    where: {
+      hostId: hostId,
+      time: bookingTime,
+      date: meetingDate,
+    },
+  });
+};
+exports.findRev = findRev;
+
+//예약 횟수 제한
+const count = async (guestId) => {
+  return await Booking.findAll({
+    where: { guestId: guestId },
+  });
+};
+exports.count = count;
 //예약 신청
 const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meetingDate) => {
   console.log(14, userId, guestId, leaf, hostId, bookingTime, meetingDate);
@@ -13,6 +32,7 @@ const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meeting
     guestId,
     leaf,
   });
+  await User.decrement({ point: leaf }, { where: { userId: guestId } });
 
   return await Booking.findByPk(guestId);
 };
@@ -36,6 +56,7 @@ const hostInquireBooking = async (userId) => {
 };
 exports.hostInquireBooking = hostInquireBooking;
 
+//예약 수락
 const confirmBooking = async (hostId, bookingId, guestId, leaf) => {
   console.log(hostId, bookingId, guestId, leaf);
   await Leaf.create({
@@ -44,8 +65,6 @@ const confirmBooking = async (hostId, bookingId, guestId, leaf) => {
     giverId: guestId,
     recipientId: hostId,
   });
-
-  await User.decrement({ point: leaf }, { where: { userId: guestId } });
 
   await User.increment({ popularity: leaf }, { where: { userId: hostId } });
 
