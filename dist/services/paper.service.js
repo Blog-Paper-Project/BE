@@ -5,6 +5,7 @@ exports.destroyComment = exports.updateComment = exports.createComment = exports
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
+const { calcOneWeek } = require('../modules/date');
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
     return await Paper.findAll({
@@ -18,16 +19,27 @@ const findPostsBy = async (keyword) => {
     });
 };
 exports.findPostsBy = findPostsBy;
-// 모든 게시글과 좋아요 검색
+// 1주일간 좋아요 순으로 게시글 11개 검색
 const findAllPosts = async () => {
-    return await Paper.findAll({ include: { model: User, as: 'Likes' } });
+    const papers = await Paper.findAll({
+        limit: 11,
+        include: { model: User, as: 'Likes' },
+    });
+    const papersByLike = papers
+        .map((paper) => {
+        const { postId, userId, title, thumbnail, Likes } = paper;
+        const likes = Likes.filter((like) => new Date(like.createdAt) > calcOneWeek()).length;
+        return { postId, userId, title, thumbnail, likes };
+    })
+        .sort((a, b) => b.likes - a.likes);
+    return papersByLike;
 };
 exports.findAllPosts = findAllPosts;
-// 인기도 순으로 유저 10명 검색
+// 인기도 순으로 유저 18명 검색
 const findBestUsers = async () => {
     return await User.findAll({
         order: [['popularity', 'DESC']],
-        limit: 10,
+        limit: 18,
         attributes: ['userId', 'nickname', 'profileImage', 'popularity'],
     });
 };
@@ -48,7 +60,7 @@ const findMiniInfo = async (userId) => {
 exports.findMiniInfo = findMiniInfo;
 // 특정 유저와 게시글 검색
 const findUserInfo = async (userId) => {
-    return await User.findOne({
+    const user = await User.findOne({
         where: { userId },
         attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
         include: {
@@ -57,6 +69,13 @@ const findUserInfo = async (userId) => {
         },
         order: [[Paper, 'createdAt', 'DESC']],
     });
+    let categories = user?.Papers.map((paper) => paper.category);
+    let tags = user?.Papers.map((paper) => paper.Tags)
+        .flat()
+        .map((tag) => tag.name);
+    categories = [...new Set(categories)];
+    tags = [...new Set(tags)];
+    return [user, categories, tags];
 };
 exports.findUserInfo = findUserInfo;
 // 개인 페이지 카테고리 수정
