@@ -8,27 +8,36 @@ moment.tz.setDefault('Asia/Seoul');
 const createBooking = async (req, res) => {
   const userId = res.locals.user.userId;
   const { leaf, guestId, date } = req.body;
+  const hostId = req.params.userId;
 
+  //날짜, 시간 설정
   const start = date.split('-')[0];
   const end = date.split('-')[1];
-
   const bookingMoment = new dayjs();
   const startMoment = dayjs(start);
   const time = moment.duration(startMoment.diff(bookingMoment)).asMinutes();
-
   const meetingMoment = dayjs(start);
   const meetingDate = dayjs(meetingMoment).format('YYYY-MM-DD ddd');
   const startTime = dayjs(start).format('HH:mm:ss');
   const endTime = dayjs(end).format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
-  const hostId = req.params.userId;
 
-  db.query(sql, sqlSelectCnt, (err, data) => {
-    console.log(sql);
-  });
+  // 예약 테이블 조회
+  const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
+  const existRevCnt = existRev.map((v) => v.bookingId);
+  const userPoint = res.locals.user.point;
 
+  if (existRev.length > 0) {
+    return res.send({ msg: '이미 예약되었습니다.' });
+  }
+  if (userPoint < 10) {
+    return res.send({ msg: '나뭇잎이 부족합니다.' });
+  }
+  if (existRevCnt.length > 2) {
+    return res.send({ msg: '금일 예약횟수를 초과했습니다.' });
+  }
   if (time < 180) {
-    res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약가능합니다.' });
+    res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
     return;
   }
   if (hostId == guestId) {
@@ -57,7 +66,6 @@ const inquireBooking = async (req, res) => {
   const userId = res.locals.user.userId;
   const status = await bookingService.findstaus(guestId);
   const recentSatus = status.map((v) => v.accepted);
-  console.log(...recentSatus);
 
   try {
     const inquireResult = await bookingService.inquireBooking(userId);
