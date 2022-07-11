@@ -40,7 +40,7 @@ router.patch('/restore', Usercontroller.user_restore);
 router.post('/login', Usercontroller.login);
 
 // 이메일 || 닉네임 중복검사
-router.post('/idcheck/:id', isNotLoggedIn, Usercontroller.duplicate);
+router.post('/idcheck', isNotLoggedIn, Usercontroller.duplicate);
 
 // 마이프로필 조회
 router.get('/myprofile', Authmiddle, Usercontroller.myprofile);
