@@ -22,6 +22,7 @@ const createBooking = async (req, res) => {
   const endTime = dayjs(end).format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
 
+  console.log(userId, guestId, leaf, hostId, bookingTime, meetingDate);
   // 예약 테이블 조회
   const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
   const existRevCnt = existRev.map((v) => v.bookingId);
