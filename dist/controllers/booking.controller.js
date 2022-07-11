@@ -23,16 +23,6 @@ const createBooking = async (req, res) => {
   const bookingTime = `${startTime} - ${endTime}`;
   const hostId = req.params.userId;
 
-  //db query
-
-  // const existLeaf = 'SELECT * FROM users WHERE point < 10';
-  // const bookingCnt = 'select count(1) from bookings where guestId=';
-  // //DB예약 쿼리
-  // const sql =
-  //   'INSERT INTO BOOKING (`bookingTime`, `meetingDate`, `hostId`,`guestId`,`leaf`) VALUES(?,?,?,?,?)';
-  // const sqlSelectCnt = 'SELECT COUNT(1) FROM bookings where guestId = ';
-  // const datas = [startTime, endTime, hostId, guestId];
-
   db.query(sql, sqlSelectCnt, (err, data) => {
     console.log(sql);
   });
