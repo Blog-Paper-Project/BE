@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import createError from '../modules/custom_error';
-import calcOneWeek from '../modules/date';
 import * as PaperService from '../services/paper.service';
 import {
   validatePaper,
@@ -16,25 +15,12 @@ export const readMain = async (req: Request, res: Response, next: NextFunction) 
     const { keyword } = req.query as { keyword: string };
 
     if (keyword) {
-      // 키워드를 입력하면 최신 순으로 결과 출력
       const papers = await PaperService.findPostsBy(keyword);
 
       return res.json({ papers });
     }
 
-    let papers = await PaperService.findAllPosts();
-
-    papers = papers // 1주일 간 좋아요를 많이 받은 게시글 순으로 정렬
-      .map((paper: Types.Paper) => {
-        const { postId, userId, title, thumbnail, Likes } = paper;
-        const likes = Likes.filter(
-          (like) => new Date(like.createdAt) > calcOneWeek()
-        ).length;
-
-        return { postId, userId, title, thumbnail, likes };
-      })
-      .sort((a: Types.LikesCount, b: Types.LikesCount) => b.likes - a.likes);
-
+    const papers = await PaperService.findAllPosts();
     const popularUsers = await PaperService.findBestUsers();
 
     return res.json({ papers, popularUsers });
@@ -52,19 +38,11 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(401, 'Unauthorized!'));
     }
 
-    const user = await PaperService.findUserInfo(userId);
+    const [user, categories, tags] = await PaperService.findUserInfo(userId);
 
     if (!user) {
       return next(createError(404, 'Not Found!'));
     }
-
-    let categories = user.Papers.map((paper: { category: string }) => paper.category);
-    let tags = user.Papers.map((paper: { Tags: { name: string } }) => paper.Tags)
-      .flat()
-      .map((tag: { name: string }) => tag.name);
-
-    categories = [...new Set(categories)];
-    tags = [...new Set(tags)];
 
     return res.json({ user, categories, tags });
   } catch (err) {
