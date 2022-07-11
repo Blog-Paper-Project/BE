@@ -16,7 +16,12 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
   host: process.env.SEQUELIZE_HOST,
   dialect: 'mysql',
   timezone: '+09:00',
-  dialectOptions: { charset: 'utf8mb4', dateStrings: true, typeCast: true },
+  dialectOptions: {
+    charset: 'utf8mb4',
+    dateStrings: true,
+    typeCast: true,
+    timezone: '+09:00',
+  },
   logging: false,
 });
 
