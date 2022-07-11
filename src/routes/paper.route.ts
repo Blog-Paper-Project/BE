@@ -12,6 +12,9 @@ router.get('/', PaperController.readMain);
 // 개인 페이지 조회
 router.get('/users/:userId', PaperController.readBlog);
 
+// 개인 페이지 카테고리 수정
+router.patch('/users/:userId/categories/:category', auth, PaperController.updateCategory);
+
 // 미니 프로필 조회
 router.get('/miniprofile', auth, PaperController.readMiniProfile);
 

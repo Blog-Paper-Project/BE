@@ -24,3 +24,18 @@ export function validateComment() {
     }),
   });
 }
+
+export function validateCategory() {
+  return Joi.object({
+    category: Joi.string().min(2).max(15).required().messages({
+      'string.empty': '카테고리를 입력해주세요',
+      'string.min': '카테고리는 최소 2글자 이상입니다.',
+      'string.max': '카테고리는 최대 15글자 이하입니다.',
+    }),
+    newCategory: Joi.string().min(2).max(15).required().messages({
+      'string.empty': '카테고리를 입력해주세요',
+      'string.min': '카테고리는 최소 2글자 이상입니다.',
+      'string.max': '카테고리는 최대 15글자 이하입니다.',
+    }),
+  });
+}
