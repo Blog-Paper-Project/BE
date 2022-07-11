@@ -217,6 +217,19 @@ const myprofile_correction = async (req, res, next) => {
     const profileImage = req.file?.transforms[0].key;
     const { nickname, introduction } = req.body;
 
+    // 닉네임 안에 정규식이 포함 되어 있으면 true, 없으면 false
+    const nickname_validator = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/.test(nickname);
+
+    // 닉네임 유효성 검사
+    if (3 > nickname.length || nickname.length > 15) {
+      return res
+        .status(400)
+        .send({ ValidationError: '3글자 ~ 15글자 이내로 작성해주세요' });
+    } else if (!nickname_validator) {
+      return res
+        .status(400)
+        .send({ ValidationError: '한글,숫자, 알파벳 대소문자로 입력해주세요' });
+    }
     const profileimg = await userService.myprofile_correction(
       user,
       profileImage,
