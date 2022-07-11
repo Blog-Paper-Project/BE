@@ -25,6 +25,7 @@
     "@types/validator": "^13.7.3",
     "@typescript-eslint/eslint-plugin": "^5.30.3",
     "@typescript-eslint/parser": "^5.30.3",
+    "artillery": "^2.0.0-20",
     "eslint": "^8.19.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",

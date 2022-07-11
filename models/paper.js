@@ -11,7 +11,7 @@ module.exports = class Paper extends Sequelize.Model {
           autoIncrement: true,
         },
         title: {
-          type: Sequelize.STRING(140),
+          type: Sequelize.STRING(40),
           allowNull: false,
         },
         contents: {
@@ -19,12 +19,13 @@ module.exports = class Paper extends Sequelize.Model {
           allowNull: false,
         },
         thumbnail: {
-          type: Sequelize.STRING(50),
+          type: Sequelize.STRING(30),
           allowNull: true,
         },
         category: {
-          type: Sequelize.STRING(140),
-          allowNull: true,
+          type: Sequelize.STRING(20),
+          allowNull: false,
+          defaultValue: 'etc',
         },
       },
       {

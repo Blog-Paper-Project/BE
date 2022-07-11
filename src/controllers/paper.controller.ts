@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import createError from '../modules/custom_error';
 import calcOneWeek from '../modules/date';
 import * as PaperService from '../services/paper.service';
-import { validatePaper, validateComment } from '../modules/validate_paper';
+import {
+  validatePaper,
+  validateComment,
+  validateCategory,
+} from '../modules/validate_paper';
 
 const { Paper } = require('../../models');
 
@@ -54,12 +58,46 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
       return next(createError(404, 'Not Found!'));
     }
 
+    let categories = user.Papers.map((paper: { category: string }) => paper.category);
     let tags = user.Papers.map((paper: { Tags: { name: string } }) => paper.Tags)
       .flat()
       .map((tag: { name: string }) => tag.name);
+
+    categories = [...new Set(categories)];
     tags = [...new Set(tags)];
 
-    return res.json({ user, tags });
+    return res.json({ user, categories, tags });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// 개인 페이지 카테고리 수정
+export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId: bloggerId, category } = req.params;
+    const { newCategory } = req.body;
+    const userId = res.locals?.user?.userId;
+
+    if (!userId) {
+      return next(createError(401, 'Unauthorized!'));
+    }
+
+    if (userId !== +bloggerId) {
+      return next(createError(403, 'Access Forbidden'));
+    }
+
+    const schema = validateCategory();
+
+    await schema.validateAsync({ category, newCategory });
+
+    const result = await PaperService.updateCategory(userId, category, newCategory);
+
+    if (!result[0]) {
+      return next(createError(404, 'Not Found!'));
+    }
+
+    return res.json({ result: true });
   } catch (err) {
     return next(err);
   }
@@ -134,7 +172,7 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
       contents,
       thumbnail,
       userId,
-      category || ''
+      category
     );
 
     if (!paper) {
