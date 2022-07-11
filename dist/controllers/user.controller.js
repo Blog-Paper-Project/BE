@@ -162,7 +162,7 @@ const login = async (req, res, next) => {
       result: true,
       nickname: user.nickname,
       token,
-      userId : user.userId,
+      userId: user.userId,
     });
   } catch (error) {
     console.log(error);
@@ -174,15 +174,16 @@ exports.login = login;
 // 이메일 || 닉네임 중복검사
 const duplicate = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const id = req.body.email || req.body.nickname;
     const idcheck = await userService.duplicate(id);
 
-    if (idcheck.length) {
+    if (idcheck[0]?.email === id || idcheck[0]?.nickname === id) {
       res.status(400).send({
         result: false,
       });
       return;
     }
+
     res.status(200).send({
       result: true,
     });
