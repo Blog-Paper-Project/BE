@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMiniProfile = exports.readBlog = exports.readMain = void 0;
+exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMiniProfile = exports.updateCategory = exports.readBlog = exports.readMain = void 0;
 const custom_error_1 = require("../modules/custom_error");
 const date_1 = require("../modules/date");
 const PaperService = require("../services/paper.service");
@@ -42,17 +42,44 @@ const readBlog = async (req, res, next) => {
         if (!user) {
             return next((0, custom_error_1.default)(404, 'Not Found!'));
         }
+        let categories = user.Papers.map((paper) => paper.category);
         let tags = user.Papers.map((paper) => paper.Tags)
             .flat()
             .map((tag) => tag.name);
+        categories = [...new Set(categories)];
         tags = [...new Set(tags)];
-        return res.json({ user, tags });
+        return res.json({ user, categories, tags });
     }
     catch (err) {
         return next(err);
     }
 };
 exports.readBlog = readBlog;
+// 개인 페이지 카테고리 수정
+const updateCategory = async (req, res, next) => {
+    try {
+        const { userId: bloggerId, category } = req.params;
+        const { newCategory } = req.body;
+        const userId = res.locals?.user?.userId;
+        if (!userId) {
+            return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+        }
+        if (userId !== +bloggerId) {
+            return next((0, custom_error_1.default)(403, 'Access Forbidden'));
+        }
+        const schema = (0, validate_paper_1.validateCategory)();
+        await schema.validateAsync({ category, newCategory });
+        const result = await PaperService.updateCategory(userId, category, newCategory);
+        if (!result[0]) {
+            return next((0, custom_error_1.default)(404, 'Not Found!'));
+        }
+        return res.json({ result: true });
+    }
+    catch (err) {
+        return next(err);
+    }
+};
+exports.updateCategory = updateCategory;
 // 미니 프로필 조회
 const readMiniProfile = async (req, res, next) => {
     try {
@@ -102,7 +129,7 @@ const createPost = async (req, res, next) => {
         }
         const schema = (0, validate_paper_1.validatePaper)();
         await schema.validateAsync({ title, contents });
-        const paper = await PaperService.createPost(title, contents, thumbnail, userId, category || '');
+        const paper = await PaperService.createPost(title, contents, thumbnail, userId, category);
         if (!paper) {
             return next((0, custom_error_1.default)(400, 'Paper Not Created'));
         }
