@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 require('dotenv').config();
 
 //mysql 접속 설정
-const paper = mysql.createConnection({
+const db = mysql.createConnection({
   host: process.env.SEQUELIZE_HOST,
   user: process.env.SEQUELIZE_NAME,
   password: process.env.SEQUELIZE_PASSWORD,
@@ -12,7 +12,7 @@ const paper = mysql.createConnection({
   port: process.env.SEQUELIZE_PORT,
 });
 
-paper.connect();
+db.connect();
 console.log('db연결!');
 
-module.exports = paper;
+module.exports = db;
