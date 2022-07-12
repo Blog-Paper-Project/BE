@@ -65,6 +65,19 @@ exports.myprofile = myprofile;
 
 // 마이 프로필 수정
 const myprofile_correction = async (user, profileImage, nickname, introduction) => {
+  if (nickname) {
+    const duplicate = await User.findAll({
+      where: { nickname },
+    });
+
+    console.log(duplicate);
+
+    // 닉네임 중복 체크
+    if (duplicate.length) {
+      return false;
+    }
+  }
+
   await deleteImg(user.profileImage);
 
   await User.update(
