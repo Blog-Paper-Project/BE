@@ -14,13 +14,6 @@ const findRev = async (hostId, bookingTime, meetingDate) => {
 };
 exports.findRev = findRev;
 
-//예약 횟수 제한
-const count = async (guestId) => {
-  return await Booking.findAll({
-    where: { guestId: guestId },
-  });
-};
-exports.count = count;
 //예약 신청
 const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meetingDate) => {
   console.log(14, userId, guestId, leaf, hostId, bookingTime, meetingDate);
@@ -86,13 +79,6 @@ const findOne = async (bookingId) => {
   });
 };
 exports.findOne = findOne;
-
-const findstaus = async (guestId, hostId) => {
-  return await Booking.findAll({
-    where: { guestId },
-  });
-};
-exports.findstaus = findstaus;
 
 // 게스트 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {

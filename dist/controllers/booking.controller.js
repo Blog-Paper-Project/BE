@@ -2,11 +2,14 @@ const bookingService = require('../services/booking.service');
 require('moment-timezone');
 const dayjs = require('dayjs');
 const moment = require('moment');
+const { stat } = require('fs');
+const { nextTick } = require('process');
 moment.tz.setDefault('Asia/Seoul');
 
 //예약 신청
 const createBooking = async (req, res) => {
   const userId = res.locals.user.userId;
+
   const { leaf, guestId, date } = req.body;
   const hostId = req.params.userId;
 
@@ -20,34 +23,34 @@ const createBooking = async (req, res) => {
   const meetingDate = dayjs(meetingMoment).format('YYYY-MM-DD ddd');
   const startTime = dayjs(start).format('HH:mm:ss');
   const endTime = dayjs(end).format('HH:mm:ss');
+
+  //예약시간 제한
   const bookingTime = `${startTime} - ${endTime}`;
-
-  // console.log(userId, guestId, leaf, hostId, bookingTime, meetingDate);
-  // 예약 테이블 조회
-  const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
-  const existRevCnt = existRev.map((v) => v.bookingId);
-  const userPoint = res.locals.user.point;
-
-  if (
-    existRev[0].dataValues.date === meetingDate &&
-    existRev[0].dataValues.time === bookingTime
-  ) {
-    return res.send({ msg: '이미 예약되었습니다.' });
-  }
-  if (userPoint < 10) {
-    return res.send({ msg: '나뭇잎이 부족합니다.' });
-  }
-  if (existRevCnt.length > 2) {
-    return res.send({ msg: '금일 예약횟수를 초과했습니다.' });
-  }
   if (time < 180) {
     res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
     return;
   }
+
+  console.log(01, userId, guestId, leaf, hostId, bookingTime, meetingDate);
+
+  // 호스트id, 예약시간, 예약날짜 조회
+  const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
+  if (existRev.length > 0) {
+    return res.send({ msg: '이미 예약된 시간 입니다.' });
+  }
+
+  // 유저 나뭇잎 조회
+  const userPoint = res.locals.user.point;
+  if (userPoint < 5) {
+    return res.send({ msg: '나뭇잎이 부족합니다.' });
+  }
+
+  //본인 예약 차단
   if (hostId == guestId) {
     return res.status(400).send({ result: false });
   }
 
+  //예약 신청
   try {
     const booking_result = await bookingService.createBooking(
       userId,
@@ -68,12 +71,10 @@ exports.createBooking = createBooking;
 const inquireBooking = async (req, res) => {
   const guestId = res.locals.user.userId;
   const userId = res.locals.user.userId;
-  const status = await bookingService.findstaus(guestId);
-  const recentSatus = status.map((v) => v.accepted);
 
   try {
-    const inquireResult = await bookingService.inquireBooking(userId);
     const hostResult = await bookingService.hostInquireBooking(userId);
+    const inquireResult = await bookingService.inquireBooking(userId);
     return res.status(200).json({ inquireResult, hostResult, result: true });
   } catch (error) {
     console.log(error);
