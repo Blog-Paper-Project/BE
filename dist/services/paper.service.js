@@ -70,9 +70,7 @@ const findUserInfo = async (userId) => {
         order: [[Paper, 'createdAt', 'DESC']],
     }));
     let categories = user?.Papers.map((paper) => paper.category);
-    let tags = user?.Papers.map((paper) => paper.Tags)
-        .flat()
-        .map((tag) => tag.name);
+    let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
     categories = [...new Set(categories)];
     tags = [...new Set(tags)];
     return [user, categories, tags];
@@ -96,7 +94,7 @@ const findPostInfo = async (postId) => {
             { model: Comment },
             { model: Tag, attributes: ['name'] },
             { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
-            { model: User, as: 'Likes' },
+            { model: User, as: 'Likes', attributes: ['nickname'] },
         ],
     });
 };
