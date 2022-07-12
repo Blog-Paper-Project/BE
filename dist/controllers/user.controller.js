@@ -237,8 +237,8 @@ const myprofile_correction = async (req, res, next) => {
       introduction
     );
 
-    if (profileImage === false) {
-      res.status(400).send({
+    if (profileimg === false) {
+      return res.status(400).send({
         result: false,
       });
     }
