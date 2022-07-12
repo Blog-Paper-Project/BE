@@ -19,7 +19,8 @@ module.exports = class User extends Sequelize.Model {
         nickname: {
           type: Sequelize.STRING(30),
           allowNull: true,
-          defaultValue: 'utf8mb4_general_ci',
+          charset: "'utf8mb4",
+          collate: 'utf8mb4_general_ci',
         },
         profileImage: {
           type: Sequelize.TEXT,
