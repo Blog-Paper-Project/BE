@@ -8,7 +8,7 @@ const { deleteImg } = require('../modules/multer');
 const { calcOneWeek } = require('../modules/date');
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
-    return await Paper.findAll({
+    return (await Paper.findAll({
         where: {
             [Op.or]: [
                 { title: { [Op.like]: `%${keyword}%` } },
@@ -16,7 +16,7 @@ const findPostsBy = async (keyword) => {
             ],
         },
         order: [['createdAt', 'DESC']],
-    });
+    }));
 };
 exports.findPostsBy = findPostsBy;
 // 1주일간 좋아요 순으로 게시글 11개 검색
@@ -60,7 +60,7 @@ const findMiniInfo = async (userId) => {
 exports.findMiniInfo = findMiniInfo;
 // 특정 유저와 게시글 검색
 const findUserInfo = async (userId) => {
-    const user = await User.findOne({
+    const user = (await User.findOne({
         where: { userId },
         attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
         include: {
@@ -68,7 +68,7 @@ const findUserInfo = async (userId) => {
             include: { model: Tag, attributes: ['name'] },
         },
         order: [[Paper, 'createdAt', 'DESC']],
-    });
+    }));
     let categories = user?.Papers.map((paper) => paper.category);
     let tags = user?.Papers.map((paper) => paper.Tags)
         .flat()
@@ -119,7 +119,10 @@ const createTags = async (postId, tags) => {
 exports.createTags = createTags;
 // 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
 const updateImage = async (postId, images) => {
-    const originalImages = await Image.findAll({ where: { postId }, raw: true });
+    const originalImages = await Image.findAll({
+        where: { postId },
+        raw: true,
+    });
     if (originalImages.length) {
         const replaced = originalImages.filter((img) => !images.includes(img.url));
         for (let item of replaced) {
@@ -158,17 +161,17 @@ const destroyPost = async (userId, postId) => {
     for (let image of images) {
         await deleteImg(image.url);
     }
-    await deleteImg(paper.thumbnail);
+    await deleteImg(paper?.thumbnail);
     return await paper.destroy();
 };
 exports.destroyPost = destroyPost;
 // 댓글 작성
 const createComment = async (text, userId, postId) => {
-    return await Comment.create({
+    return (await Comment.create({
         text,
         userId,
         postId: +postId,
-    });
+    }));
 };
 exports.createComment = createComment;
 // 댓글 수정
