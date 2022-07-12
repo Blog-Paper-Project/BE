@@ -39,7 +39,7 @@ const createBooking = async (req, res) => {
     return res.send({ msg: '이미 예약된 시간 입니다.' });
   }
 
-  //유저 나뭇잎 조회
+  // 유저 나뭇잎 조회
   const userPoint = res.locals.user.point;
   if (userPoint < 5) {
     return res.send({ msg: '나뭇잎이 부족합니다.' });

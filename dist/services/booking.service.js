@@ -87,13 +87,6 @@ const findOne = async (bookingId) => {
 };
 exports.findOne = findOne;
 
-const findstaus = async (guestId, hostId) => {
-  return await Booking.findAll({
-    where: { guestId },
-  });
-};
-exports.findstaus = findstaus;
-
 // 게스트 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
   console.log(bookingId, guestId, hostId, leaf);
