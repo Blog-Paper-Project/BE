@@ -46,8 +46,8 @@ const duplicate = async (id) => {
   return await User.findAll({
     where: {
       [Op.or]: {
-        email: { [Op.like]: `%${id}%` },
-        nickname: { [Op.like]: `%${id}%` },
+        email: id,
+        nickname: id,
       },
     },
   });
