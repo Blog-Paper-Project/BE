@@ -13,7 +13,7 @@
         "flow": [
            {
               "get": {
-                 "url": "/api/paper/users/2"
+                 "url": "/api/paper/users/1/1"
               }
            }
         ]
