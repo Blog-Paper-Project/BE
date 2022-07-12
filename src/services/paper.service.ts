@@ -2,7 +2,8 @@
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
-const { calcOneWeek } = require('../modules/date');
+
+import calcOneWeek from '../modules/date';
 
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
