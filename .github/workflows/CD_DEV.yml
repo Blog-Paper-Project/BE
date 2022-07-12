@@ -1,5 +1,8 @@
 name: ci-cd-pipeline
 on:
+  push:
+    branches:
+      - dev
   pull_request:
     branches:
       - dev
