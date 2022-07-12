@@ -5,7 +5,7 @@ exports.destroyComment = exports.updateComment = exports.createComment = exports
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
-const { calcOneWeek } = require('../modules/date');
+const date_1 = require("../modules/date");
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
     return (await Paper.findAll({
@@ -28,7 +28,7 @@ const findAllPosts = async () => {
     const papersByLike = papers
         .map((paper) => {
         const { postId, userId, title, thumbnail, Likes } = paper;
-        const likes = Likes.filter((like) => new Date(like.createdAt) > calcOneWeek()).length;
+        const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
         return { postId, userId, title, thumbnail, likes };
     })
         .sort((a, b) => b.likes - a.likes);
