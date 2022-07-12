@@ -2,7 +2,6 @@
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
-
 const { calcOneWeek } = require('../modules/date');
 
 // 키워드로 게시글 검색
@@ -74,9 +73,7 @@ export const findUserInfo = async (userId: string) => {
   })) as DTO.UserInfo;
 
   let categories = user?.Papers.map((paper) => paper.category);
-  let tags = user?.Papers.map((paper) => paper.Tags)
-    .flat()
-    .map((tag) => tag.name);
+  let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
 
   categories = [...new Set(categories)];
   tags = [...new Set(tags)];
@@ -106,7 +103,7 @@ export const findPostInfo = async (postId: string) => {
       { model: Comment },
       { model: Tag, attributes: ['name'] },
       { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
-      { model: User, as: 'Likes' },
+      { model: User, as: 'Likes', attributes: ['nickname'] },
     ],
   });
 };
