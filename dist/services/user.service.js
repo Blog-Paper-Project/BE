@@ -62,8 +62,8 @@ const duplicate = async (id) => {
   return await User.findAll({
     where: {
       [Op.or]: {
-        email: { [Op.like]: `%${id}%` },
-        nickname: { [Op.like]: `%${id}%` },
+        email: id,
+        nickname: id,
       },
     },
   });
@@ -81,13 +81,15 @@ exports.myprofile = myprofile;
 
 // 마이 프로필 수정
 const myprofile_correction = async (user, profileImage, nickname, introduction) => {
-  const duplicate = await User.findAll({
-    where: { nickname },
-  });
+  if (nickname) {
+    const duplicate = await User.findAll({
+      where: { nickname },
+    });
 
-  // 닉네임 중복 체크
-  if (duplicate.length) {
-    return false;
+    // 닉네임 중복 체크
+    if (duplicate[0]?.dataValues.nickname === nickname) {
+      return false;
+    }
   }
 
   await deleteImg(user.profileImage);

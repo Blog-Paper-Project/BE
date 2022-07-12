@@ -2,12 +2,11 @@
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
-
 const { calcOneWeek } = require('../modules/date');
 
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
-  return await Paper.findAll({
+  return (await Paper.findAll({
     where: {
       [Op.or]: [
         { title: { [Op.like]: `%${keyword}%` } },
@@ -15,17 +14,17 @@ export const findPostsBy = async (keyword: string) => {
       ],
     },
     order: [['createdAt', 'DESC']],
-  });
+  })) as Models.Paper;
 };
 
 // 1주일간 좋아요 순으로 게시글 11개 검색
 export const findAllPosts = async () => {
-  const papers = await Paper.findAll({
+  const papers: DTO.PaperLike[] = await Paper.findAll({
     limit: 11,
     include: { model: User, as: 'Likes' },
   });
   const papersByLike = papers
-    .map((paper: Types.Paper) => {
+    .map((paper) => {
       const { postId, userId, title, thumbnail, Likes } = paper;
       const likes = Likes.filter(
         (like) => new Date(like.createdAt) > calcOneWeek()
@@ -33,7 +32,7 @@ export const findAllPosts = async () => {
 
       return { postId, userId, title, thumbnail, likes };
     })
-    .sort((a: Types.LikesCount, b: Types.LikesCount) => b.likes - a.likes);
+    .sort((a, b) => b.likes - a.likes);
 
   return papersByLike;
 };
@@ -63,7 +62,7 @@ export const findMiniInfo = async (userId: number) => {
 
 // 특정 유저와 게시글 검색
 export const findUserInfo = async (userId: string) => {
-  const user = await User.findOne({
+  const user = (await User.findOne({
     where: { userId },
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
     include: {
@@ -71,12 +70,10 @@ export const findUserInfo = async (userId: string) => {
       include: { model: Tag, attributes: ['name'] },
     },
     order: [[Paper, 'createdAt', 'DESC']],
-  });
+  })) as DTO.UserInfo;
 
-  let categories = user?.Papers.map((paper: { category: string }) => paper.category);
-  let tags = user?.Papers.map((paper: { Tags: { name: string } }) => paper.Tags)
-    .flat()
-    .map((tag: { name: string }) => tag.name);
+  let categories = user?.Papers.map((paper) => paper.category);
+  let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
 
   categories = [...new Set(categories)];
   tags = [...new Set(tags)];
@@ -106,7 +103,7 @@ export const findPostInfo = async (postId: string) => {
       { model: Comment },
       { model: Tag, attributes: ['name'] },
       { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
-      { model: User, as: 'Likes' },
+      { model: User, as: 'Likes', attributes: ['nickname'] },
     ],
   });
 };
@@ -137,11 +134,12 @@ export const createTags = async (postId: string, tags: string[]) => {
 
 // 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
 export const updateImage = async (postId: number, images: string[]) => {
-  const originalImages = await Image.findAll({ where: { postId }, raw: true });
+  const originalImages: Models.Image[] = await Image.findAll({
+    where: { postId },
+    raw: true,
+  });
   if (originalImages.length) {
-    const replaced = originalImages.filter(
-      (img: { url: string }) => !images.includes(img.url)
-    );
+    const replaced = originalImages.filter((img) => !images.includes(img.url));
 
     for (let item of replaced) {
       await deleteImg(item.url);
@@ -197,18 +195,18 @@ export const destroyPost = async (userId: number, postId: string) => {
     await deleteImg(image.url);
   }
 
-  await deleteImg(paper.thumbnail);
+  await deleteImg(paper?.thumbnail);
 
   return await paper.destroy();
 };
 
 // 댓글 작성
 export const createComment = async (text: string, userId: number, postId: string) => {
-  return await Comment.create({
+  return (await Comment.create({
     text,
     userId,
     postId: +postId,
-  });
+  })) as Models.Comment;
 };
 
 // 댓글 수정
