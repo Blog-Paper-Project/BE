@@ -178,10 +178,9 @@ const duplicate = async (req, res, next) => {
     const idcheck = await userService.duplicate(id);
 
     if (idcheck[0]?.email === id || idcheck[0]?.nickname === id) {
-      res.status(400).send({
+      return res.status(400).send({
         result: false,
       });
-      return;
     }
 
     res.status(200).send({
