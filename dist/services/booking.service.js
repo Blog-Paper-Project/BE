@@ -18,16 +18,14 @@ exports.findRev = findRev;
 const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meetingDate) => {
   console.log(14, userId, guestId, leaf, hostId, bookingTime, meetingDate);
 
-  await Booking.create({
+  await User.decrement({ point: leaf }, { where: { userId: guestId } });
+  return await Booking.create({
     hostId,
     date: meetingDate,
     time: bookingTime,
     guestId,
     leaf,
   });
-  await User.decrement({ point: leaf }, { where: { userId: guestId } });
-
-  return await Booking.findByPk(guestId);
 };
 exports.createBooking = createBooking;
 
