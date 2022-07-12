@@ -70,10 +70,8 @@ const myprofile_correction = async (user, profileImage, nickname, introduction) 
       where: { nickname },
     });
 
-    console.log(duplicate);
-
     // 닉네임 중복 체크
-    if (duplicate.length) {
+    if (duplicate[0]?.dataValues.nickname === nickname) {
       return false;
     }
   }
