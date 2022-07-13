@@ -2,8 +2,7 @@ const bookingService = require('../services/booking.service');
 require('moment-timezone');
 const dayjs = require('dayjs');
 const moment = require('moment');
-const { stat } = require('fs');
-const { nextTick } = require('process');
+
 moment.tz.setDefault('Asia/Seoul');
 
 //예약 신청
