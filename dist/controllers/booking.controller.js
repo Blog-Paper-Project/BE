@@ -2,7 +2,9 @@ const bookingService = require('../services/booking.service');
 require('moment-timezone');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
-
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+dayjs.extend(timezone);
 const moment = require('moment');
 dayjs.extend(timezone);
 
@@ -23,7 +25,7 @@ const createBooking = async (req, res) => {
   const time = moment.duration(startMoment.diff(bookingMoment)).asMinutes();
   const meetingMoment = dayjs(start);
   const meetingDate = dayjs(meetingMoment).format('YYYY-MM-DD ddd');
-  const startTime = dayjs(start).format('HH:mm:ss');
+  const startTime = dayjs(start).tz().format('HH:mm:ss');
   const endTime = dayjs(end).format('HH:mm:ss');
 
   //예약시간 제한
