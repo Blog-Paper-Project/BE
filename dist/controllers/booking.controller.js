@@ -5,6 +5,7 @@ const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Seoul');
 const moment = require('moment');
 dayjs.extend(timezone);
 
@@ -26,7 +27,7 @@ const createBooking = async (req, res) => {
   const meetingMoment = dayjs(start);
   const meetingDate = dayjs(meetingMoment).format('YYYY-MM-DD ddd');
   const startTime = dayjs(start).tz().format('HH:mm:ss');
-  const endTime = dayjs(end).format('HH:mm:ss');
+  const endTime = dayjs(end).tz().format('HH:mm:ss');
 
   //예약시간 제한
   const bookingTime = `${startTime} - ${endTime}`;
