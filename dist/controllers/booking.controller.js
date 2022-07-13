@@ -24,12 +24,12 @@ const createBooking = async (req, res) => {
   const endTime = dayjs(end).tz().format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
 
+  console.log(01, userId, guestId, leaf, hostId, bookingTime, meetingDate);
+
   //예약시간 제한
   if (time < 180) {
     return res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
   }
-
-  console.log(01, userId, guestId, leaf, hostId, bookingTime, meetingDate);
 
   // 호스트id, 예약시간, 예약날짜 조회
   const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
@@ -72,7 +72,8 @@ const bookingList = async (req, res) => {
   try {
     const hostBookingList = await bookingService.hostBooking(userId);
     const guestBookingList = await bookingService.guestBooking(userId);
-    return res.status(200).json({ guestBookingList, hostBookingList, result: true });
+    const totalList = [hostBookingList, guestBookingList];
+    return res.status(200).json({ totalList, result: true });
   } catch (error) {
     console.log(error);
   }
