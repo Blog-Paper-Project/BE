@@ -1,5 +1,4 @@
 const bookingService = require('../services/booking.service');
-require('moment-timezone');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
@@ -23,12 +22,11 @@ const createBooking = async (req, res) => {
   const meetingDate = dayjs(startMoment).format('YYYY-MM-DD ddd');
   const startTime = dayjs(start).tz().format('HH:mm:ss');
   const endTime = dayjs(end).tz().format('HH:mm:ss');
+  const bookingTime = `${startTime} - ${endTime}`;
 
   //예약시간 제한
-  const bookingTime = `${startTime} - ${endTime}`;
   if (time < 180) {
-    res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
-    return;
+    return res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
   }
 
   console.log(01, userId, guestId, leaf, hostId, bookingTime, meetingDate);
@@ -68,18 +66,18 @@ const createBooking = async (req, res) => {
 exports.createBooking = createBooking;
 
 //게스트 예약 조회
-const inquireBooking = async (req, res) => {
+const bookingList = async (req, res) => {
   const userId = res.locals.user.userId;
 
   try {
-    const hostResult = await bookingService.hostInquireBooking(userId);
-    const inquireResult = await bookingService.inquireBooking(userId);
-    return res.status(200).json({ inquireResult, hostResult, result: true });
+    const hostBookingList = await bookingService.hostBooking(userId);
+    const guestBookingList = await bookingService.guestBooking(userId);
+    return res.status(200).json({ guestBookingList, hostBookingList, result: true });
   } catch (error) {
     console.log(error);
   }
 };
-exports.inquireBooking = inquireBooking;
+exports.bookingList = bookingList;
 
 // 호스트 예약 수락
 const acceptBooking = async (req, res) => {
