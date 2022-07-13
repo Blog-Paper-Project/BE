@@ -54,19 +54,6 @@ module.exports = (server) => {
       console.log(`${data.nick} : ${data.message} (총 ${checkCounts(room)}명)`);
     });
 
-    //WebRTC 연결
-    socket.on('offer', (payload) => {
-      io.to(payload.target).emit('offer', payload);
-    });
-
-    socket.on('answer', (payload) => {
-      io.to(payload.target).emit('answer', payload);
-    });
-
-    socket.on('ice-candidate', (incoming) => {
-      io.to(incoming.target).emit('ice-candidate', incoming.candidate);
-    });
-
     // disconnect됐을 때 나가기가 있는데 바로 반영이 안돼서 채팅방 나가기 버튼을 누르면 room에서 내보내도록 설정
     socket.on('leaveRoom', () => {
       socket.leave(room);
@@ -77,7 +64,23 @@ module.exports = (server) => {
       });
     });
 
+    // 화상채팅
+    socket.emit('me', socket.id);
+
+    socket.on('callUser', (data) => {
+      io.to(data.userToCall).emit('callUser', {
+        signal: data.signalData,
+        from: data.from,
+        name: data.name,
+      });
+    });
+
+    socket.on('answerCall', (data) => {
+      io.to(data.to).emit('callAccepted', data.signal);
+    });
+
     socket.on('disconnect', () => {
+      socket.broadcast.emit('callEnded');
       socket.leave(room);
       io.to(room).emit('update', {
         type: 'disconnect',
