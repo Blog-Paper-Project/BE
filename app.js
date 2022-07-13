@@ -4,6 +4,8 @@ const morgan = require('morgan');
 const passport = require('passport');
 const expressSession = require('express-session');
 const passportConfig = require('./dist/modules/social');
+const apiLimiter = require('./dist/modules/api_limiter');
+
 require('dotenv').config();
 require('./dist/modules/image_scheduler');
 
@@ -20,6 +22,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(apiLimiter);
 app.use(
   expressSession({
     resave: false,
@@ -33,7 +36,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/user', UserRouter);
-app.use('/api/paper/', PaperRouter);
+app.use('/api/paper', PaperRouter);
 app.use('/api/booking', BookingRouter);
 app.use('/api/review', ReviewRouter);
 
