@@ -6,10 +6,6 @@ const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul');
-const moment = require('moment');
-dayjs.extend(timezone);
-
-moment.tz.setDefault('Asia/Seoul');
 
 //예약 신청
 const createBooking = async (req, res) => {
@@ -23,9 +19,8 @@ const createBooking = async (req, res) => {
   const end = date.split('-')[1];
   const bookingMoment = new dayjs();
   const startMoment = dayjs(start);
-  const time = moment.duration(startMoment.diff(bookingMoment)).asMinutes();
-  const meetingMoment = dayjs(start);
-  const meetingDate = dayjs(meetingMoment).format('YYYY-MM-DD ddd');
+  const time = startMoment.diff(bookingMoment, 'minute');
+  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD ddd');
   const startTime = dayjs(start).tz().format('HH:mm:ss');
   const endTime = dayjs(end).tz().format('HH:mm:ss');
 
@@ -72,9 +67,8 @@ const createBooking = async (req, res) => {
 };
 exports.createBooking = createBooking;
 
-//예약 조회 : 분리필요
+//게스트 예약 조회
 const inquireBooking = async (req, res) => {
-  const guestId = res.locals.user.userId;
   const userId = res.locals.user.userId;
 
   try {

@@ -1,6 +1,4 @@
-const { idText } = require('typescript');
 const { User, Booking, Leaf } = require('../../models');
-const { findAll } = require('../../models/booking');
 
 //예약시간 조회
 const findRev = async (hostId, bookingTime, meetingDate) => {
