@@ -72,7 +72,7 @@ const bookingList = async (req, res) => {
   try {
     const hostBookingList = await bookingService.hostBooking(userId);
     const guestBookingList = await bookingService.guestBooking(userId);
-    const totalList = [hostBookingList, guestBookingList];
+    const totalList = { hostBookingList, guestBookingList };
     return res.status(200).json({ totalList, result: true });
   } catch (error) {
     console.log(error);
