@@ -17,6 +17,7 @@ const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meeting
   console.log(14, userId, guestId, leaf, hostId, bookingTime, meetingDate);
 
   await User.decrement({ point: leaf }, { where: { userId: guestId } });
+
   return await Booking.create({
     hostId,
     date: meetingDate,
@@ -27,23 +28,23 @@ const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meeting
 };
 exports.createBooking = createBooking;
 
-//게스트(신청자)예약 보기
-const inquireBooking = async (userId) => {
+//예약한 내역
+const guestBooking = async (userId) => {
   return await Booking.findAll({
     where: { guestId: Number(userId) },
     order: [['createdAt', 'DESC']],
   });
 };
-exports.inquireBooking = inquireBooking;
+exports.guestBooking = guestBooking;
 
-//호스트(주최자)예약보기
-const hostInquireBooking = async (userId) => {
+//예약받은 내역
+const hostBooking = async (userId) => {
   return await Booking.findAll({
     where: { hostId: Number(userId) },
     order: [['createdAt', 'DESC']],
   });
 };
-exports.hostInquireBooking = hostInquireBooking;
+exports.hostBooking = hostBooking;
 
 //예약 수락
 const confirmBooking = async (hostId, bookingId, guestId, leaf) => {
