@@ -22,7 +22,7 @@ const createBooking = async (req, res) => {
   const startMoment = dayjs(start);
   const time = moment.duration(startMoment.diff(bookingMoment)).asMinutes();
   const meetingMoment = dayjs(start);
-  const meetingDate = dayjs(meetingMoment).tz().format('YYYY-MM-DD ddd');
+  const meetingDate = dayjs(meetingMoment).format('YYYY-MM-DD ddd');
   const startTime = dayjs(start).format('HH:mm:ss');
   const endTime = dayjs(end).format('HH:mm:ss');
 
