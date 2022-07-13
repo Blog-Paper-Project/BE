@@ -2,7 +2,7 @@ const bookingService = require('../services/booking.service');
 require('moment-timezone');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
-dayjs.tz.setDefault('Asia/Seoul');
+
 const moment = require('moment');
 dayjs.extend(timezone);
 
