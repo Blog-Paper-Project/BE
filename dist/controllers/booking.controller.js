@@ -2,7 +2,9 @@ const bookingService = require('../services/booking.service');
 require('moment-timezone');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
+dayjs.tz.setDefault('Asia/Seoul');
 const moment = require('moment');
+dayjs.extend(timezone);
 
 moment.tz.setDefault('Asia/Seoul');
 
@@ -67,7 +69,7 @@ const createBooking = async (req, res) => {
 };
 exports.createBooking = createBooking;
 
-//예약 조회
+//예약 조회 : 분리필요
 const inquireBooking = async (req, res) => {
   const guestId = res.locals.user.userId;
   const userId = res.locals.user.userId;
