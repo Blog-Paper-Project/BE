@@ -7,10 +7,10 @@ const router = express.Router();
 router.post('/:userId', auth, bookingController.createBooking);
 
 //전체 예약보기
-router.get('/', auth, bookingController.inquireBooking);
+router.get('/', auth, bookingController.bookingList);
 
-// //호스트(주최자) 기져오기
-// router.get('/:hostId', auth, bookingController.hostBooking);
+//호스트(주최자) 기져오기
+// router.get('/host/:hostId', auth, bookingController.hostInquireBooking);
 
 //호스트 예약 수락
 router.patch('/:hostId/:bookingId', auth, bookingController.acceptBooking);
