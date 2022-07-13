@@ -65,6 +65,7 @@ module.exports = (server) => {
     });
 
     // 화상채팅
+
     socket.emit('me', socket.id);
 
     socket.on('callUser', (data) => {
