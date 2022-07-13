@@ -20,8 +20,8 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     charset: 'utf8mb4',
     dateStrings: true,
     typeCast: true,
-    timezone: '+09:00',
   },
+  timezone: '+09:00',
   logging: false,
 });
 
