@@ -19,8 +19,6 @@ module.exports = class User extends Sequelize.Model {
         nickname: {
           type: Sequelize.STRING(30),
           allowNull: true,
-          charset: "'utf8mb4",
-          collate: 'utf8mb4_general_ci',
         },
         profileImage: {
           type: Sequelize.TEXT,
@@ -71,8 +69,8 @@ module.exports = class User extends Sequelize.Model {
         modelName: 'User',
         tableName: 'users',
         paranoid: false,
-        charset: 'utf8',
-        collate: 'utf8_general_ci',
+        charset: 'utf8mb4',
+        collate: ' utf8mb4_unicode_ci',
       }
     );
   }
