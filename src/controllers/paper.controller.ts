@@ -65,9 +65,11 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
       return next(createError(403, 'Access Forbidden'));
     }
 
-    const schema = validateCategory();
+    if (newCategory) {
+      const schema = validateCategory();
 
-    await schema.validateAsync({ category, newCategory });
+      await schema.validateAsync({ category, newCategory });
+    }
 
     const result = await PaperService.updateCategory(userId, category, newCategory);
 
