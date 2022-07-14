@@ -28,7 +28,7 @@ module.exports = (server) => {
       room = data.room;
 
       if (checkCounts(room) >= 2) {
-        return io.emit('roomfull');
+        return socket.to(socket.id).emit('roomfull');
       }
       socket.join(room);
       console.log([
