@@ -1,3 +1,6 @@
+const cron = require('node-cron');
+const dayjs = require('dayjs');
+
 const task = cron.schedule(
   '* 0 * * *', // 수정
   async () => {
