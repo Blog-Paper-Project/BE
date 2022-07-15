@@ -21,7 +21,6 @@ export const findPostsBy = async (keyword: string) => {
 // 1주일간 좋아요 순으로 게시글 11개 검색
 export const findAllPosts = async () => {
   const papers: DTO.PaperLike[] = await Paper.findAll({
-    limit: 11,
     include: { model: User, as: 'Likes' },
   });
   const papersByLike = papers
@@ -33,7 +32,8 @@ export const findAllPosts = async () => {
 
       return { postId, userId, title, thumbnail, likes };
     })
-    .sort((a, b) => b.likes - a.likes);
+    .sort((a, b) => b.likes - a.likes)
+    .slice(0, 11);
 
   return papersByLike;
 };

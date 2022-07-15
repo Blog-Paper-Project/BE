@@ -1,13 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const helmet = require('helmet');
 const passport = require('passport');
 const expressSession = require('express-session');
-const helmet = require('helmet');
 const passportConfig = require('./dist/modules/social');
-require('./dist/modules/node_cron');
 const apiLimiter = require('./dist/modules/api_limiter');
 require('dotenv').config();
+require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
 
 const app = express();

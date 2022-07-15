@@ -34,7 +34,7 @@ module.exports = class User extends Sequelize.Model {
         },
         point: {
           type: Sequelize.INTEGER,
-          defaultValue: '10',
+          defaultValue: 10,
         },
         popularity: {
           type: Sequelize.INTEGER,

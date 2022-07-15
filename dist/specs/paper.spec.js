@@ -1,8 +1,6 @@
 const request = require('supertest');
 const app = require('../../app');
 
-require('dotenv').config();
-
 let token;
 let postId;
 let commentId;
@@ -39,15 +37,6 @@ describe('페이지 조회 테스트', () => {
       });
   });
 
-  it('개인 페이지 조회', (done) => {
-    request(app)
-      .get('/api/paper/users/1')
-      .then((res) => {
-        expect(res.status).toBe(200);
-        done();
-      });
-  });
-
   it('미니 프로필 조회', (done) => {
     request(app)
       .get('/api/paper/miniprofile')
@@ -60,17 +49,65 @@ describe('페이지 조회 테스트', () => {
 });
 
 describe('게시글 테스트', () => {
+  it('게시글 작성 500', (done) => {
+    request(app)
+      .post('/api/paper')
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(500);
+        done();
+      });
+  });
+
   it('게시글 작성', (done) => {
     request(app)
       .post('/api/paper')
-      .send({ title: 'Jest 테스트 중', contents: '성공인가?' })
+      .send({
+        title: 'Jest 테스트 중',
+        contents: '성공인가?',
+        category: 'sports',
+        tags: ['tag1', 'tag2'],
+      })
       .set('Authorization', token)
       .then((res) => {
         const { paper } = res.body;
         postId = paper.postId;
         expect(paper.title).toBe('Jest 테스트 중');
         expect(paper.contents).toBe('성공인가?');
+        expect(paper.category).toBe('sports');
         expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('게시글 수정 400', (done) => {
+    request(app)
+      .patch(`/api/paper/abc`)
+      .send({ title: 'Jest 수정 중', contents: '수정 성공?' })
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        done();
+      });
+  });
+
+  it('게시글 수정 500', (done) => {
+    request(app)
+      .patch(`/api/paper/${postId}`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(500);
+        done();
+      });
+  });
+
+  it('게시글 수정 404', (done) => {
+    request(app)
+      .patch(`/api/paper/9999999`)
+      .send({ title: 'Jest 수정 중', contents: '수정 성공?' })
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(404);
         done();
       });
   });
@@ -92,7 +129,16 @@ describe('게시글 테스트', () => {
 
   it('게시글 조회', (done) => {
     request(app)
-      .get(`/api/paper/users/2/${postId}`)
+      .get(`/api/paper/users/1/999999`)
+      .then((res) => {
+        expect(res.status).toBe(404);
+        done();
+      });
+  });
+
+  it('게시글 조회', (done) => {
+    request(app)
+      .get(`/api/paper/users/1/${postId}`)
       .then((res) => {
         const { title, contents } = res.body.paper;
 
@@ -102,10 +148,43 @@ describe('게시글 테스트', () => {
         done();
       });
   });
+});
 
-  it('게시글 삭제', (done) => {
+describe('개인 페이지 테스트', () => {
+  it('개인 페이지 조회 404', (done) => {
     request(app)
-      .delete(`/api/paper/${postId}`)
+      .get('/api/paper/users/99999')
+      .then((res) => {
+        expect(res.status).toBe(404);
+        done();
+      });
+  });
+
+  it('개인 페이지 조회', (done) => {
+    request(app)
+      .get('/api/paper/users/1')
+      .then((res) => {
+        console.log(res.body);
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('개인 페이지 카테고리 수정 404', (done) => {
+    request(app)
+      .patch('/api/paper/users/1/categories/travel')
+      .send({ newCategory: '스포츠' })
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(404);
+        done();
+      });
+  });
+
+  it('개인 페이지 카테고리 수정', (done) => {
+    request(app)
+      .patch('/api/paper/users/1/categories/sports')
+      .send({ newCategory: '스포츠' })
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);
@@ -115,9 +194,20 @@ describe('게시글 테스트', () => {
 });
 
 describe('댓글 테스트', () => {
+  it('댓글 작성 500', (done) => {
+    request(app)
+      .post(`/api/paper/${postId}/comments`)
+      .send({ text: '1' })
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(500);
+        done();
+      });
+  });
+
   it('댓글 작성', (done) => {
     request(app)
-      .post('/api/paper/1/comments')
+      .post(`/api/paper/${postId}/comments`)
       .send({ text: '성공인가?' })
       .set('Authorization', token)
       .then((res) => {
@@ -129,9 +219,20 @@ describe('댓글 테스트', () => {
       });
   });
 
+  it('댓글 수정 404', (done) => {
+    request(app)
+      .patch(`/api/paper/${postId}/comments/9999999`)
+      .send({ text: '수정 성공?' })
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(404);
+        done();
+      });
+  });
+
   it('댓글 수정', (done) => {
     request(app)
-      .patch(`/api/paper/1/comments/${commentId}`)
+      .patch(`/api/paper/${postId}/comments/${commentId}`)
       .send({ text: '수정 성공?' })
       .set('Authorization', token)
       .then((res) => {
@@ -141,9 +242,19 @@ describe('댓글 테스트', () => {
       });
   });
 
+  it('댓글 삭제 404', (done) => {
+    request(app)
+      .delete(`/api/paper/${postId}/comments/9999999`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(404);
+        done();
+      });
+  });
+
   it('댓글 삭제', (done) => {
     request(app)
-      .delete(`/api/paper/1/comments/${commentId}`)
+      .delete(`/api/paper/${postId}/comments/${commentId}`)
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);
@@ -153,19 +264,31 @@ describe('댓글 테스트', () => {
 });
 
 describe('좋아요 & 구독 테스트', () => {
-  it('좋아요', (done) => {
+  it('좋아요 400', (done) => {
     request(app)
-      .post(`/api/paper/1/likes`)
+      .post(`/api/paper/${postId}/likes`)
       .set('Authorization', token)
       .then((res) => {
-        expect(res.status).toBe(200);
+        expect(res.status).toBe(400);
         done();
       });
   });
 
-  it('구독', (done) => {
+  it('구독 400', (done) => {
     request(app)
       .post(`/api/paper/users/1/subscription`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        done();
+      });
+  });
+});
+
+describe('게시글 삭제', () => {
+  it('게시글 삭제', (done) => {
+    request(app)
+      .delete(`/api/paper/${postId}`)
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);

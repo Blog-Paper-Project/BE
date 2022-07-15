@@ -22,7 +22,6 @@ exports.findPostsBy = findPostsBy;
 // 1주일간 좋아요 순으로 게시글 11개 검색
 const findAllPosts = async () => {
     const papers = await Paper.findAll({
-        limit: 11,
         include: { model: User, as: 'Likes' },
     });
     const papersByLike = papers
@@ -31,7 +30,8 @@ const findAllPosts = async () => {
         const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
         return { postId, userId, title, thumbnail, likes };
     })
-        .sort((a, b) => b.likes - a.likes);
+        .sort((a, b) => b.likes - a.likes)
+        .slice(0, 11);
     return papersByLike;
 };
 exports.findAllPosts = findAllPosts;
