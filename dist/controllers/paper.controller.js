@@ -52,10 +52,8 @@ const updateCategory = async (req, res, next) => {
         if (userId !== +bloggerId) {
             return next((0, custom_error_1.default)(403, 'Access Forbidden'));
         }
-        if (newCategory) {
-            const schema = (0, validate_paper_1.validateCategory)();
-            await schema.validateAsync({ category, newCategory });
-        }
+        const schema = (0, validate_paper_1.validateCategory)();
+        await schema.validateAsync({ category, newCategory });
         const result = await PaperService.updateCategory(userId, category, newCategory);
         if (!result[0]) {
             return next((0, custom_error_1.default)(404, 'Not Found!'));
