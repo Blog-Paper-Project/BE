@@ -11,7 +11,7 @@ module.exports = (server) => {
   // io.sockets.adapter.rooms.get(room) 결과값은 room에 참가한 id가 Set으로 나온다
 
   io.on('connection', (socket) => {
-    console.log('연결됐습니다!!');
+    console.log('연결됐습니다');
     let { name, room } = socket;
     socket.emit('search', {
       rooms: [
