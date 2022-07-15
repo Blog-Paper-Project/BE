@@ -5,6 +5,7 @@ const passport = require('passport');
 const expressSession = require('express-session');
 const helmet = require('helmet');
 const passportConfig = require('./dist/modules/social');
+require('./dist/modules/node_cron');
 const apiLimiter = require('./dist/modules/api_limiter');
 
 require('dotenv').config();
