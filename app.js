@@ -6,7 +6,6 @@ const passport = require('passport');
 const expressSession = require('express-session');
 const passportConfig = require('./dist/modules/social');
 const apiLimiter = require('./dist/modules/api_limiter');
-
 require('dotenv').config();
 require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
