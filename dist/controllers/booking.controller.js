@@ -43,6 +43,12 @@ const createBooking = async (req, res) => {
     return res.send({ msg: '나뭇잎이 부족합니다.' });
   }
 
+  //포인트 음수 차단
+  const availablePoint = userPoint - leaf;
+  if (availablePoint < 0) {
+    return res.send({ msg: '가지고 있는 나뭇잎이 부족합니다.' });
+  }
+
   //본인 예약 차단
   if (hostId == guestId) {
     return res.status(400).send({ result: false });
