@@ -139,7 +139,7 @@ const login = async (req, res, next) => {
     const user = await userService.login(email);
     const passwordck = await Bcrypt.compare(password, user.password);
     const exuser = user.deletedAt;
-    console.log(exuser);
+    console.log(user.profileImage);
 
     // 탈퇴한 회원
     if (exuser) {
@@ -161,6 +161,7 @@ const login = async (req, res, next) => {
     res.status(200).send({
       result: true,
       nickname: user.nickname,
+      profileImage: user.profileImage,
       token,
       userId: user.userId,
     });
