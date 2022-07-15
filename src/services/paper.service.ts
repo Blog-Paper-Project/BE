@@ -25,17 +25,25 @@ export const findAllPosts = async () => {
   });
   const papersByLike = papers
     .map((paper) => {
-      const { postId, userId, title, thumbnail, Likes } = paper;
+      const { postId, userId, title, contents, thumbnail, Likes } = paper;
       const likes = Likes.filter(
         (like) => new Date(like.createdAt) > calcOneWeek()
       ).length;
 
-      return { postId, userId, title, thumbnail, likes };
+      return { postId, userId, title, contents, thumbnail, likes };
     })
     .sort((a, b) => b.likes - a.likes)
     .slice(0, 11);
 
-  return papersByLike;
+  const papersWithNoImg = papersByLike.map((paper) => {
+    paper.contents = paper.contents.replace(
+      /!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g,
+      ''
+    );
+    return paper;
+  });
+
+  return papersWithNoImg;
 };
 
 // 인기도 순으로 유저 18명 검색
