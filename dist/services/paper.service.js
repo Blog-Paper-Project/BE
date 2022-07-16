@@ -31,12 +31,12 @@ const findAllPosts = async () => {
         return { postId, userId, title, contents, thumbnail, likes };
     })
         .sort((a, b) => b.likes - a.likes)
-        .slice(0, 11);
-    const papersWithNoImg = papersByLike.map((paper) => {
+        .slice(0, 11)
+        .map((paper) => {
         paper.contents = paper.contents.replace(/!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g, '');
         return paper;
     });
-    return papersWithNoImg;
+    return papersByLike;
 };
 exports.findAllPosts = findAllPosts;
 // 인기도 순으로 유저 18명 검색
