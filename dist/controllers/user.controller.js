@@ -188,7 +188,7 @@ const login = async (req, res, next) => {
     const user = await userService.login(email);
     const passwordck = await Bcrypt.compare(password, user.password);
     const exuser = user.deletedAt;
-    console.log(exuser);
+    console.log(user.profileImage);
 
     // 탈퇴한 회원
     if (exuser) {
@@ -222,6 +222,9 @@ const login = async (req, res, next) => {
       nickname: user.nickname,
       accessToken,
       refreshToken,
+      profileImage: user.profileImage,
+      userId: user.userId,
+
     });
   } catch (error) {
     console.log(error);

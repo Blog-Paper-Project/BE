@@ -6,7 +6,7 @@ const dayjs = require('dayjs');
 const User = require('../../models/user');
 
 const task = cron.schedule(
-  '* 1 * * * *',
+  '* 0 * * *', // 수정
   async () => {
     try {
       const user = await User.findAll({
@@ -19,10 +19,9 @@ const task = cron.schedule(
       for (let i = 0; i < user.length; i++) {
         const stopdate = dayjs(user[i].deletedAt);
         const startdate = dayjs(new Date());
-        console.log(startdate.format('YYYY-MM-DD HH:mm:ss'));
-        console.log(stopdate.add(3, 'M').format('YYYY-MM-DD HH:mm:ss'));
+
         if (
-          startdate.format('YYYY-MM-DD HH:mm:ss') ===
+          startdate.format('YYYY-MM-DD HH:mm:ss') > // 수정
           stopdate.add(3, 'M').format('YYYY-MM-DD HH:mm:ss')
         ) {
           await User.destroy({ where: { userId: user[i].userId } });

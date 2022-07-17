@@ -22,16 +22,20 @@ exports.findPostsBy = findPostsBy;
 // 1주일간 좋아요 순으로 게시글 11개 검색
 const findAllPosts = async () => {
     const papers = await Paper.findAll({
-        limit: 11,
         include: { model: User, as: 'Likes' },
     });
     const papersByLike = papers
         .map((paper) => {
-        const { postId, userId, title, thumbnail, Likes } = paper;
+        const { postId, userId, title, contents, thumbnail, Likes } = paper;
         const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
-        return { postId, userId, title, thumbnail, likes };
+        return { postId, userId, title, contents, thumbnail, likes };
     })
-        .sort((a, b) => b.likes - a.likes);
+        .sort((a, b) => b.likes - a.likes)
+        .slice(0, 11)
+        .map((paper) => {
+        paper.contents = paper.contents.replace(/!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g, '');
+        return paper;
+    });
     return papersByLike;
 };
 exports.findAllPosts = findAllPosts;
