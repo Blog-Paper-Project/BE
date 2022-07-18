@@ -16,6 +16,10 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.STRING(40),
           allowNull: true,
         },
+        blogId: {
+          type: Sequelize.STRING(40),
+          allowNull: true,
+        },
         nickname: {
           type: Sequelize.STRING(30),
           allowNull: true,
@@ -77,7 +81,6 @@ module.exports = class User extends Sequelize.Model {
   static associate(db) {
     db.User.hasMany(db.Paper, { foreignKey: 'userId', onDelete: 'cascade' });
     db.User.hasMany(db.Comment, { foreignKey: 'userId', onDelete: 'cascade' });
-    db.User.hasOne(db.Point, { foreignKey: 'userId', onDelete: 'cascade' });
     db.User.belongsToMany(db.Paper, {
       foreignKey: 'userId',
       as: 'Likes',

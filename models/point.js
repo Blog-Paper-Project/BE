@@ -22,8 +22,6 @@ module.exports = class Point extends Sequelize.Model {
         modelName: 'Point',
         tableName: 'points',
         paranoid: false,
-        charset: 'utf8mb4',
-        collate: 'utf8mb4_general_ci',
       }
     );
   }
@@ -31,7 +29,7 @@ module.exports = class Point extends Sequelize.Model {
     db.Point.belongsTo(db.User, {
       as: 'Points',
       foreignKey: 'userId',
-      onDelete: 'cascde',
+      // onDelete: 'cascde',
     });
   }
 };
