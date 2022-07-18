@@ -1,32 +1,60 @@
 const bookingService = require('../services/booking.service');
 const dayjs = require('dayjs');
-const { Leaf } = require('../../models/leaf');
-const moment = require('moment');
-moment.tz.setDefault('Asia/Seoul');
+const timezone = require('dayjs/plugin/timezone');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Seoul');
 
 //예약 신청
 const createBooking = async (req, res) => {
   const userId = res.locals.user.userId;
-  const { leaf, guestId, start, end } = req.body;
+
+  const { leaf, guestId, date } = req.body;
   const hostId = req.params.userId;
+
+  //날짜, 시간 설정
+  const start = date.split('-')[0];
+  const end = date.split('-')[1];
   const bookingMoment = new dayjs();
   const startMoment = dayjs(start);
-  const time = moment.duration(startMoment.diff(bookingMoment)).asMinutes();
+  const time = startMoment.diff(bookingMoment, 'minute');
+  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD ddd');
+  const startTime = dayjs(start).tz().format('HH:mm:ss');
+  const endTime = dayjs(end).tz().format('HH:mm:ss');
+  const bookingTime = `${startTime} - ${endTime}`;
 
-  const meetingMoment = dayjs(start);
-  const meetingDate = dayjs(meetingMoment).format('YYYY.MM.DD');
-  const meetingTime = dayjs(start).format('HH:mm:ss');
-  const endTime = dayjs(end).format('HH:mm:ss');
-  const bookingTime = `${meetingTime} - ${endTime}`;
+  console.log(01, userId, guestId, leaf, hostId, bookingTime, meetingDate);
 
-  if (time < 60) {
-    res.status(400).send({ msg: '화상 채팅 1시간 전까지만 예약가능합니다.' });
-    return;
+  //예약시간 제한
+  if (time < 180) {
+    return res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
   }
+
+  // 호스트id, 예약시간, 예약날짜 조회
+  const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
+  if (existRev.length > 0) {
+    return res.send({ msg: '이미 예약된 시간 입니다.' });
+  }
+
+  // 유저 나뭇잎 조회
+  const userPoint = res.locals.user.point;
+  if (userPoint < 5) {
+    return res.send({ msg: '나뭇잎이 부족합니다.' });
+  }
+
+  //포인트 음수 차단
+  const availablePoint = userPoint - leaf;
+  if (availablePoint < 0) {
+    return res.send({ msg: '가지고 있는 나뭇잎이 부족합니다.' });
+  }
+
+  //본인 예약 차단
   if (hostId == guestId) {
     return res.status(400).send({ result: false });
   }
 
+  //예약 신청
   try {
     const booking_result = await bookingService.createBooking(
       userId,
@@ -36,76 +64,92 @@ const createBooking = async (req, res) => {
       bookingTime,
       meetingDate
     );
-    return res.status(200).json({ result: true });
+    return res.status(200).json({ booking_result, result: true });
   } catch (error) {
     console.log(error);
   }
 };
 exports.createBooking = createBooking;
 
-//예약 조회
-const inquireBooking = async (req, res) => {
+//게스트 예약 조회
+const bookingList = async (req, res) => {
   const userId = res.locals.user.userId;
-  console.log(userId);
 
   try {
-    if (userId !== undefined) {
-      const inquireResult = await bookingService.inquireBooking(userId);
-      return res.status(200).json({ inquireResult, result: true });
-    } else {
-      const hostResult = await bookingService.hostInquireBooking(userId);
-      return res.status(200).json({ hostResult, result: true });
-    }
+    const hostBookingList = await bookingService.hostBooking(userId);
+    const guestBookingList = await bookingService.guestBooking(userId);
+    const totalList = { hostBookingList, guestBookingList };
+    return res.status(200).json({ totalList, result: true });
   } catch (error) {
     console.log(error);
   }
 };
-exports.inquireBooking = inquireBooking;
+exports.bookingList = bookingList;
 
-// 예약 수락
-const accpetBooking = async (req, res) => {
-  const hostId = res.locals.user.userId;
-
-  const hostResult = await bookingService.hostInquireBooking(hostId);
-  // const guestId = guestIdList[].guestId;
-  // const guestId = hostResult.map((hostResult) => hostResult.guestId);
-  const bookingIdArray = hostResult.map((hostResult) => hostResult.bookingId);
-  console.log(bookingIdArray);
+// 호스트 예약 수락
+const acceptBooking = async (req, res) => {
+  const hostId = req.params.hostId;
+  const bookingId = req.params.bookingId;
+  const guest = await bookingService.findOne(bookingId);
+  const guestId = guest[0].guestId;
+  const cntLeaf = await bookingService.findOne(bookingId);
+  const leaf = cntLeaf[0].leaf;
+  console.log(hostId, bookingId, guestId, leaf);
   try {
-    for (let i = 0; i < bookingIdArray.length; i++) {
-      return console.log(i);
-    }
-    const accpetBooking = await bookingService.confirmBooking(hostId, bookingId);
-    return res.status(200).json({ accpetBooking, result: true });
+    const acceptBooking = await bookingService.confirmBooking(
+      hostId,
+      bookingId,
+      guestId,
+      leaf
+    );
+    return res.status(200).json({ acceptBooking, result: true });
   } catch (error) {
     console.log(error);
   }
 };
-exports.accpetBooking = accpetBooking;
+exports.acceptBooking = acceptBooking;
 
-// 예약 취소
-const cancelBooking = async (req, res) => {
-  const guestId = res.locals.user.userId;
-  const giverId = res.locals.user.userId;
-  const recipientId = req.params.userId;
-  const hostId = req.params.userId;
-  //console.log(guestId, hostId, recipientId);
-  const pointList = await bookingService.findLeaf(giverId, guestId);
-  const point = pointList[1].leaf;
-  const bookingList = await bookingService.checkBooking(guestId, hostId);
-  const booking = bookingList[0].bookingId;
-  console.log(booking, point);
+// 호스트 예약 취소
+const cancelReservation = async (req, res) => {
+  const hostId = req.params.hostId;
+  const bookingId = req.params.bookingId;
+  const guest = await bookingService.findOne(bookingId);
+  const guestId = guest[0].guestId;
+  const cntLeaf = await bookingService.findOne(bookingId);
+  const leaf = cntLeaf[0].leaf;
 
+  console.log(guestId, bookingId, hostId, leaf);
   try {
     const booking_result = await bookingService.cancelBooking(
-      booking,
-      point,
+      bookingId,
       guestId,
-      recipientId,
-      giverId
+      leaf,
+      hostId
     );
+    res.status(200).json({ booking_result, result: true });
+  } catch (error) {
+    console.log(error);
+  }
+};
+exports.cancelReservation = cancelReservation;
 
-    res.status(200).json({ result: true });
+// 게스트 예약 취소
+const cancelBooking = async (req, res) => {
+  const guestId = req.params.guestId;
+  const bookingId = req.params.bookingId;
+  const host = await bookingService.findOne(bookingId);
+  const hostId = host[0].hostId;
+  const cntLeaf = await bookingService.findOne(bookingId);
+  const leaf = cntLeaf[0].leaf;
+  console.log(guestId, bookingId, hostId, leaf);
+  try {
+    const booking_result = await bookingService.cancelBooking(
+      bookingId,
+      guestId,
+      leaf,
+      hostId
+    );
+    res.status(200).json({ booking_result, result: true });
   } catch (error) {
     console.log(error);
   }

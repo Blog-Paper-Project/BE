@@ -35,7 +35,7 @@ exports.user_restore = user_restore;
 // 로그인
 const login = async (email) => {
   return await User.findOne({
-    attributes: ['nickname', 'password', 'userId', 'email', 'deletedAt'],
+    attributes: ['nickname', 'password', 'userId', 'email', 'deletedAt', 'profileImage'],
     where: { email },
   });
 };
@@ -46,8 +46,8 @@ const duplicate = async (id) => {
   return await User.findAll({
     where: {
       [Op.or]: {
-        email: { [Op.like]: `%${id}%` },
-        nickname: { [Op.like]: `%${id}%` },
+        email: id,
+        nickname: id,
       },
     },
   });
@@ -65,6 +65,17 @@ exports.myprofile = myprofile;
 
 // 마이 프로필 수정
 const myprofile_correction = async (user, profileImage, nickname, introduction) => {
+  if (nickname) {
+    const duplicate = await User.findAll({
+      where: { nickname },
+    });
+
+    // 닉네임 중복 체크
+    if (duplicate[0]?.dataValues.nickname === nickname) {
+      return false;
+    }
+  }
+
   await deleteImg(user.profileImage);
 
   await User.update(

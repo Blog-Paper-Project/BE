@@ -1,28 +1,49 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
 /* eslint-disable */
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
+const date_1 = require("../modules/date");
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
-    return await Paper.findAll({
-        where: { title: { [Op.like]: `%${keyword}%` } },
+    return (await Paper.findAll({
+        where: {
+            [Op.or]: [
+                { title: { [Op.like]: `%${keyword}%` } },
+                { contents: { [Op.like]: `%${keyword}%` } },
+            ],
+        },
         order: [['createdAt', 'DESC']],
-    });
+    }));
 };
 exports.findPostsBy = findPostsBy;
-// 모든 게시글과 좋아요 검색
+// 1주일간 좋아요 순으로 게시글 11개 검색
 const findAllPosts = async () => {
-    return await Paper.findAll({ include: { model: User, as: 'Likes' } });
+    const papers = await Paper.findAll({
+        include: { model: User, as: 'Likes' },
+    });
+    const papersByLike = papers
+        .map((paper) => {
+        const { postId, userId, title, contents, thumbnail, Likes } = paper;
+        const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
+        return { postId, userId, title, contents, thumbnail, likes };
+    })
+        .sort((a, b) => b.likes - a.likes)
+        .slice(0, 11)
+        .map((paper) => {
+        paper.contents = paper.contents.replace(/!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g, '');
+        return paper;
+    });
+    return papersByLike;
 };
 exports.findAllPosts = findAllPosts;
-// 인기도 순으로 유저 10명 검색
+// 인기도 순으로 유저 18명 검색
 const findBestUsers = async () => {
     return await User.findAll({
         order: [['popularity', 'DESC']],
-        limit: 10,
+        limit: 18,
         attributes: ['userId', 'nickname', 'profileImage', 'popularity'],
     });
 };
@@ -43,7 +64,7 @@ const findMiniInfo = async (userId) => {
 exports.findMiniInfo = findMiniInfo;
 // 특정 유저와 게시글 검색
 const findUserInfo = async (userId) => {
-    return await User.findOne({
+    const user = (await User.findOne({
         where: { userId },
         attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
         include: {
@@ -51,9 +72,19 @@ const findUserInfo = async (userId) => {
             include: { model: Tag, attributes: ['name'] },
         },
         order: [[Paper, 'createdAt', 'DESC']],
-    });
+    }));
+    let categories = user?.Papers.map((paper) => paper.category);
+    let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
+    categories = [...new Set(categories)];
+    tags = [...new Set(tags)];
+    return [user, categories, tags];
 };
 exports.findUserInfo = findUserInfo;
+// 개인 페이지 카테고리 수정
+const updateCategory = async (userId, category, newCategory) => {
+    return await Paper.update({ category: newCategory }, { where: { userId, category } });
+};
+exports.updateCategory = updateCategory;
 // 특정 게시글 검색
 const findPost = async (postId) => {
     return await Paper.findOne({ where: { postId } });
@@ -67,7 +98,7 @@ const findPostInfo = async (postId) => {
             { model: Comment },
             { model: Tag, attributes: ['name'] },
             { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
-            { model: User, as: 'Likes' },
+            { model: User, as: 'Likes', attributes: ['nickname'] },
         ],
     });
 };
@@ -90,7 +121,10 @@ const createTags = async (postId, tags) => {
 exports.createTags = createTags;
 // 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
 const updateImage = async (postId, images) => {
-    const originalImages = await Image.findAll({ where: { postId }, raw: true });
+    const originalImages = await Image.findAll({
+        where: { postId },
+        raw: true,
+    });
     if (originalImages.length) {
         const replaced = originalImages.filter((img) => !images.includes(img.url));
         for (let item of replaced) {
@@ -129,17 +163,17 @@ const destroyPost = async (userId, postId) => {
     for (let image of images) {
         await deleteImg(image.url);
     }
-    await deleteImg(paper.thumbnail);
+    await deleteImg(paper?.thumbnail);
     return await paper.destroy();
 };
 exports.destroyPost = destroyPost;
 // 댓글 작성
 const createComment = async (text, userId, postId) => {
-    return await Comment.create({
+    return (await Comment.create({
         text,
         userId,
         postId: +postId,
-    });
+    }));
 };
 exports.createComment = createComment;
 // 댓글 수정
