@@ -1,4 +1,15 @@
-const { User, Booking, Leaf } = require('../../models');
+const { User, Booking, Leaf, Point } = require('../../models');
+
+//나뭇잎 설정
+const setPoint = async (leaf, userId) => {
+  return await Point.update({
+    where: {
+      userId: userId,
+      setPoint: leaf,
+    },
+  });
+};
+exports.setPoint = setPoint;
 
 //예약시간 조회
 const findRev = async (hostId, bookingTime, meetingDate) => {
