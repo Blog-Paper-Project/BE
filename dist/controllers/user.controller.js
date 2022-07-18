@@ -5,7 +5,6 @@ const userService = require('../services/user.service');
 const passport = require('passport');
 const Validatorsinup = require('../middleware/signup.validator');
 const Validatorlogin = require('../middleware/login.validator');
-const { string } = require('joi');
 
 require('dotenv').config();
 
@@ -115,23 +114,18 @@ exports.googleCallback = googleCallback;
 
 //회원가입
 const signup = async (req, res, next) => {
-  try {
-    const { email, nickname, password, confirmPassword } =
-      await Validatorsinup.validateAsync(req.body);
+  const { email, nickname, password, confirmPassword } =
+    await Validatorsinup.validateAsync(req.body);
 
-    const rows = await userService.signup(email, nickname, password);
-    if (rows === false) {
-      return res.status(200).send({
-        result: false,
-      });
-    } else {
-      res.status(200).send({
-        result: true,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    next(error);
+  const rows = await userService.signup(email, nickname, password);
+  if (rows === false) {
+    return res.status(400).send({
+      result: false,
+    });
+  } else {
+    res.status(200).send({
+      result: true,
+    });
   }
 };
 exports.signup = signup;
@@ -183,53 +177,43 @@ exports.user_restore = user_restore;
 
 // 로그인
 const login = async (req, res, next) => {
-  try {
-    const { email, password } = await Validatorlogin.validateAsync(req.body);
-    const user = await userService.login(email);
-    const passwordck = await Bcrypt.compare(password, user.password);
-    const exuser = user.deletedAt;
-    console.log(user.profileImage);
+  const { email, password } = await Validatorlogin.validateAsync(req.body);
+  const user = await userService.login(email);
+  const passwordck = await Bcrypt.compare(password, user.password);
+  const exuser = user.deletedAt;
+  console.log(user.profileImage);
 
-    // 탈퇴한 회원
-    if (exuser) {
-      return res.status(400).send({
-        result: false,
-        msg: '탈퇴한 회원입니다',
-      });
-    }
-
-    // 이메일이 틀리거나 패스워드가 틀렸을때
-    if (!user || !passwordck) {
-      return res.status(400).send({
-        result: false,
-      });
-    }
-    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
-      expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+  // 탈퇴한 회원
+  if (exuser) {
+    return res.status(400).send({
+      result: false,
+      msg: '탈퇴한 회원입니다',
     });
-    const refreshToken = jwt.sign(
-      { userId: user.userId },
-      process.env.REFRESH_TOKEN_KEY,
-      {
-        expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
-      }
-    );
-
-    await userService.refresh_token(email, refreshToken);
-
-    res.status(200).send({
-      result: true,
-      nickname: user.nickname,
-      accessToken,
-      refreshToken,
-      profileImage: user.profileImage,
-      userId: user.userId,
-
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
   }
+
+  // 이메일이 틀리거나 패스워드가 틀렸을때
+  if (!user || !passwordck) {
+    return res.status(400).send({
+      result: false,
+    });
+  }
+  const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+    expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+  });
+  const refreshToken = jwt.sign({ userId: user.userId }, process.env.REFRESH_TOKEN_KEY, {
+    expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+  });
+
+  await userService.refresh_token(email, refreshToken);
+
+  res.status(200).send({
+    result: true,
+    nickname: user.nickname,
+    accessToken,
+    refreshToken,
+    profileImage: user.profileImage,
+    userId: user.userId,
+  });
 };
 exports.login = login;
 

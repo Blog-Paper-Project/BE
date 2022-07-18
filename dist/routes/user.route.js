@@ -5,6 +5,7 @@ const { upload } = require('../modules/multer');
 const passport = require('passport');
 const router = express.Router();
 const Usercontroller = require('../controllers/user.controller');
+const AsyncHandler = require('../middleware/async.handler');
 
 require('dotenv').config();
 
@@ -28,7 +29,7 @@ router.get(
 router.get('/login/google/callback', Usercontroller.googleCallback);
 
 // 회원가입
-router.post('/signup', Usercontroller.signup);
+router.post('/signup', AsyncHandler(Usercontroller.signup));
 
 // 회원탈퇴
 router.patch('/', Authmiddle, Usercontroller.userDelete);
@@ -37,7 +38,7 @@ router.patch('/', Authmiddle, Usercontroller.userDelete);
 router.patch('/restore', Usercontroller.user_restore);
 
 // 로그인
-router.post('/login', Usercontroller.login);
+router.post('/login', AsyncHandler(Usercontroller.login));
 
 router.post('/refresh', Usercontroller.refresh);
 
