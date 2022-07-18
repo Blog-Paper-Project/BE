@@ -9,6 +9,7 @@ const Booking = require('./booking');
 const Leaf = require('./leaf');
 const Review = require('./review');
 const Image = require('./image');
+const Point = require('./point');
 
 const db = {};
 
@@ -34,6 +35,7 @@ db.Booking = Booking;
 db.Leaf = Leaf;
 db.Review = Review;
 db.Image = Image;
+db.Point = Point;
 
 User.init(sequelize);
 Paper.init(sequelize);
@@ -43,6 +45,7 @@ Booking.init(sequelize);
 Leaf.init(sequelize);
 Review.init(sequelize);
 Image.init(sequelize);
+Point.init(sequelize);
 
 User.associate(db);
 Paper.associate(db);
@@ -52,5 +55,6 @@ Booking.associate(db);
 Leaf.associate(db);
 Review.associate(db);
 Image.associate(db);
+Point.associate(db);
 
 module.exports = db;
