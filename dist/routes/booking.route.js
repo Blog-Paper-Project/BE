@@ -9,8 +9,8 @@ router.post('/:userId', auth, bookingController.createBooking);
 //전체 예약보기
 router.get('/', auth, bookingController.bookingList);
 
-//호스트(주최자) 기져오기
-// router.get('/host/:hostId', auth, bookingController.hostInquireBooking);
+//나뭇잎 설정
+router.patch('leaf/:userId', auth, bookingController.setPoint);
 
 //호스트 예약 수락
 router.patch('/:hostId/:bookingId', auth, bookingController.acceptBooking);
