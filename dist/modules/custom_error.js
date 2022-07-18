@@ -5,7 +5,7 @@ function createError(status, message, userId = null) {
     winston_1.default.error(`${userId} - ${message}`);
     const error = new Error(message);
     error.status = status;
-    error.success = false;
+    error.result = false;
     return error;
 }
 exports.default = createError;
