@@ -33,7 +33,15 @@ exports.user_restore = async (email, deletedAt) => {
 // 로그인
 exports.login = async (email) => {
   return await User.findOne({
-    attributes: ['nickname', 'password', 'userId', 'email', 'deletedAt', 'profileImage'],
+    attributes: [
+      'nickname',
+      'password',
+      'userId',
+      'email',
+      'deletedAt',
+      'profileImage',
+      'blogId',
+    ],
     where: { email },
   });
 };
@@ -91,7 +99,7 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
 
 // 이메일 인증
 exports.emailauth = async (emailAuth) => {
-  await User.create({ emailAuth});
+  await User.create({ emailAuth });
 };
 
 // 이메일 인증 체크
