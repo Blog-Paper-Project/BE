@@ -23,6 +23,9 @@ router.patch(
 // 미니 프로필 조회
 router.get('/miniprofile', auth, asyncHandler(PaperController.readMiniProfile));
 
+// 구독 중인 최신 게시글 조회
+router.get('/myfeed', auth, asyncHandler(PaperController.readMyFeed));
+
 // 상세 페이지 조회
 router.get('/users/:userId/:postId', asyncHandler(PaperController.readPost));
 
