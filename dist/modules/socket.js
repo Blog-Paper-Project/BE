@@ -19,6 +19,8 @@ module.exports = (server) => {
       ],
     });
 
+    console.log(io.sockets.adapter.sids.values());
+
     // io.sockets.adapter.sids를 하면 map으로 websocket에 들어온 socket id와 참가한 방이 나온다.
     // Map은 key, value 형식이므로 value()로 접근해 id와 room에 접근
     // 1번쨰 인덱스에 내가 참가한 방이 나오므로 map을 돌면서 첫번쨰 인덱스만 다 가지고 온다. Set으로 중복 데이터를 없앤다
@@ -34,7 +36,7 @@ module.exports = (server) => {
       console.log([
         ...new Set([...io.sockets.adapter.sids.values()].map((data) => [...data][1])),
       ]);
-
+      console.log(io.sockets.adapter.sids.values());
       io.to(room).emit('update', {
         type: 'connect',
         name,
@@ -70,7 +72,7 @@ module.exports = (server) => {
 
     socket.on('callUser', (data) => {
       io.to(data.userToCall).emit('callUser', {
-        signal: data.signalData,
+        signal: data.signalData, //sdp
         from: data.from,
         name: data.name,
       });
