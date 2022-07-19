@@ -90,8 +90,8 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
 };
 
 // 이메일 인증
-exports.emailauth = async (email, emailAuth) => {
-  await User.create({ emailAuth, email }, { where: { email } });
+exports.emailauth = async (emailAuth) => {
+  await User.create({ emailAuth});
 };
 
 // 이메일 인증 체크
