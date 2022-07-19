@@ -2,7 +2,7 @@ const bookingService = require('../services/booking.service');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
-const exp = require('constants');
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
@@ -23,11 +23,12 @@ const setPoint = async (req, res, next) => {
 exports.setPoint = setPoint;
 
 const patchPoint = async (req, res, next) => {
-  const { userId } = req.params;
+  const userId = req.params.userId;
   const { setLeaf } = req.body;
 
   try {
     const patchPoint = await bookingService.patchPoint(setLeaf, userId);
+    console.log(patchPoint);
     return res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
@@ -106,7 +107,7 @@ const createBooking = async (req, res, next) => {
 };
 exports.createBooking = createBooking;
 
-//게스트 예약 조회
+// 예약 조회
 const bookingList = async (req, res, next) => {
   const userId = res.locals.user.userId;
 
@@ -146,7 +147,7 @@ const acceptBooking = async (req, res, next) => {
 };
 exports.acceptBooking = acceptBooking;
 
-// 호스트 예약 취소
+// 호스트 화상채팅 수락 후 예약 취소
 const cancelReservation = async (req, res, next) => {
   const hostId = req.params.hostId;
   const bookingId = req.params.bookingId;
@@ -173,7 +174,7 @@ const cancelReservation = async (req, res, next) => {
 };
 exports.cancelReservation = cancelReservation;
 
-// 게스트 예약 취소
+// 게스트 화상채팅 수락 후 예약 취소
 const cancelBooking = async (req, res, next) => {
   const guestId = req.params.guestId;
   const bookingId = req.params.bookingId;
@@ -196,3 +197,25 @@ const cancelBooking = async (req, res, next) => {
   }
 };
 exports.cancelBooking = cancelBooking;
+
+//예약 수락전 화상채팅 취소
+// const recall = async (req, res, next) => {
+//   const guestId = req.params.guestId;
+
+//   const bookingId = req.params.bookingId;
+//   const host = await bookingService.findOne(bookingId);
+//   const hostId = host[0].hostId;
+//   const cntLeaf = await bookingService.findOne(bookingId);
+//   const leaf = cntLeaf[0].leaf;
+
+//   console.log(bookingId, guestId, leaf, hostId);
+
+//   try {
+//     const bookingResult = await bookingService.recall(bookingId, guestId, leaf, hostId);
+//     res.status(200).json({ result: true });
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// };
+// exports.recall = recall;
