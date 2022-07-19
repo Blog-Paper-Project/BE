@@ -17,11 +17,6 @@ module.exports = () => {
           const existUser = await User.findOne({
             where: { email: profile._json.kakao_account.email },
           });
-          console.log(existUser.dataValues.email === profile._json.kakao_account.email);
-          console.log(
-            (existUser.dataValues.email === profile._json.kakao_account.email &&
-              profile.provider) === 'local'
-          );
           if (
             existUser?.dataValues.email === profile._json.kakao_account.email &&
             existUser?.dataValues.provider === 'local'
