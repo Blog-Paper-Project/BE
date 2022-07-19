@@ -143,6 +143,7 @@ exports.login = async (req, res, next) => {
     profileImage: user.profileImage,
     token,
     userId: user.userId,
+    blogId: user.blogId,
   });
 };
 

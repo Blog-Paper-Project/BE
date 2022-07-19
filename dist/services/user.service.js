@@ -33,7 +33,15 @@ exports.user_restore = async (email, deletedAt) => {
 // 로그인
 exports.login = async (email) => {
   return await User.findOne({
-    attributes: ['nickname', 'password', 'userId', 'email', 'deletedAt', 'profileImage'],
+    attributes: [
+      'nickname',
+      'password',
+      'userId',
+      'email',
+      'deletedAt',
+      'profileImage',
+      'blogId',
+    ],
     where: { email },
   });
 };
