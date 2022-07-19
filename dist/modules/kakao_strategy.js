@@ -17,6 +17,7 @@ module.exports = () => {
           const existUser = await User.findOne({
             where: { snsId: profile.id, provider: 'kakao' },
           });
+          console.log(existUser);
           if (existUser) {
             // kakao 를 통해 이미 가입된 회원이면 로그인 처리
             done(null, existUser);
