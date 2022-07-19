@@ -2,7 +2,12 @@ const { User, Booking, Leaf, Point } = require('../../models');
 
 //나뭇잎 설정
 const setPoint = async (setPoint, userId) => {
-  console.log(setPoint, userId);
+  const duplicate = await Point.findAll({
+    where: { userId: userId },
+  });
+
+  if (duplicate.length) return false;
+
   await Point.create({
     userId: userId,
     setPoint: setPoint,
