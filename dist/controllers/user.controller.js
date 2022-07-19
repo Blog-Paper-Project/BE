@@ -10,14 +10,13 @@ require('dotenv').config();
 
 // 카카오 로그인
 exports.kakaoCallback = (req, res, next) => {
-  passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
+  passport.authenticate('kakao', (err, user) => {
     if (err) return next(err);
 
     const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-    console.log(profileImage);
-    res.status(200).send({
+    res.status(200).json({
       result: true,
       token,
       nickname,
@@ -119,14 +118,20 @@ exports.user_restore = async (req, res, next) => {
 
 // 로그인
 exports.login = async (req, res, next) => {
+  const session = req.sessionID;
   const { email, password } = await Validatorlogin.validateAsync(req.body);
-  const user = await userService.login(email);
+  const user = await userService.login(email, session);
   const passwordck = await Bcrypt.compare(password, user.password);
-  const exuser = user.deletedAt;
-  console.log(user.profileImage);
+
+  // if (user.snsId !== snsId && snsId !== null) {
+  //   return res.status(400).send({
+  //     result: false,
+  //     message: '다른 곳에서 로그인 중입니다.',
+  //   });
+  // }
 
   // 탈퇴한 회원
-  if (exuser) {
+  if (user.deletedAt) {
     return res.status(400).send({
       result: false,
       msg: '탈퇴한 회원입니다',
@@ -149,6 +154,7 @@ exports.login = async (req, res, next) => {
     token,
     userId: user.userId,
     blogId: user.blogId,
+    session,
   });
 };
 
