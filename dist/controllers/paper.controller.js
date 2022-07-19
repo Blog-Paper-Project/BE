@@ -19,11 +19,11 @@ const readMain = async (req, res) => {
 exports.readMain = readMain;
 // 개인 페이지 조회
 const readBlog = async (req, res, next) => {
-    const { userId } = req.params;
-    if (!+userId) {
-        return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+    const { blogId } = req.params;
+    if (!blogId) {
+        return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    const [user, categories, tags] = await PaperService.findUserInfo(userId);
+    const [user, categories, tags] = await PaperService.findUserInfo(blogId);
     if (!user) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
@@ -32,18 +32,18 @@ const readBlog = async (req, res, next) => {
 exports.readBlog = readBlog;
 // 개인 페이지 카테고리 수정
 const updateCategory = async (req, res, next) => {
-    const { userId: bloggerId, category } = req.params;
+    const { blogId, category } = req.params;
     const { newCategory } = req.body;
-    const userId = res.locals?.user?.userId;
-    if (!userId) {
+    const user = res.locals?.user;
+    if (!user) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
-    if (userId !== +bloggerId) {
+    if (user.blogId !== blogId) {
         return next((0, custom_error_1.default)(403, 'Access Forbidden'));
     }
     const schema = (0, validate_paper_1.validateCategory)();
     await schema.validateAsync({ category, newCategory });
-    const result = await PaperService.updateCategory(userId, category, newCategory);
+    const result = await PaperService.updateCategory(user.userId, category, newCategory);
     if (!result[0]) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
@@ -75,15 +75,15 @@ const readMyFeed = async (req, res, next) => {
 exports.readMyFeed = readMyFeed;
 // 상세 페이지 조회
 const readPost = async (req, res, next) => {
-    const { userId, postId } = req.params;
-    if (!+userId) {
-        return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+    const { blogId, postId } = req.params;
+    if (!blogId) {
+        return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
     if (!+postId) {
         return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
     }
     const paper = await PaperService.findPostInfo(postId);
-    if (!paper) {
+    if (!paper || paper.Users.blogId !== blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
     return res.json({ paper });
@@ -258,27 +258,27 @@ const createLike = async (req, res, next) => {
 exports.createLike = createLike;
 // 구독 등록 및 취소
 const createSubs = async (req, res, next) => {
-    const myId = res.locals?.user?.userId;
-    const { userId: writerId } = req.params;
-    if (!myId) {
+    const user = res.locals?.user;
+    const { blogId } = req.params;
+    if (!user) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
-    if (!+writerId) {
-        return next((0, custom_error_1.default)(400, `Invalid WriterId : ${writerId}`));
-    }
-    if (+myId === +writerId) {
-        return next((0, custom_error_1.default)(400, 'Self-Subs Forbidden'));
-    }
-    const user = await PaperService.findUser(writerId);
-    if (!user) {
+    if (!blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    const subbed = await user.getFollowers({ where: { userId: myId } });
+    if (user.blogId === blogId) {
+        return next((0, custom_error_1.default)(400, 'Self-Subs Forbidden'));
+    }
+    const blogger = await PaperService.findUser(blogId);
+    if (!blogger) {
+        return next((0, custom_error_1.default)(404, 'Not Found!'));
+    }
+    const subbed = await blogger.getFollowers({ where: { userId: user.userId } });
     if (subbed.length) {
-        await user.removeFollowers(myId);
+        await blogger.removeFollowers(user.userId);
         return res.json({ result: true, message: 'Subs Canceled' });
     }
-    await user.addFollowers(myId);
+    await blogger.addFollowers(user.userId);
     return res.json({ result: true, message: 'Subs Done' });
 };
 exports.createSubs = createSubs;

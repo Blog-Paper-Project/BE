@@ -27,13 +27,13 @@ export const readMain = async (req: Request, res: Response) => {
 
 // 개인 페이지 조회
 export const readBlog = async (req: Request, res: Response, next: NextFunction) => {
-  const { userId } = req.params;
+  const { blogId } = req.params;
 
-  if (!+userId) {
-    return next(createError(401, 'Unauthorized!'));
+  if (!blogId) {
+    return next(createError(404, 'Not Found!'));
   }
 
-  const [user, categories, tags] = await PaperService.findUserInfo(userId);
+  const [user, categories, tags] = await PaperService.findUserInfo(blogId);
 
   if (!user) {
     return next(createError(404, 'Not Found!'));
@@ -44,15 +44,15 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
 
 // 개인 페이지 카테고리 수정
 export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
-  const { userId: bloggerId, category } = req.params;
+  const { blogId, category } = req.params;
   const { newCategory } = req.body;
-  const userId = res.locals?.user?.userId;
+  const user = res.locals?.user as Models.User;
 
-  if (!userId) {
+  if (!user) {
     return next(createError(401, 'Unauthorized!'));
   }
 
-  if (userId !== +bloggerId) {
+  if (user.blogId !== blogId) {
     return next(createError(403, 'Access Forbidden'));
   }
 
@@ -60,7 +60,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
 
   await schema.validateAsync({ category, newCategory });
 
-  const result = await PaperService.updateCategory(userId, category, newCategory);
+  const result = await PaperService.updateCategory(user.userId, category, newCategory);
 
   if (!result[0]) {
     return next(createError(404, 'Not Found!'));
@@ -105,10 +105,10 @@ export const readMyFeed = async (req: Request, res: Response, next: NextFunction
 
 // 상세 페이지 조회
 export const readPost = async (req: Request, res: Response, next: NextFunction) => {
-  const { userId, postId } = req.params;
+  const { blogId, postId } = req.params;
 
-  if (!+userId) {
-    return next(createError(401, 'Unauthorized!'));
+  if (!blogId) {
+    return next(createError(404, 'Not Found!'));
   }
 
   if (!+postId) {
@@ -117,7 +117,7 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
 
   const paper = await PaperService.findPostInfo(postId);
 
-  if (!paper) {
+  if (!paper || paper.Users.blogId !== blogId) {
     return next(createError(404, 'Not Found!'));
   }
 
@@ -371,36 +371,36 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
 
 // 구독 등록 및 취소
 export const createSubs = async (req: Request, res: Response, next: NextFunction) => {
-  const myId = res.locals?.user?.userId;
-  const { userId: writerId } = req.params;
+  const user = res.locals?.user as Models.User;
+  const { blogId } = req.params;
 
-  if (!myId) {
+  if (!user) {
     return next(createError(401, 'Unauthorized!'));
   }
 
-  if (!+writerId) {
-    return next(createError(400, `Invalid WriterId : ${writerId}`));
-  }
-
-  if (+myId === +writerId) {
-    return next(createError(400, 'Self-Subs Forbidden'));
-  }
-
-  const user = await PaperService.findUser(writerId);
-
-  if (!user) {
+  if (!blogId) {
     return next(createError(404, 'Not Found!'));
   }
 
-  const subbed = await user.getFollowers({ where: { userId: myId } });
+  if (user.blogId === blogId) {
+    return next(createError(400, 'Self-Subs Forbidden'));
+  }
+
+  const blogger = await PaperService.findUser(blogId);
+
+  if (!blogger) {
+    return next(createError(404, 'Not Found!'));
+  }
+
+  const subbed = await blogger.getFollowers({ where: { userId: user.userId } });
 
   if (subbed.length) {
-    await user.removeFollowers(myId);
+    await blogger.removeFollowers(user.userId);
 
     return res.json({ result: true, message: 'Subs Canceled' });
   }
 
-  await user.addFollowers(myId);
+  await blogger.addFollowers(user.userId);
 
   return res.json({ result: true, message: 'Subs Done' });
 };

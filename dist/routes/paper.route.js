@@ -8,16 +8,16 @@ const asyncHandler = require('../middleware/async.handler');
 const router = express.Router();
 // 메인 페이지 조회 & 게시글 검색
 router.get('/', asyncHandler(PaperController.readMain));
-// 개인 페이지 조회
-router.get('/users/:userId', asyncHandler(PaperController.readBlog));
-// 개인 페이지 카테고리 수정
-router.patch('/users/:userId/categories/:category', auth, asyncHandler(PaperController.updateCategory));
 // 미니 프로필 조회
 router.get('/miniprofile', auth, asyncHandler(PaperController.readMiniProfile));
 // 구독 중인 최신 게시글 조회
 router.get('/myfeed', auth, asyncHandler(PaperController.readMyFeed));
+// 개인 페이지 조회
+router.get('/:blogId', asyncHandler(PaperController.readBlog));
+// 개인 페이지 카테고리 수정
+router.patch('/:blogId/categories/:category', auth, asyncHandler(PaperController.updateCategory));
 // 상세 페이지 조회
-router.get('/users/:userId/:postId', asyncHandler(PaperController.readPost));
+router.get('/:blogId/:postId', asyncHandler(PaperController.readPost));
 // 상세 페이지 작성
 router.post('/', auth, asyncHandler(PaperController.createPost));
 // 상세 페이지 이미지 첨부
@@ -35,5 +35,5 @@ router.delete('/:postId/comments/:commentId', auth, asyncHandler(PaperController
 // 좋아요 등록 및 취소
 router.post('/:postId/likes', auth, asyncHandler(PaperController.createLike));
 // 구독 등록 및 취소
-router.post('/users/:userId/subscription', auth, asyncHandler(PaperController.createSubs));
+router.post('/:blogId/subscription', auth, asyncHandler(PaperController.createSubs));
 module.exports = router;
