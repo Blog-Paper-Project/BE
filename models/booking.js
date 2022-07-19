@@ -40,5 +40,16 @@ module.exports = class Booking extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.Booking.belongsTo(db.User, {
+      as: 'guest',
+      foreignKey: 'guestId',
+      onDelete: 'cascade',
+    });
+    db.Booking.belongsTo(db.User, {
+      as: 'host',
+      foreignKey: 'hostId',
+      onDelete: 'cascade',
+    });
+  }
 };

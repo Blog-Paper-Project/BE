@@ -13,7 +13,7 @@ module.exports = class Point extends Sequelize.Model {
         setPoint: {
           type: Sequelize.INTEGER,
           allowNull: true,
-          defaultValue: 0,
+          defaultValue: 5,
         },
       },
       {
@@ -30,7 +30,7 @@ module.exports = class Point extends Sequelize.Model {
     db.Point.belongsTo(db.User, {
       as: 'Points',
       foreignKey: 'userId',
-      // onDelete: 'cascde',
+      onDelete: 'cascde',
     });
   }
 };

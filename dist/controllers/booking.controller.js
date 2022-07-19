@@ -10,6 +10,7 @@ dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
 //나뭇잎 설정
 const setPoint = async (req, res, next) => {
   const { setPoint } = req.body;
+
   const { userId } = req.params;
 
   try {
@@ -189,12 +190,7 @@ const cancelBooking = async (req, res, next) => {
   const leaf = cntLeaf[0].leaf;
   console.log(guestId, bookingId, hostId, leaf);
   try {
-    const booking_result = await bookingService.cancelBooking(
-      bookingId,
-      guestId,
-      leaf,
-      hostId
-    );
+    const booking_result = await bookingService.recall(bookingId, guestId, leaf, hostId);
     res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);

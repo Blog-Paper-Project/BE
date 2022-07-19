@@ -2,7 +2,7 @@ const sequelize = require('sequelize');
 const Bcrypt = require('bcrypt');
 const { Op } = sequelize;
 const { deleteImg } = require('../modules/multer');
-const { User } = require('../../models');
+const { User, Point } = require('../../models');
 
 // 회원가입
 exports.signup = async (email, nickname, password, blogId) => {
@@ -68,6 +68,12 @@ exports.myprofile = async (user) => {
   return await User.findOne({
     where: { userId: user.userId },
     attributes: { exclude: ['password'] },
+    include: [
+      {
+        model: Point,
+        attributes: ['setPoint'],
+      },
+    ],
   });
 };
 
