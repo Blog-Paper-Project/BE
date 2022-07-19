@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findUserInfo = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
 /* eslint-disable */
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
@@ -48,9 +48,27 @@ const findBestUsers = async () => {
     });
 };
 exports.findBestUsers = findBestUsers;
+// 특정 유저와 게시글 검색
+const findUserInfo = async (blogId) => {
+    const user = (await User.findOne({
+        where: { blogId },
+        attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
+        include: {
+            model: Paper,
+            include: { model: Tag, attributes: ['name'] },
+        },
+        order: [[Paper, 'createdAt', 'DESC']],
+    }));
+    let categories = user?.Papers.map((paper) => paper.category);
+    let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
+    categories = [...new Set(categories)];
+    tags = [...new Set(tags)];
+    return [user, categories, tags];
+};
+exports.findUserInfo = findUserInfo;
 // 특정 유저 검색
-const findUser = async (userId) => {
-    return await User.findOne({ where: { userId } });
+const findUser = async (blogId) => {
+    return await User.findOne({ where: { blogId } });
 };
 exports.findUser = findUser;
 // 특정 유저와 모든 구독 검색
@@ -78,24 +96,6 @@ const findNewPosts = async (userId) => {
     return posts;
 };
 exports.findNewPosts = findNewPosts;
-// 특정 유저와 게시글 검색
-const findUserInfo = async (userId) => {
-    const user = (await User.findOne({
-        where: { userId },
-        attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-        include: {
-            model: Paper,
-            include: { model: Tag, attributes: ['name'] },
-        },
-        order: [[Paper, 'createdAt', 'DESC']],
-    }));
-    let categories = user?.Papers.map((paper) => paper.category);
-    let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
-    categories = [...new Set(categories)];
-    tags = [...new Set(tags)];
-    return [user, categories, tags];
-};
-exports.findUserInfo = findUserInfo;
 // 개인 페이지 카테고리 수정
 const updateCategory = async (userId, category, newCategory) => {
     return await Paper.update({ category: newCategory }, { where: { userId, category } });
@@ -113,7 +113,7 @@ const findPostInfo = async (postId) => {
         include: [
             { model: Comment },
             { model: Tag, attributes: ['name'] },
-            { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
             { model: User, as: 'Likes', attributes: ['nickname'] },
         ],
     });
