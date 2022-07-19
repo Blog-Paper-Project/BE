@@ -9,7 +9,7 @@ const Validatorlogin = require('../middleware/login.validator');
 require('dotenv').config();
 
 // 카카오 로그인
-const kakaoCallback = (req, res, next) => {
+exports.kakaoCallback = (req, res, next) => {
   passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
 
@@ -25,10 +25,9 @@ const kakaoCallback = (req, res, next) => {
     res.send({ user: result });
   })(req, res, next);
 };
-exports.kakaoCallback = kakaoCallback;
 
 // 네이버 로그인
-const naverCallback = (req, res, next) => {
+exports.naverCallback = (req, res, next) => {
   passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
 
@@ -44,10 +43,9 @@ const naverCallback = (req, res, next) => {
     res.send({ user: result });
   })(req, res, next);
 };
-exports.naverCallback = naverCallback;
 
 // 구글 로그인
-const googleCallback = (req, res, next) => {
+exports.googleCallback = (req, res, next) => {
   passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
     const { nickname } = user;
@@ -62,17 +60,16 @@ const googleCallback = (req, res, next) => {
     res.send({ user: result });
   })(req, res, next);
 };
-exports.googleCallback = googleCallback;
 
 //회원가입
-const signup = async (req, res, next) => {
+exports.signup = async (req, res, next) => {
   const { email, nickname, password, blogId } = await Validatorsinup.validateAsync(
     req.body
   );
 
   const rows = await userService.signup(email, nickname, password, blogId);
   if (rows === false) {
-    return res.status(200).send({
+    return res.status(400).send({
       result: false,
     });
   } else {
@@ -81,10 +78,9 @@ const signup = async (req, res, next) => {
     });
   }
 };
-exports.signup = signup;
 
 // 회원탈퇴
-const userDelete = async (req, res, next) => {
+exports.userDelete = async (req, res, next) => {
   const { user } = res.locals;
   const deletedAt = new Date();
   await userService.userDelete(user, deletedAt);
@@ -93,10 +89,9 @@ const userDelete = async (req, res, next) => {
     result: true,
   });
 };
-exports.userDelete = userDelete;
 
 // 회원복구
-const user_restore = async (req, res, next) => {
+exports.user_restore = async (req, res, next) => {
   const { email, password } = req.body;
   const deletedAt = null;
 
@@ -116,10 +111,9 @@ const user_restore = async (req, res, next) => {
     msg: '회원복구 완료',
   });
 };
-exports.user_restore = user_restore;
 
 // 로그인
-const login = async (req, res, next) => {
+exports.login = async (req, res, next) => {
   const { email, password } = await Validatorlogin.validateAsync(req.body);
   const user = await userService.login(email);
   const passwordck = await Bcrypt.compare(password, user.password);
@@ -151,15 +145,14 @@ const login = async (req, res, next) => {
     userId: user.userId,
   });
 };
-exports.login = login;
 
 // 블로그 아이디 중복검사
-const blogcheck = async (req, res, next) => {
+exports.blogcheck = async (req, res, next) => {
   const { blogId } = req.body;
 
-  const blogch = await userService.blogcheck(blogId);
+  const blogidch = await userService.blogcheck(blogId);
 
-  if (blogch) {
+  if (blogidch) {
     return res.status(400).send({
       result: false,
     });
@@ -168,10 +161,9 @@ const blogcheck = async (req, res, next) => {
     result: true,
   });
 };
-exports.blogcheck = blogcheck;
 
 // 이메일 || 닉네임 중복검사
-const duplicate = async (req, res, next) => {
+exports.duplicate = async (req, res, next) => {
   const id = req.body.email || req.body.nickname;
   const idcheck = await userService.duplicate(id);
 
@@ -185,10 +177,9 @@ const duplicate = async (req, res, next) => {
     result: true,
   });
 };
-exports.duplicate = duplicate;
 
 // 마이프로필 조회
-const myprofile = async (req, res, next) => {
+exports.myprofile = async (req, res, next) => {
   const { user } = res.locals;
   const myprofile = await userService.myprofile(user);
 
@@ -196,10 +187,9 @@ const myprofile = async (req, res, next) => {
     myprofile,
   });
 };
-exports.myprofile = myprofile;
 
 // 마이프로필 수정
-const myprofile_correction = async (req, res, next) => {
+exports.myprofile_correction = async (req, res, next) => {
   const { user } = res.locals;
   const profileImage = req.file?.transforms[0].key;
   const { nickname, introduction } = req?.body;
@@ -232,10 +222,9 @@ const myprofile_correction = async (req, res, next) => {
 
   res.status(200).send(profileimg);
 };
-exports.myprofile_correction = myprofile_correction;
 
 // 이메일 인증
-const emailauth = async (req, res, next) => {
+exports.emailauth = async (req, res, next) => {
   const { email } = req.body;
   // 인증메일 (번호)
   const emailAuth = Math.floor(Math.random() * 10000);
@@ -264,10 +253,9 @@ const emailauth = async (req, res, next) => {
     result: true,
   });
 };
-exports.emailauth = emailauth;
 
 // 이메일 인증 체크
-const check_emaliauth = async (req, res, next) => {
+exports.check_emaliauth = async (req, res, next) => {
   const { emailAuth } = req.body;
   const text = await userService.check_emaliauth(emailAuth);
   await userService.delet_check_emaliauth(emailAuth);
@@ -282,10 +270,9 @@ const check_emaliauth = async (req, res, next) => {
     result: false,
   });
 };
-exports.check_emaliauth = check_emaliauth;
 
 // 비밀번호 변경
-const change_password = async (req, res, next) => {
+exports.change_password = async (req, res, next) => {
   const { email, password } = req.body;
 
   await userService.change_password(email, password);
@@ -294,10 +281,9 @@ const change_password = async (req, res, next) => {
     result: true,
   });
 };
-exports.change_password = change_password;
 
 // 이메일 인증 (로그인 시)
-const login_emailauth = async (req, res, next) => {
+exports.login_emailauth = async (req, res, next) => {
   const { user } = res.locals;
   console.log(user.email);
   // 인증메일 (번호)
@@ -327,10 +313,9 @@ const login_emailauth = async (req, res, next) => {
     result: true,
   });
 };
-exports.login_emailauth = login_emailauth;
 
 // 이메일 인증 체크(로그인 시)
-const login_check_emaliauth = async (req, res, next) => {
+exports.login_check_emaliauth = async (req, res, next) => {
   const { user } = res.locals;
   const { emailAuth } = req.body;
   const text = await userService.login_check_emaliauth(user);
@@ -346,10 +331,9 @@ const login_check_emaliauth = async (req, res, next) => {
     result: false,
   });
 };
-exports.login_check_emaliauth = login_check_emaliauth;
 
 // 비밀번호 변경(로그인 시)
-const login_change_password = async (req, res, next) => {
+exports.login_change_password = async (req, res, next) => {
   const { user } = res.locals;
   const { password } = req.body;
 
@@ -359,4 +343,3 @@ const login_change_password = async (req, res, next) => {
     result: true,
   });
 };
-exports.login_change_password = login_change_password;

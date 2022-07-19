@@ -40,7 +40,7 @@ router.patch('/restore', AsyncHandler(Usercontroller.user_restore));
 // 로그인
 router.post('/login', AsyncHandler(Usercontroller.login));
 
-// 블로그 아이디 중복검사
+// 유저 아이디 중복검사
 router.post('/blogid', AsyncHandler(Usercontroller.blogcheck));
 
 // 이메일 || 닉네임 중복검사
