@@ -16,6 +16,7 @@ exports.kakaoCallback = (req, res, next) => {
     const { nickname, userId, profileImage, blogId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
+    console.log(profileImage);
     res.status(200).send({
       result: true,
       token,
