@@ -11,10 +11,10 @@ const setPoint = async (setPoint, userId) => {
 };
 exports.setPoint = setPoint;
 
-const patchPoint = async (setLeaf, userId) => {
-  console.log(setLeaf, userId);
+const patchPoint = async (setPoint, userId) => {
+  console.log(setPoint, userId);
   await Point.update(
-    { setPoint: setLeaf },
+    { setPoint: setPoint },
     {
       where: {
         userId: userId,
