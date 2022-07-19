@@ -15,9 +15,15 @@ module.exports = () => {
         console.log('kakao profile: ', profile);
         try {
           const existUser = await User.findOne({
-            where: { snsId: profile.id, provider: 'kakao' },
+            where: { email: profile._json.kakao_account.email },
           });
-          console.log(existUser);
+          console.log(existUser.dataValues.email);
+          if (
+            existUser?.dataValues.email === profile._json.kakao_account.email &&
+            profile.provider === 'local'
+          ) {
+            throw `{result : False , "이미 가입된 이메일 존재"}`;
+          }
           if (existUser) {
             // kakao 를 통해 이미 가입된 회원이면 로그인 처리
             done(null, existUser);
@@ -27,7 +33,6 @@ module.exports = () => {
               email: profile.id,
               nickname: profile._json && profile._json.properties.nickname,
               snsId: profile.id,
-              profileImage: profile._json.properties.profile_image,
               provider: 'kakao',
             });
             done(null, newUser);
