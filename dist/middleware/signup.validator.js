@@ -13,6 +13,11 @@ const UsersSchema = Joi.object({
       'string.empty': '닉네임 입력해주세요',
       'string.pattern.base': '한글,숫자, 알파벳 대소문자로 입력해주세요',
     }),
+  blogId: Joi.string().min(2).max(15).empty().required().messages({
+    'string.min': '2글자 ~ 15글자 이내로 작성해주세요',
+    'string.max': '2글자 ~ 15글자 이내로 작성해주세요',
+    'string.empty': '블로그 주소 아이디를 입력해주세요',
+  }),
   email: Joi.string().email().empty().required().messages({
     'string.email': '이메일 형식 아닙니다',
     'string.empty': '이메일을 입력해주세요',

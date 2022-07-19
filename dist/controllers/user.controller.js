@@ -66,10 +66,11 @@ exports.googleCallback = googleCallback;
 
 //회원가입
 const signup = async (req, res, next) => {
-  const { email, nickname, password, confirmPassword } =
-    await Validatorsinup.validateAsync(req.body);
+  const { email, nickname, password, blogId } = await Validatorsinup.validateAsync(
+    req.body
+  );
 
-  const rows = await userService.signup(email, nickname, password);
+  const rows = await userService.signup(email, nickname, password, blogId);
   if (rows === false) {
     return res.status(200).send({
       result: false,
@@ -151,6 +152,23 @@ const login = async (req, res, next) => {
   });
 };
 exports.login = login;
+
+// 블로그 아이디 중복검사
+const blogcheck = async (req, res, next) => {
+  const { blogId } = req.body;
+
+  const blogch = await userService.blogcheck(blogId);
+
+  if (blogch) {
+    return res.status(400).send({
+      result: false,
+    });
+  }
+  res.status(200).send({
+    result: true,
+  });
+};
+exports.blogcheck = blogcheck;
 
 // 이메일 || 닉네임 중복검사
 const duplicate = async (req, res, next) => {
