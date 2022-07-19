@@ -10,14 +10,13 @@ require('dotenv').config();
 
 // 카카오 로그인
 exports.kakaoCallback = (req, res, next) => {
-  passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
+  passport.authenticate('kakao', (err, user) => {
     if (err) return next(err);
 
     const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-    console.log(profileImage);
-    res.status(200).send({
+    res.status(200).json({
       result: true,
       token,
       nickname,
