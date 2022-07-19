@@ -129,7 +129,7 @@ describe('게시글 테스트', () => {
 
   it('게시글 조회', (done) => {
     request(app)
-      .get(`/api/paper/users/1/999999`)
+      .get(`/api/paper/testbot/999999`)
       .then((res) => {
         expect(res.status).toBe(404);
         done();
@@ -138,7 +138,7 @@ describe('게시글 테스트', () => {
 
   it('게시글 조회', (done) => {
     request(app)
-      .get(`/api/paper/users/1/${postId}`)
+      .get(`/api/paper/testbot/${postId}`)
       .then((res) => {
         const { title, contents } = res.body.paper;
 
@@ -153,7 +153,7 @@ describe('게시글 테스트', () => {
 describe('개인 페이지 테스트', () => {
   it('개인 페이지 조회 404', (done) => {
     request(app)
-      .get('/api/paper/users/99999')
+      .get('/api/paper/testbot9999999')
       .then((res) => {
         expect(res.status).toBe(404);
         done();
@@ -162,7 +162,7 @@ describe('개인 페이지 테스트', () => {
 
   it('개인 페이지 조회', (done) => {
     request(app)
-      .get('/api/paper/users/1')
+      .get('/api/paper/testbot')
       .then((res) => {
         console.log(res.body);
         expect(res.status).toBe(200);
@@ -172,7 +172,7 @@ describe('개인 페이지 테스트', () => {
 
   it('개인 페이지 카테고리 수정 404', (done) => {
     request(app)
-      .patch('/api/paper/users/1/categories/travel')
+      .patch('/api/paper/testbot/categories/travel')
       .send({ newCategory: '스포츠' })
       .set('Authorization', token)
       .then((res) => {
@@ -183,7 +183,7 @@ describe('개인 페이지 테스트', () => {
 
   it('개인 페이지 카테고리 수정', (done) => {
     request(app)
-      .patch('/api/paper/users/1/categories/sports')
+      .patch('/api/paper/testbot/categories/sports')
       .send({ newCategory: '스포츠' })
       .set('Authorization', token)
       .then((res) => {
@@ -276,7 +276,7 @@ describe('좋아요 & 구독 테스트', () => {
 
   it('구독 400', (done) => {
     request(app)
-      .post(`/api/paper/users/1/subscription`)
+      .post(`/api/paper/testbot1/subscription`)
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(400);

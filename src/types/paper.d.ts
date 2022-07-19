@@ -1,6 +1,7 @@
 declare namespace DTO {
   interface PaperLike extends Models.Paper {
     Likes: Models.Like[];
+    Users: Models.User;
   }
 
   interface PaperTag extends Models.Paper {

@@ -22,13 +22,17 @@ exports.findPostsBy = findPostsBy;
 // 1주일간 좋아요 순으로 게시글 11개 검색
 const findAllPosts = async () => {
     const papers = await Paper.findAll({
-        include: { model: User, as: 'Likes' },
+        include: [
+            { model: User, as: 'Users', attributes: ['blogId'] },
+            { model: User, as: 'Likes' },
+        ],
     });
     const papersByLike = papers
         .map((paper) => {
-        const { postId, userId, title, contents, thumbnail, Likes } = paper;
+        const { postId, userId, title, contents, thumbnail, Likes, Users } = paper;
         const likes = Likes.filter((like) => like.createdAt > (0, date_1.calcDays)(7)).length;
-        return { postId, userId, title, contents, thumbnail, likes };
+        const { blogId } = Users;
+        return { postId, blogId, title, contents, thumbnail, likes };
     })
         .sort((a, b) => b.likes - a.likes)
         .slice(0, 11)
@@ -44,13 +48,13 @@ const findBestUsers = async () => {
     return await User.findAll({
         order: [['popularity', 'DESC']],
         limit: 18,
-        attributes: ['userId', 'nickname', 'profileImage', 'popularity'],
+        attributes: ['userId', 'blogId', 'nickname', 'profileImage', 'popularity'],
     });
 };
 exports.findBestUsers = findBestUsers;
 // 특정 유저와 게시글 검색
 const findUserInfo = async (blogId) => {
-    const user = (await User.findOne({
+    const user = await User.findOne({
         where: { blogId },
         attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
         include: {
@@ -58,7 +62,7 @@ const findUserInfo = async (blogId) => {
             include: { model: Tag, attributes: ['name'] },
         },
         order: [[Paper, 'createdAt', 'DESC']],
-    }));
+    });
     let categories = user?.Papers.map((paper) => paper.category);
     let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
     categories = [...new Set(categories)];
