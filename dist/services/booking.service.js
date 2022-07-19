@@ -1,4 +1,29 @@
-const { User, Booking, Leaf } = require('../../models');
+const { User, Booking, Leaf, Point } = require('../../models');
+
+//나뭇잎 설정
+const setPoint = async (setLeaf, userId) => {
+  console.log(setLeaf, userId);
+  await Point.create({
+    userId: userId,
+    setPoint: setLeaf,
+  });
+  return await Point.findByPk(userId);
+};
+exports.setPoint = setPoint;
+
+const patchPoint = async (setLeaf, userId) => {
+  console.log(setLeaf, userId);
+  await Point.update(
+    { setPoint: setLeaf },
+    {
+      where: {
+        userId: userId,
+      },
+    }
+  );
+  return await Point.findByPk(userId);
+};
+exports.patchPoint = patchPoint;
 
 //예약시간 조회
 const findRev = async (hostId, bookingTime, meetingDate) => {
@@ -72,22 +97,19 @@ exports.confirmBooking = confirmBooking;
 //선택 행 정보찾기
 const findOne = async (bookingId) => {
   return await Booking.findAll({
-    where: { bookingId },
+    where: { bookingId: bookingId },
   });
 };
 exports.findOne = findOne;
 
-// 게스트 예약 취소
+// 화상채팅 수락 후 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
   console.log(bookingId, guestId, hostId, leaf);
-  await Booking.update(
-    { accepted: false },
-    {
-      where: { bookingId: bookingId },
-    }
-  );
-  User.increment({ point: leaf }, { where: { userId: hostId } });
-  User.decrement({ popularity: leaf }, { where: { userId: guestId } });
+  await Booking.destroy({
+    where: { bookingId: bookingId },
+  });
+  User.increment({ point: leaf }, { where: { userId: guestId } });
+  User.decrement({ popularity: leaf }, { where: { userId: hostId } });
   await Leaf.create({
     leaf,
     remarks: '화상채팅 취소',
@@ -98,3 +120,21 @@ const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
   return await Booking.findByPk(bookingId);
 };
 exports.cancelBooking = cancelBooking;
+
+// 수락전 예약 취소
+const recall = async (bookingId, guestId, hostId, leaf) => {
+  console.log(bookingId, guestId, hostId, leaf);
+  await Booking.destroy({
+    where: { bookingId: bookingId },
+  });
+  User.increment({ point: leaf }, { where: { userId: guestId } });
+  await Leaf.create({
+    leaf,
+    remarks: '화상채팅 수락 전 취소',
+    giverId: hostId,
+    recipientId: guestId,
+  });
+
+  return await Booking.findByPk(bookingId);
+};
+exports.recall = recall;

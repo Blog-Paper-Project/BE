@@ -5,9 +5,9 @@ const { deleteImg } = require('../modules/multer');
 const { User } = require('../../models');
 
 // 회원가입
-const signup = async (email, nickname, password) => {
+const signup = async (email, nickname, password, blogId) => {
   const duplicate = await User.findAll({
-    where: { [Op.or]: { email, nickname } },
+    where: { [Op.or]: { email, nickname, blogId } },
   });
   // 이메일 || 닉네임 중복 체크
   if (duplicate.length) {
@@ -17,7 +17,7 @@ const signup = async (email, nickname, password) => {
   const salt = await Bcrypt.genSalt();
   const pwhash = await Bcrypt.hash(password, salt);
 
-  await User.create({ email, nickname, password: pwhash });
+  await User.create({ email, nickname, password: pwhash, blogId });
 };
 exports.signup = signup;
 
@@ -40,6 +40,12 @@ const login = async (email) => {
   });
 };
 exports.login = login;
+
+// 블로그 아이디 중복검사
+const blogcheck = async (blogId) => {
+  return await User.findOne({ attributes: ['blogId'], where: { blogId } });
+};
+exports.blogcheck = blogcheck;
 
 // 이메일 || 닉네임 중복검사
 const duplicate = async (id) => {
