@@ -43,4 +43,4 @@ jobs:
           script: |
             cd /home/ubuntu/
             docker rm -f $(docker ps -aq) && docker image rm -f $(docker image ls -q)
-            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker run --env-file /home/ubuntu/.env -d -i -p 8000:8000 ${{ secrets.DOCKER_NAME }}/paper:test && docker run --env-file /home/ubuntu/.env -d -i -p 8001:8000 ${{ secrets.DOCKER_NAME }}/paper:test
+            docker pull ${{ secrets.DOCKER_NAME }}/paper:test && docker run --env-file /home/ubuntu/.env -d -i -p 8000:8000 ${{ secrets.DOCKER_NAME }}/paper:test --name server1 && docker run --env-file /home/ubuntu/.env -d -i -p 8001:8000 ${{ secrets.DOCKER_NAME }}/paper:test --name server2
