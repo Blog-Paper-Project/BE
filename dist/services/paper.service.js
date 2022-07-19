@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findUserInfo = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findUserInfo = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
 /* eslint-disable */
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
@@ -27,7 +27,7 @@ const findAllPosts = async () => {
     const papersByLike = papers
         .map((paper) => {
         const { postId, userId, title, contents, thumbnail, Likes } = paper;
-        const likes = Likes.filter((like) => new Date(like.createdAt) > (0, date_1.default)()).length;
+        const likes = Likes.filter((like) => like.createdAt > (0, date_1.calcDays)(7)).length;
         return { postId, userId, title, contents, thumbnail, likes };
     })
         .sort((a, b) => b.likes - a.likes)
@@ -62,6 +62,22 @@ const findMiniInfo = async (userId) => {
     });
 };
 exports.findMiniInfo = findMiniInfo;
+// 구독 중인 최신 게시글 검색
+const findNewPosts = async (userId) => {
+    const user = (await User.findOne({
+        where: { userId },
+        include: {
+            model: User,
+            as: 'Followees',
+            include: { model: Paper, attributes: ['postId', 'title', 'createdAt', 'userId'] },
+        },
+    }));
+    const posts = user.Followees.flatMap((followee) => followee.Papers)
+        .filter((paper) => paper.createdAt > (0, date_1.calcDays)(3))
+        .sort((a, b) => (0, date_1.calcMs)(b.createdAt) - (0, date_1.calcMs)(a.createdAt));
+    return posts;
+};
+exports.findNewPosts = findNewPosts;
 // 특정 유저와 게시글 검색
 const findUserInfo = async (userId) => {
     const user = (await User.findOne({

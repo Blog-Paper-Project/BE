@@ -11,7 +11,7 @@ const { Paper } = require('../../models');
 
 // 메인 페이지 조회 & 게시글 검색
 export const readMain = async (req: Request, res: Response) => {
-  const { keyword } = req.query as { keyword: string };
+  const { keyword } = req.query as { keyword?: string };
 
   if (keyword) {
     const papers = await PaperService.findPostsBy(keyword);
@@ -88,6 +88,19 @@ export const readMiniProfile = async (
   }
 
   return res.json({ user });
+};
+
+// 구독 중인 최신 게시글 조회
+export const readMyFeed = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = res.locals?.user?.userId;
+
+  if (!userId) {
+    return next(createError(401, 'Unauthorized!'));
+  }
+
+  const posts = await PaperService.findNewPosts(userId);
+
+  return res.json({ posts });
 };
 
 // 상세 페이지 조회
@@ -379,15 +392,15 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
     return next(createError(404, 'Not Found!'));
   }
 
-  const subbed = await user.getFollowees({ where: { userId: myId } });
+  const subbed = await user.getFollowers({ where: { userId: myId } });
 
   if (subbed.length) {
-    await user.removeFollowees(myId);
+    await user.removeFollowers(myId);
 
     return res.json({ result: true, message: 'Subs Canceled' });
   }
 
-  await user.addFollowees(myId);
+  await user.addFollowers(myId);
 
   return res.json({ result: true, message: 'Subs Done' });
 };

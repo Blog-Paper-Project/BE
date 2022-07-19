@@ -85,13 +85,13 @@ module.exports = class User extends Sequelize.Model {
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followeeId',
-      as: 'Followees',
+      as: 'Followers',
       through: 'subscriptions',
       onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followerId',
-      as: 'Followers',
+      as: 'Followees',
       through: 'subscriptions',
       onDelete: 'cascade',
     });
