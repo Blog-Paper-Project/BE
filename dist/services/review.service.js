@@ -9,7 +9,6 @@ const createReview = async (userId, revieweeId, review, rate) => {
     rate,
   });
 };
-exports.createReview = createReview;
 
 // 리뷰 조회
 const readReview = async (revieweeId) => {
@@ -20,4 +19,15 @@ const readReview = async (revieweeId) => {
     include: { model: User, as: 'Reviewer', attributes: ['nickname'] },
   });
 };
-exports.readReview = readReview;
+
+// 리뷰 수정
+const updateReview = async (reviewId, review, rate) => {
+  return await Review.update({ review, rate }, { where: { reviewId } });
+};
+
+// 리뷰 아이디 조회
+const reviewById = async (reviewId) => {
+  return await Review.findOne({ where: { reviewId } });
+};
+
+module.exports = { createReview, readReview, updateReview, reviewById };

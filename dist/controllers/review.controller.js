@@ -1,4 +1,4 @@
-const custom_error_1 = require('../modules/custom_error');
+const createError = require('../modules/custom_error');
 const reviewService = require('../services/review.service');
 
 // 리뷰 작성
@@ -8,7 +8,7 @@ const postReview = async (req, res, next) => {
     const revieweeId = Number(req.params.userId);
     const { review, rate } = req.body;
     if (userId === revieweeId) {
-      return next((0, custom_error_1.createError)(400, '본인 리뷰 불가'));
+      return next(createError(400, '본인 리뷰 불가'));
     }
     const newReview = await reviewService.createReview(userId, revieweeId, review, rate);
 
@@ -18,7 +18,6 @@ const postReview = async (req, res, next) => {
     next(error);
   }
 };
-exports.postReview = postReview;
 
 // 리뷰 조회
 const readReview = async (req, res, next) => {
@@ -37,4 +36,23 @@ const readReview = async (req, res, next) => {
     next(error);
   }
 };
-exports.readReview = readReview;
+
+// 리뷰 수정
+const updateReview = async (req, res, next) => {
+  try {
+    const userId = res.locals.user.userId;
+    const { reviewId } = req.params;
+    const { review, rate } = req.body;
+    const { reviewerId } = await reviewService.reviewById(reviewId);
+    if (reviewerId !== userId) {
+      return next(createError(400, '본인이 작성한 리뷰만 수정 가능합니다.'));
+    }
+    const updateReview = await reviewService.updateReview(userId, reviewId, review, rate);
+    res.status(200).json({ review: updateReview });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+module.exports = { postReview, readReview, updateReview };
