@@ -29,7 +29,7 @@ module.exports = () => {
           } else {
             // kakao 를 통해 처음 로그인하는 회원이면 회원가입 처리 및 로그인 처리
             const newUser = await User.create({
-              email: profile.id,
+              email: profile._json.kakao_account.email,
               nickname: profile._json && profile._json.properties.nickname,
               snsId: profile.id,
               provider: 'kakao',
