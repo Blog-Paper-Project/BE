@@ -74,6 +74,13 @@ const guestBooking = async (userId) => {
   return await Booking.findAll({
     where: { guestId: Number(userId) },
     order: [['createdAt', 'DESC']],
+    include: [
+      {
+        model: User,
+        as: 'guest',
+        attributes: ['blogId'],
+      },
+    ],
   });
 };
 exports.guestBooking = guestBooking;
@@ -83,6 +90,13 @@ const hostBooking = async (userId) => {
   return await Booking.findAll({
     where: { hostId: Number(userId) },
     order: [['createdAt', 'DESC']],
+    include: [
+      {
+        model: User,
+        as: 'host',
+        attributes: ['blogId'],
+      },
+    ],
   });
 };
 exports.hostBooking = hostBooking;

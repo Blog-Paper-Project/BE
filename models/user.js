@@ -129,5 +129,9 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Review, {
       foreignKey: 'userId',
     });
+    db.User.hasOne(db.Point, {
+      foreignKey: 'userId',
+      onDelete: 'cascade',
+    });
   }
 };
