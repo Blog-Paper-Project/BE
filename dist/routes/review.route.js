@@ -10,6 +10,6 @@ router.post('/:userId', auth, reviewController.postReview);
 router.get('/:userId', reviewController.readReview);
 
 // 리뷰 수정
-router.post('/:reviewId', auth, reviewController.updateReview);
+router.put('/:reviewId', auth, reviewController.updateReview);
 
 module.exports = router;

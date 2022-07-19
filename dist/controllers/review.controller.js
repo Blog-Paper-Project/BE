@@ -25,10 +25,10 @@ const readReview = async (req, res, next) => {
     const revieweeId = Number(req.params.userId);
     let review = await reviewService.readReview(revieweeId);
     review = review.map((r) => {
-      let { review, rate, Reviewer } = r;
+      let { review, rate, Reviewer, createdAt } = r;
       Reviewer = Reviewer.nickname;
       let reviewer = Reviewer;
-      return { review, rate, reviewer };
+      return { review, rate, reviewer, createdAt };
     });
 
     res.status(200).json({ review });
@@ -47,7 +47,7 @@ const updateReview = async (req, res, next) => {
     if (reviewerId !== userId) {
       return next(createError(400, '본인이 작성한 리뷰만 수정 가능합니다.'));
     }
-    const updateReview = await reviewService.updateReview(userId, reviewId, review, rate);
+    const updateReview = await reviewService.updateReview(reviewId, review, rate);
     res.status(200).json({ review: updateReview });
   } catch (error) {
     console.log(error);

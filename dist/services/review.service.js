@@ -15,7 +15,7 @@ const readReview = async (revieweeId) => {
   return await Review.findAll({
     where: { revieweeId },
     order: [['createdAt', 'DESC']],
-    attributes: ['review', 'rate'],
+    attributes: ['review', 'rate', 'createdAt'],
     include: { model: User, as: 'Reviewer', attributes: ['nickname'] },
   });
 };
