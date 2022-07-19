@@ -21,10 +21,10 @@ router.get('/', auth, bookingController.bookingList);
 //호스트 예약 수락
 router.patch('/:hostId/:bookingId', auth, bookingController.acceptBooking);
 
-// 호스트 예약 수락 후  예약 취소
+// 호스트  예약 취소
 router.delete('/host/:hostId/:bookingId', auth, bookingController.cancelReservation);
 
-//게스트 예약 수락 후  예약 취소
+//게스트  예약 취소
 router.delete('/guest/:guestId/:bookingId', auth, bookingController.cancelBooking);
 
 module.exports = router;

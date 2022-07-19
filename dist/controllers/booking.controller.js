@@ -9,11 +9,11 @@ dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
 
 //나뭇잎 설정
 const setPoint = async (req, res, next) => {
-  const { setLeaf } = req.body;
+  const { setPoint } = req.body;
   const { userId } = req.params;
 
   try {
-    const setPoint = await bookingService.setPoint(setLeaf, userId);
+    const point = await bookingService.setPoint(setPoint, userId);
     return res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
@@ -41,7 +41,9 @@ exports.patchPoint = patchPoint;
 const createBooking = async (req, res, next) => {
   const userId = res.locals.user.userId;
 
-  const { leaf, guestId, date } = req.body;
+  const { guestId, date } = req.body;
+  const Leaf = await bookingService.findLeaf(userId);
+  const leaf = Leaf.dataValues.setPoint;
   const hostId = req.params.userId;
 
   //날짜, 시간 설정
@@ -147,7 +149,7 @@ const acceptBooking = async (req, res, next) => {
 };
 exports.acceptBooking = acceptBooking;
 
-// 호스트 화상채팅 수락 후 예약 취소
+// 호스트 예약 취소
 const cancelReservation = async (req, res, next) => {
   const hostId = req.params.hostId;
   const bookingId = req.params.bookingId;
@@ -174,7 +176,7 @@ const cancelReservation = async (req, res, next) => {
 };
 exports.cancelReservation = cancelReservation;
 
-// 게스트 화상채팅 수락 후 예약 취소
+// 게스트  예약 취소
 const cancelBooking = async (req, res, next) => {
   const guestId = req.params.guestId;
   const bookingId = req.params.bookingId;
