@@ -17,10 +17,14 @@ module.exports = () => {
           const existUser = await User.findOne({
             where: { email: profile._json.kakao_account.email },
           });
-          console.log(existUser.dataValues.email);
+          console.log(existUser.dataValues.email === profile._json.kakao_account.email);
+          console.log(
+            (existUser.dataValues.email === profile._json.kakao_account.email &&
+              profile.provider) === 'local'
+          );
           if (
             existUser?.dataValues.email === profile._json.kakao_account.email &&
-            profile.provider === 'local'
+            existUser?.dataValues.provider === 'local'
           ) {
             throw `{result : False , "이미 가입된 이메일 존재"}`;
           }

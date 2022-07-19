@@ -32,16 +32,17 @@ exports.naverCallback = (req, res, next) => {
   passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
     if (err) return next(err);
 
-    const nickname = user.email;
-    const { userId } = user;
+    const { nickname, userId, profileImage, blogId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-    result = {
+    res.status(200).send({
+      result: true,
       token,
       nickname,
-    };
-    console.log('네이버 콜백 함수 결과', result);
-    res.send({ user: result });
+      profileImage,
+      blogId,
+      userId,
+    });
   })(req, res, next);
 };
 
@@ -52,14 +53,14 @@ exports.googleCallback = (req, res, next) => {
     const { nickname, userId, profileImage, blogId } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-    result = {
+    res.status(200).send({
+      result: true,
       token,
       nickname,
       profileImage,
       blogId,
-    };
-    console.log('구글 콜백 함수 결과', result);
-    res.send({ user: result });
+      userId,
+    });
   })(req, res, next);
 };
 
