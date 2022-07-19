@@ -94,20 +94,17 @@ exports.confirmBooking = confirmBooking;
 //선택 행 정보찾기
 const findOne = async (bookingId) => {
   return await Booking.findAll({
-    where: { bookingId },
+    where: { bookingId: bookingId },
   });
 };
 exports.findOne = findOne;
 
-// 게스트 예약 취소
+// 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
   console.log(bookingId, guestId, hostId, leaf);
-  await Booking.update(
-    { accepted: false },
-    {
-      where: { bookingId: bookingId },
-    }
-  );
+  await Booking.destroy({
+    where: { bookingId: bookingId },
+  });
   User.increment({ point: leaf }, { where: { userId: hostId } });
   User.decrement({ popularity: leaf }, { where: { userId: guestId } });
   await Leaf.create({

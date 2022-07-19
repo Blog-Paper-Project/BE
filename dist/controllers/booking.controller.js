@@ -150,7 +150,9 @@ exports.acceptBooking = acceptBooking;
 const cancelReservation = async (req, res, next) => {
   const hostId = req.params.hostId;
   const bookingId = req.params.bookingId;
+  console.log(hostId, bookingId);
   const guest = await bookingService.findOne(bookingId);
+  console.log(guest);
   const guestId = guest[0].guestId;
   const cntLeaf = await bookingService.findOne(bookingId);
   const leaf = cntLeaf[0].leaf;
@@ -163,7 +165,7 @@ const cancelReservation = async (req, res, next) => {
       leaf,
       hostId
     );
-    res.status(200).json({ booking_result, result: true });
+    res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
     next(error);
@@ -187,7 +189,7 @@ const cancelBooking = async (req, res, next) => {
       leaf,
       hostId
     );
-    res.status(200).json({ booking_result, result: true });
+    res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
     next(error);
