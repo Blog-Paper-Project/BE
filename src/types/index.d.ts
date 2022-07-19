@@ -1,6 +1,7 @@
 declare namespace Models {
   interface User {
     userId: number;
+    blogId: string;
     email: string;
     nickname: string;
     profileImage: string;

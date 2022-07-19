@@ -51,9 +51,30 @@ export const findBestUsers = async () => {
   });
 };
 
+// 특정 유저와 게시글 검색
+export const findUserInfo = async (blogId: string) => {
+  const user = (await User.findOne({
+    where: { blogId },
+    attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
+    include: {
+      model: Paper,
+      include: { model: Tag, attributes: ['name'] },
+    },
+    order: [[Paper, 'createdAt', 'DESC']],
+  })) as DTO.UserInfo;
+
+  let categories = user?.Papers.map((paper) => paper.category);
+  let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
+
+  categories = [...new Set(categories)];
+  tags = [...new Set(tags)];
+
+  return [user, categories, tags];
+};
+
 // 특정 유저 검색
-export const findUser = async (userId: string) => {
-  return await User.findOne({ where: { userId } });
+export const findUser = async (blogId: string) => {
+  return await User.findOne({ where: { blogId } });
 };
 
 // 특정 유저와 모든 구독 검색
@@ -82,30 +103,9 @@ export const findNewPosts = async (userId: number) => {
   return posts;
 };
 
-// 특정 유저와 게시글 검색
-export const findUserInfo = async (userId: string) => {
-  const user = (await User.findOne({
-    where: { userId },
-    attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-    include: {
-      model: Paper,
-      include: { model: Tag, attributes: ['name'] },
-    },
-    order: [[Paper, 'createdAt', 'DESC']],
-  })) as DTO.UserInfo;
-
-  let categories = user?.Papers.map((paper) => paper.category);
-  let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
-
-  categories = [...new Set(categories)];
-  tags = [...new Set(tags)];
-
-  return [user, categories, tags];
-};
-
 // 개인 페이지 카테고리 수정
 export const updateCategory = async (
-  userId: string,
+  userId: number,
   category: string,
   newCategory: string
 ) => {
@@ -124,7 +124,7 @@ export const findPostInfo = async (postId: string) => {
     include: [
       { model: Comment },
       { model: Tag, attributes: ['name'] },
-      { model: User, as: 'Users', attributes: ['nickname', 'profileImage'] },
+      { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
       { model: User, as: 'Likes', attributes: ['nickname'] },
     ],
   });
