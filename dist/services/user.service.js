@@ -17,7 +17,7 @@ exports.signup = async (email, nickname, password, blogId) => {
   const salt = await Bcrypt.genSalt();
   const pwhash = await Bcrypt.hash(password, salt);
 
-  await User.create({ email, nickname, password: pwhash, Id });
+  await User.create({ email, nickname, password: pwhash, blogId });
 };
 
 // 회원탈퇴
