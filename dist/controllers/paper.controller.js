@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMiniProfile = exports.updateCategory = exports.readBlog = exports.readMain = void 0;
+exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMyFeed = exports.readMiniProfile = exports.updateCategory = exports.readBlog = exports.readMain = void 0;
 const custom_error_1 = require("../modules/custom_error");
 const PaperService = require("../services/paper.service");
 const validate_paper_1 = require("../modules/validate_paper");
@@ -63,6 +63,16 @@ const readMiniProfile = async (req, res, next) => {
     return res.json({ user });
 };
 exports.readMiniProfile = readMiniProfile;
+// 구독 중인 최신 게시글 조회
+const readMyFeed = async (req, res, next) => {
+    const userId = res.locals?.user?.userId;
+    if (!userId) {
+        return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+    }
+    const posts = await PaperService.findNewPosts(userId);
+    return res.json({ posts });
+};
+exports.readMyFeed = readMyFeed;
 // 상세 페이지 조회
 const readPost = async (req, res, next) => {
     const { userId, postId } = req.params;
@@ -263,12 +273,12 @@ const createSubs = async (req, res, next) => {
     if (!user) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    const subbed = await user.getFollowees({ where: { userId: myId } });
+    const subbed = await user.getFollowers({ where: { userId: myId } });
     if (subbed.length) {
-        await user.removeFollowees(myId);
+        await user.removeFollowers(myId);
         return res.json({ result: true, message: 'Subs Canceled' });
     }
-    await user.addFollowees(myId);
+    await user.addFollowers(myId);
     return res.json({ result: true, message: 'Subs Done' });
 };
 exports.createSubs = createSubs;

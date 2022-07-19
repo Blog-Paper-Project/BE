@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
 
-import calcOneWeek from '../modules/date';
+import { calcDays, calcMs } from '../modules/date';
 
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
@@ -26,9 +26,7 @@ export const findAllPosts = async () => {
   const papersByLike = papers
     .map((paper) => {
       const { postId, userId, title, contents, thumbnail, Likes } = paper;
-      const likes = Likes.filter(
-        (like) => new Date(like.createdAt) > calcOneWeek()
-      ).length;
+      const likes = Likes.filter((like) => like.createdAt > calcDays(7)).length;
 
       return { postId, userId, title, contents, thumbnail, likes };
     })
@@ -41,7 +39,6 @@ export const findAllPosts = async () => {
       );
       return paper;
     });
-
   return papersByLike;
 };
 
@@ -66,6 +63,23 @@ export const findMiniInfo = async (userId: number) => {
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
     include: { model: User, as: 'Followers', attributes: ['userId'] },
   });
+};
+
+// 구독 중인 최신 게시글 검색
+export const findNewPosts = async (userId: number) => {
+  const user = (await User.findOne({
+    where: { userId },
+    include: {
+      model: User,
+      as: 'Followees',
+      include: { model: Paper, attributes: ['postId', 'title', 'createdAt', 'userId'] },
+    },
+  })) as DTO.MyFeed;
+  const posts = user.Followees.flatMap((followee) => followee.Papers)
+    .filter((paper) => paper.createdAt > calcDays(3))
+    .sort((a, b) => calcMs(b.createdAt) - calcMs(a.createdAt));
+
+  return posts;
 };
 
 // 특정 유저와 게시글 검색

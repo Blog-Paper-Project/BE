@@ -13,6 +13,7 @@ module.exports = class Point extends Sequelize.Model {
         setPoint: {
           type: Sequelize.INTEGER,
           allowNull: true,
+          defaultValue: 0,
         },
       },
       {
