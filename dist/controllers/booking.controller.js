@@ -14,6 +14,9 @@ const setPoint = async (req, res, next) => {
 
   try {
     const point = await bookingService.setPoint(setPoint, userId);
+    if (point === false) {
+      return res.status(400).send({ result: false });
+    }
     return res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
@@ -24,10 +27,10 @@ exports.setPoint = setPoint;
 
 const patchPoint = async (req, res, next) => {
   const userId = req.params.userId;
-  const { setLeaf } = req.body;
+  const { setPoint } = req.body;
 
   try {
-    const patchPoint = await bookingService.patchPoint(setLeaf, userId);
+    const patchPoint = await bookingService.patchPoint(setPoint, userId);
     console.log(patchPoint);
     return res.status(200).json({ result: true });
   } catch (error) {
