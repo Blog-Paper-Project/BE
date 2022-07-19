@@ -1,11 +1,11 @@
 const { User, Booking, Leaf, Point } = require('../../models');
 
 //나뭇잎 설정
-const setPoint = async (setLeaf, userId) => {
-  console.log(setLeaf, userId);
+const setPoint = async (setPoint, userId) => {
+  console.log(setPoint, userId);
   await Point.create({
     userId: userId,
-    setPoint: setLeaf,
+    setPoint: setPoint,
   });
   return await Point.findByPk(userId);
 };
@@ -24,6 +24,17 @@ const patchPoint = async (setLeaf, userId) => {
   return await Point.findByPk(userId);
 };
 exports.patchPoint = patchPoint;
+
+//나뭇잎 조회
+const findLeaf = async (userId) => {
+  await Point.findAll({
+    where: {
+      userId: userId,
+    },
+  });
+  return await Point.findByPk(userId);
+};
+exports.findLeaf = findLeaf;
 
 //예약시간 조회
 const findRev = async (hostId, bookingTime, meetingDate) => {
