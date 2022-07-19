@@ -112,7 +112,7 @@ exports.check_emaliauth = async (emailAuth) => {
 
 // 이메일 인증 삭제
 exports.delet_check_emaliauth = async (emailAuth) => {
-  await User.update({ emailAuth: null }, { where: { emailAuth } });
+  await User.destroy({ emailAuth: null }, { where: { emailAuth } });
 };
 
 // 비밀번호 변경
