@@ -9,7 +9,7 @@ dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
 
 //나뭇잎 설정
 const patchPoint = async (req, res, next) => {
-  const userId = req.params.blogId;
+  const userId = req.params.userId;
   const { setPoint } = req.body;
 
   try {
