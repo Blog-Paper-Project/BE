@@ -258,7 +258,7 @@ exports.emailauth = async (req, res, next) => {
   // 인증메일 (번호)
   const emailAuth = Math.floor(Math.random() * 10000);
 
-  await userService.emailauth(emailAuth);
+  await userService.emailauth(email, emailAuth);
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',

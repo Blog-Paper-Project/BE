@@ -67,6 +67,14 @@ exports.blogcheck = async (blogId) => {
 
 // 이메일 || 닉네임 중복검사
 exports.duplicate = async (id) => {
+  const emailcheck = await User.findAll({
+    where: { nickname: id },
+    attributes: { exclude: ['password'] },
+  });
+  if (emailcheck?.nickname === null) {
+    await User.destroy({ where: { id } });
+  }
+
   return await User.findAll({
     where: {
       [Op.or]: {
@@ -112,8 +120,9 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
 };
 
 // 이메일 인증
-exports.emailauth = async (emailAuth) => {
-  await User.create({ emailAuth });
+exports.emailauth = async (email, emailAuth) => {
+  await User.create({ email });
+  await User.update({ where: { emailAuth } });
 };
 
 // 이메일 인증 체크
@@ -126,7 +135,7 @@ exports.check_emaliauth = async (emailAuth) => {
 
 // 이메일 인증 삭제
 exports.delet_check_emaliauth = async (emailAuth) => {
-  await User.destroy({ where: { emailAuth } });
+  await User.update({ emailAuth: null }, { where: { emailAuth } });
 };
 
 // 비밀번호 변경
