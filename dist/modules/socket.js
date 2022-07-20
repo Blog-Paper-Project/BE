@@ -8,7 +8,7 @@ module.exports = (server) => {
       transports: ['websocket', 'polling'],
       credentials: true,
     },
-    allowEI03: true,
+    allowEI04: true,
   });
 
   const checkCounts = (room) => io.sockets.adapter.rooms.get(room)?.size || 0;
