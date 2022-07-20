@@ -9,9 +9,13 @@ exports.signup = async (email, nickname, password, blogId) => {
   const duplicate = await User.findAll({
     where: { [Op.or]: { email, nickname, blogId } },
   });
+
   // 이메일 || 닉네임 중복 체크
-  if (duplicate.length) {
-    return false;
+  if (
+    duplicate[0]?.dataValues.blogId === null &&
+    duplicate[0]?.dataValues.nickname === null
+  ) {
+    await User.destroy({ where: { email } });
   }
 
   const salt = await Bcrypt.genSalt();
@@ -124,7 +128,6 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
 // 이메일 인증
 exports.emailauth = async (email, emailAuth) => {
   const emailcheck = await User.findOne({ where: { email } });
-  console.log(emailcheck);
   if (!emailcheck) {
     await User.create({ email });
   }
