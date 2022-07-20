@@ -69,7 +69,7 @@ exports.blogcheck = async (blogId) => {
 exports.duplicate = async (id) => {
   const emailcheck = await User.findAll({
     where: { nickname: id },
-    attributes: { exclude: ['password'] },
+    attributes: { exclude: ['nickname'] },
   });
   if (emailcheck?.nickname === null) {
     await User.destroy({ where: { id } });
