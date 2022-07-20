@@ -22,7 +22,7 @@ exports.signup = async (email, nickname, password, blogId) => {
   const salt = await Bcrypt.genSalt();
   const pwhash = await Bcrypt.hash(password, salt);
 
-  await User.create({ email, nickname, password: pwhash, blogId });
+  await User.update({ nickname, password: pwhash, blogId }, { where: { email } });
 };
 // 소셜 회원가입
 exports.social_signup = async (blogId, nickname, email) => {
