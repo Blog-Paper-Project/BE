@@ -86,9 +86,9 @@ exports.signup = async (req, res, next) => {
 
 // 소셜 회원가입
 exports.social_signup = async (req, res, next) => {
-  const { blogId, nickname } = req.body;
+  const { blogId, nickname, email } = req.body;
 
-  const social_duplicate = await userService.social_signup(blogId, nickname);
+  const social_duplicate = await userService.social_signup(blogId, nickname, email);
 
   if (social_duplicate === false) {
     return res.status(400).send({
