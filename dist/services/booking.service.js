@@ -38,17 +38,14 @@ exports.findRev = findRev;
 
 //예약 신청
 const createBooking = async (blogId, guestId, leaf, bookingTime, meetingDate, hostId) => {
-  console.log('**', blogId, guestId, leaf, bookingTime, meetingDate, hostId);
-
+  //console.log('**', blogId, guestId, leaf, bookingTime, meetingDate, hostId);
   await User.decrement({ point: leaf }, { where: { userId: guestId } });
-
   await Leaf.create({
     leaf,
     remarks: '화상채팅 예약',
     giverId: guestId,
     recipientId: hostId,
   });
-
   return await Booking.create({
     hostId,
     date: meetingDate,

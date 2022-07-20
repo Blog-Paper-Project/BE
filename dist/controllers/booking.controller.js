@@ -75,16 +75,17 @@ const createBooking = async (req, res, next) => {
     return res.status(400).send({ result: false });
   }
   //커스텀 에러.. 공부
-  // console.log('*', blogId, guestId, leaf, bookingTime, meetingDate, userId, hostId);
+  console.log('*', blogId, guestId, leaf, bookingTime, meetingDate, userId, hostId);
+
   //예약 신청
   try {
     const booking_result = await bookingService.createBooking(
-      userId,
+      blogId,
       guestId,
       leaf,
-      blogId,
       bookingTime,
       meetingDate,
+      userId,
       hostId
     );
     return res.status(200).json({ booking_result, result: true });
