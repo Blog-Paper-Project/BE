@@ -23,7 +23,7 @@ module.exports = class Review extends Sequelize.Model {
           allowNull: false,
         },
         revieweeId: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.STRING(40),
           allowNull: false,
         },
       },

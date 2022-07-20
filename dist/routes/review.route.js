@@ -4,10 +4,10 @@ const reviewController = require('../controllers/review.controller');
 const router = express.Router();
 
 // 리뷰 작성
-router.post('/:userId', auth, reviewController.postReview);
+router.post('/:blogId', auth, reviewController.postReview);
 
 // 리뷰 조회
-router.get('/:userId', reviewController.readReview);
+router.get('/:blogId', reviewController.readReview);
 
 // 리뷰 수정
 router.put('/:reviewId', auth, reviewController.updateReview);
