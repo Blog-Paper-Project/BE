@@ -68,11 +68,13 @@ exports.blogcheck = async (blogId) => {
 // 이메일 || 닉네임 중복검사
 exports.duplicate = async (id) => {
   const emailcheck = await User.findAll({
-    where: { nickname: id },
-    attributes: { exclude: ['nickname'] },
+    where: { email: id },
   });
-  if (emailcheck?.nickname === null) {
-    await User.destroy({ where: { id } });
+  if (
+    emailcheck[0]?.dataValues.blogId === null &&
+    emailcheck[0]?.dataValues.nickname === null
+  ) {
+    await User.destroy({ where: { email: id } });
   }
 
   return await User.findAll({
@@ -89,7 +91,7 @@ exports.duplicate = async (id) => {
 exports.myprofile = async (user) => {
   return await User.findOne({
     where: { userId: user.userId },
-    attributes: { exclude: ['password'] },
+    attributes: { exclude: ['password', 'email'] },
   });
 };
 
@@ -121,8 +123,12 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
 
 // 이메일 인증
 exports.emailauth = async (email, emailAuth) => {
-  await User.create({ email });
-  await User.update({ where: { emailAuth } });
+  const emailcheck = await User.findOne({ where: { email } });
+  console.log(emailcheck);
+  if (!emailcheck) {
+    await User.create({ email });
+  }
+  await User.update({ emailAuth }, { where: { email } });
 };
 
 // 이메일 인증 체크
