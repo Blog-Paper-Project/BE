@@ -28,7 +28,7 @@ export const findAllPosts = async () => {
   });
   const papersByLike = papers
     .map((paper) => {
-      const { postId, userId, title, contents, thumbnail, Likes, Users } = paper;
+      const { postId, title, contents, thumbnail, Likes, Users } = paper;
       const likes = Likes.filter((like) => like.createdAt > calcDays(7)).length;
       const { blogId } = Users;
 
