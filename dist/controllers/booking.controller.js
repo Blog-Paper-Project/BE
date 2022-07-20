@@ -8,23 +8,22 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
 
 //나뭇잎 설정
-const setPoint = async (req, res, next) => {
-  const { setPoint } = req.body;
+// const setPoint = async (req, res, next) => {
+//   const { setPoint } = req.body;
+//   const { userId } = req.params;
 
-  const { userId } = req.params;
-
-  try {
-    const point = await bookingService.setPoint(setPoint, userId);
-    if (point === false) {
-      return res.status(400).send({ result: false });
-    }
-    return res.status(200).json({ result: true });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
-exports.setPoint = setPoint;
+//   try {
+//     const point = await bookingService.setPoint(setPoint, userId);
+//     if (point === false) {
+//       return res.status(400).send({ result: false });
+//     }
+//     return res.status(200).json({ result: true });
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// };
+// exports.setPoint = setPoint;
 
 const patchPoint = async (req, res, next) => {
   const blogId = req.params.blogId;
@@ -44,11 +43,13 @@ exports.patchPoint = patchPoint;
 //예약 신청
 const createBooking = async (req, res, next) => {
   const userId = res.locals.user.userId;
+  const userBlogId = res.locals.user.blogId;
 
   const { guestId, date } = req.body;
-  const Leaf = await bookingService.findLeaf(userId);
-  const leaf = Leaf.dataValues.setPoint;
   const blogId = req.params.blogId;
+  const Leaf = await bookingService.findLeaf(blogId);
+  const leaf = Leaf.dataValues.setPoint;
+  const hostId = Leaf.dataValues.userId;
 
   //날짜, 시간 설정
   const start = date.split('-')[0];
@@ -61,8 +62,6 @@ const createBooking = async (req, res, next) => {
   const endTime = dayjs(end).tz().format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
   //new dayjs 와 dayjs의 차이점
-
-  console.log(01, userId, guestId, leaf, blogId, bookingTime, meetingDate);
 
   //예약시간 제한
   if (time < 180) {
@@ -90,11 +89,11 @@ const createBooking = async (req, res, next) => {
   }
 
   //본인 예약 차단
-  if (hostId == guestId) {
+  if (blogId == userBlogId) {
     return res.status(400).send({ result: false });
   }
   //커스텀 에러.. 공부
-
+  // console.log('*', blogId, guestId, leaf, bookingTime, meetingDate, userId, hostId);
   //예약 신청
   try {
     const booking_result = await bookingService.createBooking(
@@ -103,7 +102,8 @@ const createBooking = async (req, res, next) => {
       leaf,
       blogId,
       bookingTime,
-      meetingDate
+      meetingDate,
+      hostId
     );
     return res.status(200).json({ booking_result, result: true });
   } catch (error) {
@@ -118,8 +118,8 @@ const bookingList = async (req, res, next) => {
   const userId = res.locals.user.userId;
 
   try {
-    const hostBookingList = await bookingService.hostBooking(blogId);
-    const guestBookingList = await bookingService.guestBooking(blogId);
+    const hostBookingList = await bookingService.hostBooking(userId);
+    const guestBookingList = await bookingService.guestBooking(userId);
     const totalList = { hostBookingList, guestBookingList };
     return res.status(200).json({ totalList, result: true });
   } catch (error) {

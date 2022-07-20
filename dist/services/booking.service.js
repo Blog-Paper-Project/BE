@@ -1,21 +1,6 @@
-const { User, Booking, Leaf, Point } = require('../../models');
+const { User, Booking, Leaf } = require('../../models');
 
 //나뭇잎 설정
-const setPoint = async (setPoint, userId) => {
-  const duplicate = await Point.findAll({
-    where: { userId: userId },
-  });
-
-  if (duplicate.length) return false;
-
-  await Point.create({
-    userId: userId,
-    setPoint: setPoint,
-  });
-  return await Point.findByPk(userId);
-};
-exports.setPoint = setPoint;
-
 const patchPoint = async (setPoint, blogId) => {
   console.log(setPoint, blogId);
   await User.update(
@@ -26,18 +11,17 @@ const patchPoint = async (setPoint, blogId) => {
       },
     }
   );
-  return await Point.findByPk(blogId);
+  return await User.findByPk(blogId);
 };
 exports.patchPoint = patchPoint;
 
 //나뭇잎 조회
 const findLeaf = async (blogId) => {
-  await Point.findAll({
+  return await User.findOne({
     where: {
       blogId: blogId,
     },
   });
-  return await Point.findByPk(blogId);
 };
 exports.findLeaf = findLeaf;
 
@@ -54,13 +38,20 @@ const findRev = async (hostId, bookingTime, meetingDate) => {
 exports.findRev = findRev;
 
 //예약 신청
-const createBooking = async (blogId, guestId, leaf, hostId, bookingTime, meetingDate) => {
-  console.log(14, blogId, guestId, leaf, hostId, bookingTime, meetingDate);
+const createBooking = async (blogId, guestId, leaf, bookingTime, meetingDate, hostId) => {
+  console.log('**', blogId, guestId, leaf, bookingTime, meetingDate, hostId);
 
-  await User.decrement({ point: leaf }, { where: { blogId: blogId } });
+  await User.decrement({ point: leaf }, { where: { userId: guestId } });
+
+  await Leaf.create({
+    leaf,
+    remarks: '화상채팅 예약',
+    giverId: guestId,
+    recipientId: hostId,
+  });
 
   return await Booking.create({
-    hostId: blogId,
+    hostId,
     date: meetingDate,
     time: bookingTime,
     guestId,
@@ -70,33 +61,19 @@ const createBooking = async (blogId, guestId, leaf, hostId, bookingTime, meeting
 exports.createBooking = createBooking;
 
 //예약한 내역
-const guestBooking = async (blogId) => {
+const guestBooking = async (userId) => {
   return await Booking.findAll({
-    where: { guestId: blogId },
+    where: { guestId: userId },
     order: [['createdAt', 'DESC']],
-    include: [
-      {
-        model: User,
-        as: 'guest',
-        attributes: ['blogId'],
-      },
-    ],
   });
 };
 exports.guestBooking = guestBooking;
 
 //예약받은 내역
-const hostBooking = async (blogId) => {
+const hostBooking = async (userId) => {
   return await Booking.findAll({
-    where: { hostId: blogId },
+    where: { hostId: userId },
     order: [['createdAt', 'DESC']],
-    include: [
-      {
-        model: User,
-        as: 'host',
-        attributes: ['blogId'],
-      },
-    ],
   });
 };
 exports.hostBooking = hostBooking;
