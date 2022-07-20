@@ -19,6 +19,17 @@ exports.signup = async (email, nickname, password, blogId) => {
 
   await User.create({ email, nickname, password: pwhash, blogId });
 };
+// 소셜 회원가입
+exports.social_signup = async (blogId, nickname) => {
+  const duplicate = await User.findAll({
+    where: { [Op.or]: { nickname, blogId } },
+  });
+  // 블로그 Id || 닉네임 중복 체크
+  if (duplicate.length) {
+    return false;
+  }
+  await User.update({ blogId, nickname }, { where: { email } });
+};
 
 // 회원탈퇴
 exports.userDelete = async (user, deletedAt) => {
