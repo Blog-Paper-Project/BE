@@ -7,16 +7,12 @@ const { User, Point } = require('../../models');
 // 회원가입
 exports.signup = async (email, nickname, password, blogId) => {
   const duplicate = await User.findAll({
-    where: { [Op.or]: { email, nickname, blogId } },
+    where: { [Op.or]: { nickname, blogId } },
   });
-  // 이메일 || 닉네임 중복 체크
+
+  // blogId || 닉네임 중복 체크
   if (duplicate.length) {
     return false;
-  } else if (
-    duplicate[0]?.dataValues.blogId === null &&
-    duplicate[0]?.dataValues.nickname === null
-  ) {
-    await User.destroy({ where: { email } });
   }
 
   const salt = await Bcrypt.genSalt();
