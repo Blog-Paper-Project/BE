@@ -21,7 +21,9 @@ module.exports = () => {
             existUser?.dataValues.email === profile._json.kakao_account.email &&
             existUser?.dataValues.provider === 'local'
           ) {
-            throw `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`;
+            throw new Error(
+              `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`
+            );
           }
           if (existUser) {
             // kakao 를 통해 이미 가입된 회원이면 로그인 처리
