@@ -12,7 +12,6 @@ require('dotenv').config();
 exports.kakaoCallback = (req, res, next) => {
   passport.authenticate('kakao', (err, user) => {
     if (err) return next(err);
-
     const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
@@ -30,10 +29,10 @@ exports.kakaoCallback = (req, res, next) => {
 
 // 네이버 로그인
 exports.naverCallback = (req, res, next) => {
-  passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
+  passport.authenticate('naver', (err, user, info) => {
     if (err) return next(err);
 
-    const { nickname, userId, profileImage, blogId } = user;
+    const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
     res.status(200).send({
@@ -43,15 +42,16 @@ exports.naverCallback = (req, res, next) => {
       profileImage,
       blogId,
       userId,
+      email,
     });
   })(req, res, next);
 };
 
 // 구글 로그인
 exports.googleCallback = (req, res, next) => {
-  passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
+  passport.authenticate('google', (err, user, info) => {
     if (err) return next(err);
-    const { nickname, userId, profileImage, blogId } = user;
+    const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
     res.status(200).send({
@@ -61,6 +61,7 @@ exports.googleCallback = (req, res, next) => {
       profileImage,
       blogId,
       userId,
+      email,
     });
   })(req, res, next);
 };
@@ -118,9 +119,9 @@ exports.user_restore = async (req, res, next) => {
 
 // 로그인
 exports.login = async (req, res, next) => {
-  const session = req.sessionID;
+  // const session = req.sessionID;
   const { email, password } = await Validatorlogin.validateAsync(req.body);
-  const user = await userService.login(email, session);
+  const user = await userService.login(email);
   const passwordck = await Bcrypt.compare(password, user.password);
 
   // if (user.snsId !== snsId && snsId !== null) {
@@ -154,7 +155,7 @@ exports.login = async (req, res, next) => {
     token,
     userId: user.userId,
     blogId: user.blogId,
-    session,
+    // session,
   });
 };
 
