@@ -7,7 +7,7 @@ const webSocket = require('./dist/modules/socket');
 const port = process.env.PORT;
 
 const http = Http.createServer(app);
-const https = Https.createServer(options, app).listen(443);
+const https = Https.createServer(app).listen(443);
 
 webSocket(https);
 
