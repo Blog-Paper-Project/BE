@@ -1,5 +1,4 @@
 const Http = require('http');
-const Https = require('https');
 const app = require('./app');
 const db = require('./models');
 const webSocket = require('./dist/modules/socket');
@@ -7,9 +6,8 @@ const webSocket = require('./dist/modules/socket');
 const port = process.env.PORT;
 
 const http = Http.createServer(app);
-const https = Https.createServer(app).listen(443);
 
-webSocket(https);
+webSocket(http);
 
 db.sequelize
   .sync({ force: false, logging: false })
