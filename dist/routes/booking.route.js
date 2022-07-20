@@ -3,14 +3,11 @@ const auth = require('../middleware/auth');
 const bookingController = require('../controllers/booking.controller');
 const router = express.Router();
 
-//나뭇잎 설정
-router.post('/leaf/:userId', auth, bookingController.setPoint);
-
 //나뭇잎 수정
-router.patch('/leaf/:userId', auth, bookingController.patchPoint);
+router.patch('/leaf/:blogId', auth, bookingController.patchPoint);
 
 //예약 신청
-router.post('/:userId', auth, bookingController.createBooking);
+router.post('/:blogId', auth, bookingController.createBooking);
 
 //전체 예약보기
 router.get('/', auth, bookingController.bookingList);

@@ -16,28 +16,28 @@ const setPoint = async (setPoint, userId) => {
 };
 exports.setPoint = setPoint;
 
-const patchPoint = async (setPoint, userId) => {
-  console.log(setPoint, userId);
-  await Point.update(
+const patchPoint = async (setPoint, blogId) => {
+  console.log(setPoint, blogId);
+  await User.update(
     { setPoint: setPoint },
     {
       where: {
-        userId: userId,
+        blogId: blogId,
       },
     }
   );
-  return await Point.findByPk(userId);
+  return await Point.findByPk(blogId);
 };
 exports.patchPoint = patchPoint;
 
 //나뭇잎 조회
-const findLeaf = async (userId) => {
+const findLeaf = async (blogId) => {
   await Point.findAll({
     where: {
-      userId: userId,
+      blogId: blogId,
     },
   });
-  return await Point.findByPk(userId);
+  return await Point.findByPk(blogId);
 };
 exports.findLeaf = findLeaf;
 
@@ -54,13 +54,13 @@ const findRev = async (hostId, bookingTime, meetingDate) => {
 exports.findRev = findRev;
 
 //예약 신청
-const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meetingDate) => {
-  console.log(14, userId, guestId, leaf, hostId, bookingTime, meetingDate);
+const createBooking = async (blogId, guestId, leaf, hostId, bookingTime, meetingDate) => {
+  console.log(14, blogId, guestId, leaf, hostId, bookingTime, meetingDate);
 
-  await User.decrement({ point: leaf }, { where: { userId: guestId } });
+  await User.decrement({ point: leaf }, { where: { blogId: blogId } });
 
   return await Booking.create({
-    hostId,
+    hostId: blogId,
     date: meetingDate,
     time: bookingTime,
     guestId,
@@ -70,9 +70,9 @@ const createBooking = async (userId, guestId, leaf, hostId, bookingTime, meeting
 exports.createBooking = createBooking;
 
 //예약한 내역
-const guestBooking = async (userId) => {
+const guestBooking = async (blogId) => {
   return await Booking.findAll({
-    where: { guestId: Number(userId) },
+    where: { guestId: blogId },
     order: [['createdAt', 'DESC']],
     include: [
       {
@@ -86,9 +86,9 @@ const guestBooking = async (userId) => {
 exports.guestBooking = guestBooking;
 
 //예약받은 내역
-const hostBooking = async (userId) => {
+const hostBooking = async (blogId) => {
   return await Booking.findAll({
-    where: { hostId: Number(userId) },
+    where: { hostId: blogId },
     order: [['createdAt', 'DESC']],
     include: [
       {
