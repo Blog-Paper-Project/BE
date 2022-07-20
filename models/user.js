@@ -65,6 +65,10 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.DATE,
           allowNull: true,
         },
+        setPoint: {
+          type: Sequelize.INTEGER,
+          defaultValue: 0,
+        },
       },
       {
         sequelize,
@@ -128,10 +132,6 @@ module.exports = class User extends Sequelize.Model {
     });
     db.User.hasMany(db.Review, {
       foreignKey: 'userId',
-    });
-    db.User.hasOne(db.Point, {
-      foreignKey: 'userId',
-      onDelete: 'cascade',
     });
   }
 };

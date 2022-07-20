@@ -71,12 +71,6 @@ exports.myprofile = async (user) => {
   return await User.findOne({
     where: { userId: user.userId },
     attributes: { exclude: ['password'] },
-    include: [
-      {
-        model: Point,
-        attributes: ['setPoint'],
-      },
-    ],
   });
 };
 

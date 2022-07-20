@@ -27,11 +27,11 @@ const setPoint = async (req, res, next) => {
 exports.setPoint = setPoint;
 
 const patchPoint = async (req, res, next) => {
-  const userId = req.params.userId;
+  const blogId = req.params.blogId;
   const { setPoint } = req.body;
 
   try {
-    const patchPoint = await bookingService.patchPoint(setPoint, userId);
+    const patchPoint = await bookingService.patchPoint(setPoint, blogId);
     console.log(patchPoint);
     return res.status(200).json({ result: true });
   } catch (error) {
@@ -48,7 +48,7 @@ const createBooking = async (req, res, next) => {
   const { guestId, date } = req.body;
   const Leaf = await bookingService.findLeaf(userId);
   const leaf = Leaf.dataValues.setPoint;
-  const hostId = req.params.userId;
+  const blogId = req.params.blogId;
 
   //날짜, 시간 설정
   const start = date.split('-')[0];
@@ -62,7 +62,7 @@ const createBooking = async (req, res, next) => {
   const bookingTime = `${startTime} - ${endTime}`;
   //new dayjs 와 dayjs의 차이점
 
-  console.log(01, userId, guestId, leaf, hostId, bookingTime, meetingDate);
+  console.log(01, userId, guestId, leaf, blogId, bookingTime, meetingDate);
 
   //예약시간 제한
   if (time < 180) {
@@ -71,7 +71,7 @@ const createBooking = async (req, res, next) => {
 
   // 호스트id, 예약시간, 예약날짜 조회,
   // try catch공부 날카롭다.. ㅎㄷㄷ
-  const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
+  const existRev = await bookingService.findRev(blogId, bookingTime, meetingDate);
   if (existRev.length > 0) {
     return res.status(400).send({ msg: '이미 예약된 시간 입니다.' });
   }
@@ -101,7 +101,7 @@ const createBooking = async (req, res, next) => {
       userId,
       guestId,
       leaf,
-      hostId,
+      blogId,
       bookingTime,
       meetingDate
     );
@@ -118,8 +118,8 @@ const bookingList = async (req, res, next) => {
   const userId = res.locals.user.userId;
 
   try {
-    const hostBookingList = await bookingService.hostBooking(userId);
-    const guestBookingList = await bookingService.guestBooking(userId);
+    const hostBookingList = await bookingService.hostBooking(blogId);
+    const guestBookingList = await bookingService.guestBooking(blogId);
     const totalList = { hostBookingList, guestBookingList };
     return res.status(200).json({ totalList, result: true });
   } catch (error) {
@@ -131,7 +131,7 @@ exports.bookingList = bookingList;
 
 // 호스트 예약 수락
 const acceptBooking = async (req, res, next) => {
-  const hostId = req.params.hostId;
+  const blogId = req.params.blogId;
   const bookingId = req.params.bookingId;
   const guest = await bookingService.findOne(bookingId);
   const guestId = guest[0].guestId;
