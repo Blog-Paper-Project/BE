@@ -22,23 +22,17 @@ exports.signup = async (email, nickname, password, blogId) => {
 };
 // 소셜 회원가입
 exports.social_signup = async (blogId, nickname, email) => {
-  if (nickname) {
-    const duplicate = await User.findAll({
-      where: { nickname },
-      attributes: ['nickname'],
-    });
-
-    // 닉네임 중복 체크
-    if (duplicate[0]?.dataValues.nickname === nickname) {
-      return false;
-    }
-  }
-  const blogIdcheck = await User.findAll({
+  const duplicate = await User.findAll({
     where: { email },
-    attributes: ['blogId'],
+    attributes: ['nickname', 'blogId', 'provider'],
   });
-  // 블로그 Id
-  if (blogIdcheck[0]?.dataValues.blogId === blogId) {
+
+  // 블로그 Id중복 체크 || 닉네임 중복 체크 || 로컬 회원 가입된 경우
+  if (
+    duplicate[0]?.dataValues.nickname === nickname &&
+    duplicate[0]?.dataValues.blogId === blogId &&
+    duplicate[0]?.dataValues.provider === 'local'
+  ) {
     return false;
   }
   await User.update({ blogId, nickname }, { where: { email } });
