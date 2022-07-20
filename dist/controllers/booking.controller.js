@@ -8,29 +8,12 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
 
 //나뭇잎 설정
-// const setPoint = async (req, res, next) => {
-//   const { setPoint } = req.body;
-//   const { userId } = req.params;
-
-//   try {
-//     const point = await bookingService.setPoint(setPoint, userId);
-//     if (point === false) {
-//       return res.status(400).send({ result: false });
-//     }
-//     return res.status(200).json({ result: true });
-//   } catch (error) {
-//     console.log(error);
-//     next(error);
-//   }
-// };
-// exports.setPoint = setPoint;
-
 const patchPoint = async (req, res, next) => {
   const blogId = req.params.blogId;
   const { setPoint } = req.body;
 
   try {
-    const patchPoint = await bookingService.patchPoint(setPoint, blogId);
+    const patchPoint = await bookingService.patchPoint(setPoint, userId);
     console.log(patchPoint);
     return res.status(200).json({ result: true });
   } catch (error) {
