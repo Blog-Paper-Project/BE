@@ -17,19 +17,24 @@ module.exports = () => {
         try {
           const exUser = await User.findOne({
             // 기존의 User가 있는지 조회
-            where: { email: profile.emails[0].value, provider: 'naver' },
+            where: { email: profile._json.email },
           });
+          if (
+            existUser?.dataValues.email === profile._json.email &&
+            existUser?.dataValues.provider === 'local'
+          ) {
+            throw `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`;
+          }
           if (exUser) {
             // 기존 User의 정보가 있다면 User정보를 done과 호출하고 전략을 종료
             done(null, exUser);
           } else {
             // 기존의 User정보가 없다면 회원가입을 진행
             const newUser = await User.create({
-              email: profile.id,
+              email: profile._json.email,
               nickname: profile._json.nickname,
               snsId: profile.id,
               provider: 'naver',
-              profileImage: profile._json.profile_image,
             });
             done(null, newUser); // 사용자 생성 후 done함수 호출
           }
