@@ -32,7 +32,7 @@ exports.social_signup = async (blogId, nickname, email) => {
     });
 
     // 닉네임 중복 체크
-    if (duplicate === nickname) {
+    if (duplicate[0]?.dataValues.nickname === nickname) {
       return false;
     }
   }
@@ -87,7 +87,10 @@ exports.duplicate = async (id) => {
     where: { email: id },
     attributes: ['blogId', 'nickname'],
   });
-  if (emailcheck?.blogId === null && emailcheck?.nickname === null) {
+  if (
+    emailcheck[0]?.dataValues.blogId === null &&
+    emailcheck[0]?.dataValues.nickname === null
+  ) {
     await User.destroy({ where: { email: id } });
   }
 
@@ -118,7 +121,7 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
     });
 
     // 닉네임 중복 체크
-    if (duplicate?.nickname === nickname) {
+    if (duplicate[0]?.dataValues.nickname === nickname) {
       return false;
     }
   }
