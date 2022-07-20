@@ -7,42 +7,32 @@ const { User, Point } = require('../../models');
 // 회원가입
 exports.signup = async (email, nickname, password, blogId) => {
   const duplicate = await User.findAll({
-    where: { [Op.or]: { email, nickname, blogId } },
+    where: { [Op.or]: { nickname, blogId } },
   });
-  // 이메일 || 닉네임 중복 체크
+
+  // blogId || 닉네임 중복 체크
   if (duplicate.length) {
     return false;
-  } else if (
-    duplicate[0]?.dataValues.blogId === null &&
-    duplicate[0]?.dataValues.nickname === null
-  ) {
-    await User.destroy({ where: { email } });
   }
 
   const salt = await Bcrypt.genSalt();
   const pwhash = await Bcrypt.hash(password, salt);
 
-  await User.create({ email, nickname, password: pwhash, blogId });
+  await User.update({ nickname, password: pwhash, blogId }, { where: { email } });
 };
 // 소셜 회원가입
 exports.social_signup = async (blogId, nickname, email) => {
-  if (nickname) {
-    const duplicate = await User.findAll({
-      where: { nickname },
-      attributes: ['nickname'],
-    });
-
-    // 닉네임 중복 체크
-    if (duplicate[0]?.dataValues.nickname === nickname) {
-      return false;
-    }
-  }
-  const blogIdcheck = await User.findAll({
-    where: { blogId },
-    attributes: ['blogId'],
+  const duplicate = await User.findAll({
+    where: { email },
+    attributes: ['nickname', 'blogId', 'provider'],
   });
-  // 블로그 Id
-  if (blogIdcheck) {
+
+  // 블로그 Id중복 체크 || 닉네임 중복 체크 || 로컬 회원 가입된 경우
+  if (
+    duplicate[0]?.dataValues.nickname === nickname &&
+    duplicate[0]?.dataValues.blogId === blogId &&
+    duplicate[0]?.dataValues.provider === 'local'
+  ) {
     return false;
   }
   await User.update({ blogId, nickname }, { where: { email } });
