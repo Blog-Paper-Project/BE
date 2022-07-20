@@ -24,12 +24,24 @@ exports.signup = async (email, nickname, password, blogId) => {
   await User.create({ email, nickname, password: pwhash, blogId });
 };
 // 소셜 회원가입
-exports.social_signup = async (blogId, nickname) => {
-  const duplicate = await User.findAll({
-    where: { [Op.or]: { nickname, blogId } },
+exports.social_signup = async (blogId, nickname, email) => {
+  if (nickname) {
+    const duplicate = await User.findAll({
+      where: { nickname },
+      attributes: ['nickname'],
+    });
+
+    // 닉네임 중복 체크
+    if (duplicate === nickname) {
+      return false;
+    }
+  }
+  const blogIdcheck = await User.findAll({
+    where: { blogId },
+    attributes: ['blogId'],
   });
-  // 블로그 Id || 닉네임 중복 체크
-  if (duplicate.length) {
+  // 블로그 Id
+  if (blogIdcheck) {
     return false;
   }
   await User.update({ blogId, nickname }, { where: { email } });
@@ -73,11 +85,9 @@ exports.blogcheck = async (blogId) => {
 exports.duplicate = async (id) => {
   const emailcheck = await User.findAll({
     where: { email: id },
+    attributes: ['blogId', 'nickname'],
   });
-  if (
-    emailcheck[0]?.dataValues.blogId === null &&
-    emailcheck[0]?.dataValues.nickname === null
-  ) {
+  if (emailcheck?.blogId === null && emailcheck?.nickname === null) {
     await User.destroy({ where: { email: id } });
   }
 
@@ -104,10 +114,11 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
   if (nickname) {
     const duplicate = await User.findAll({
       where: { nickname },
+      attributes: ['nickname'],
     });
 
     // 닉네임 중복 체크
-    if (duplicate[0]?.dataValues.nickname === nickname) {
+    if (duplicate?.nickname === nickname) {
       return false;
     }
   }

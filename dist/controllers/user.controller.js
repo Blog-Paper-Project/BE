@@ -86,9 +86,9 @@ exports.signup = async (req, res, next) => {
 
 // 소셜 회원가입
 exports.social_signup = async (req, res, next) => {
-  const { blogId, nickname } = req.body;
+  const { blogId, nickname, email } = req.body;
 
-  const social_duplicate = await userService.social_signup(blogId, nickname);
+  const social_duplicate = await userService.social_signup(blogId, nickname, email);
 
   if (social_duplicate === false) {
     return res.status(400).send({
@@ -261,9 +261,9 @@ exports.emailauth = async (req, res, next) => {
   await userService.emailauth(email, emailAuth);
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 587,
+    service: process.env.NODEMAILER_SERVICE,
+    host: process.env.NODEMAILER_HOST,
+    port: process.env.NODEMAILER_PORT,
     secure: false,
     auth: {
       user: process.env.NODEMAILER_USER,
@@ -321,9 +321,9 @@ exports.login_emailauth = async (req, res, next) => {
   await userService.login_emailauth(user, emailAuth);
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 587,
+    service: process.env.NODEMAILER_SERVICE,
+    host: process.env.NODEMAILER_HOST,
+    port: process.env.NODEMAILER_PORT,
     secure: false,
     auth: {
       user: process.env.NODEMAILER_USER,
