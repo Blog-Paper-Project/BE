@@ -9,12 +9,11 @@ dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
 
 //나뭇잎 설정
 const patchPoint = async (req, res, next) => {
-  const blogId = req.params.blogId;
+  const userId = req.params.blogId;
   const { setPoint } = req.body;
 
   try {
     const patchPoint = await bookingService.patchPoint(setPoint, userId);
-    console.log(patchPoint);
     return res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
