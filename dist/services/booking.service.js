@@ -38,7 +38,7 @@ exports.findRev = findRev;
 
 //예약 신청
 const createBooking = async (blogId, guestId, leaf, bookingTime, meetingDate, hostId) => {
-  //console.log('**', blogId, guestId, leaf, bookingTime, meetingDate, hostId);
+  console.log('**', blogId, guestId, leaf, bookingTime, meetingDate, hostId);
   await User.decrement({ point: leaf }, { where: { userId: guestId } });
   await Leaf.create({
     leaf,
