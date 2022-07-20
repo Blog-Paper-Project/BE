@@ -38,11 +38,11 @@ exports.social_signup = async (blogId, nickname, email) => {
     }
   }
   const blogIdcheck = await User.findAll({
-    where: { blogId },
+    where: { email },
     attributes: ['blogId'],
   });
   // 블로그 Id
-  if (blogIdcheck) {
+  if (blogIdcheck[0]?.dataValues.blogId === blogId) {
     return false;
   }
   await User.update({ blogId, nickname }, { where: { email } });
