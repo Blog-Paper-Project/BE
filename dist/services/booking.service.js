@@ -1,17 +1,17 @@
 const { User, Booking, Leaf } = require('../../models');
 
 //나뭇잎 설정
-const patchPoint = async (setPoint, blogId) => {
+const patchPoint = async (setPoint, userId) => {
   console.log(setPoint, blogId);
   await User.update(
     { setPoint: setPoint },
     {
       where: {
-        blogId: blogId,
+        userId: userId,
       },
     }
   );
-  return await User.findByPk(blogId);
+  return await User.findByPk(userId);
 };
 exports.patchPoint = patchPoint;
 
