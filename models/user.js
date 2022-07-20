@@ -130,8 +130,5 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Review, {
       foreignKey: 'userId',
     });
-    db.User.hasMany(db.Review, {
-      foreignKey: 'userId',
-    });
   }
 };
