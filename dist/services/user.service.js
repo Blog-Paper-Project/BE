@@ -127,8 +127,8 @@ exports.emailauth = async (email, emailAuth) => {
   console.log(emailcheck);
   if (!emailcheck) {
     await User.create({ email });
-    await User.update({ emailAuth }, { where: { email } });
   }
+  await User.update({ emailAuth }, { where: { email } });
 };
 
 // 이메일 인증 체크
