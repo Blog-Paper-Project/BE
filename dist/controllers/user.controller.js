@@ -72,8 +72,8 @@ exports.signup = async (req, res, next) => {
     req.body
   );
 
-  const rows = await userService.signup(email, nickname, password, blogId);
-  if (rows === false) {
+  const duplicate = await userService.signup(email, nickname, password, blogId);
+  if (duplicate === false) {
     return res.status(400).send({
       result: false,
     });
@@ -82,6 +82,22 @@ exports.signup = async (req, res, next) => {
       result: true,
     });
   }
+};
+
+// 소셜 회원가입
+exports.social_signup = async (req, res, next) => {
+  const { blogId, nickname } = req.body;
+
+  const social_duplicate = await userService.social_signup(blogId, nickname);
+
+  if (social_duplicate === false) {
+    return res.status(400).send({
+      result: false,
+    });
+  }
+  res.status(200).send({
+    result: true,
+  });
 };
 
 // 회원탈퇴

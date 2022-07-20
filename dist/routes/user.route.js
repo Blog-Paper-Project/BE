@@ -31,6 +31,9 @@ router.get('/login/google/callback', AsyncHandler(Usercontroller.googleCallback)
 // 회원가입
 router.post('/signup', AsyncHandler(Usercontroller.signup));
 
+// 소셜 회원가입
+router.patch('/social-signup', AsyncHandler(Usercontroller.social_signup));
+
 // 회원탈퇴
 router.patch('/', Authmiddle, AsyncHandler(Usercontroller.userDelete));
 
