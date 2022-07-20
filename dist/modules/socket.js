@@ -4,7 +4,11 @@ module.exports = (server) => {
   const io = SocketIO(server, {
     cors: {
       origin: '*',
+      methods: ['GET', 'POST'],
+      transports: ['websocket', 'polling'],
+      credentials: true,
     },
+    allowEI03: true,
   });
 
   const checkCounts = (room) => io.sockets.adapter.rooms.get(room)?.size || 0;
