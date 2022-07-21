@@ -6,9 +6,25 @@ const passport = require('passport');
 const expressSession = require('express-session');
 const passportConfig = require('./dist/modules/social');
 const apiLimiter = require('./dist/modules/api_limiter');
+const redis = require('redis');
+
 require('dotenv').config();
 require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
+
+// redis 연결
+const redisClient = redis.createClient({
+  url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
+  legacyMode: true,
+});
+redisClient.on('connect', () => {
+  console.info('🟢 Redis 연결 성공!');
+});
+redisClient.on('error', (err) => {
+  console.error('Redis Client Error', err);
+});
+redisClient.connect().then();
+exports.redisCli = redisClient; //  v4버젼은 프로미스 기반이라 사용
 
 const app = express();
 

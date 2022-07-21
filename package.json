@@ -64,6 +64,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-kakao": "^1.0.1",
     "passport-naver": "^1.0.6",
+    "redis": "^4.2.0",
     "request": "^2.88.2",
     "sequelize": "^6.21.1",
     "sequelize-cli": "^6.4.1",

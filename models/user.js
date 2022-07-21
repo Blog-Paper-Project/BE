@@ -53,10 +53,6 @@ module.exports = class User extends Sequelize.Model {
           allowNull: false,
           defaultValue: 'local',
         },
-        emailAuth: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-        },
         refreshToken: {
           type: Sequelize.TEXT,
           allowNull: true,
