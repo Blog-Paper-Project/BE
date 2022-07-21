@@ -182,8 +182,8 @@ exports.login_check_emaliauth = async (user) => {
 
 // 이메일 인증 삭제
 exports.login_delet_check_emaliauth = async (user) => {
-  const emailcheck = await redisCliv4.exists(user.eamil); // true: 1 , false: 0
-  if (emailcheck) await redisCli.del(user.eamil);
+  const emailcheck = await redisCliv4.exists(user.dataValues.email); // true: 1 , false: 0
+  if (emailcheck) await redisCli.del(user.dataValues.email);
 };
 
 // 비밀번호 변경 (로그인 시)

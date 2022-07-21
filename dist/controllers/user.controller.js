@@ -348,8 +348,9 @@ exports.login_check_emaliauth = async (req, res, next) => {
   const { user } = res.locals;
   const { emailAuth } = req.body;
   const text = await userService.login_check_emaliauth(user);
-  await userService.login_delet_check_emaliauth(user);
-  if (Number(emailAuth) === text) {
+
+  if (emailAuth === text) {
+    await userService.login_delet_check_emaliauth(user);
     res.status(200).send({
       result: true,
     });
