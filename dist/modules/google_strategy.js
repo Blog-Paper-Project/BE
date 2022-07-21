@@ -22,7 +22,9 @@ module.exports = () => {
             existUser?.dataValues.email === profile._json.email &&
             existUser?.dataValues.provider === 'local'
           ) {
-            throw `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`;
+            throw new Error(
+              `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`
+            );
           }
           // 이미 가입된 구글 프로필이면 성공
           if (exUser) {
@@ -31,7 +33,7 @@ module.exports = () => {
             // 가입되지 않는 유저면 회원가입 시키고 로그인을 시킨다
             const newUser = await User.create({
               email: profile._json.email,
-              nickname: profile.displayName,
+              nickname: 'g' + profile.displayName,
               snsId: profile.id,
               provider: 'google',
             });

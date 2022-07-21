@@ -23,7 +23,9 @@ module.exports = () => {
             existUser?.dataValues.email === profile._json.email &&
             existUser?.dataValues.provider === 'local'
           ) {
-            throw `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`;
+            throw new Error(
+              `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`
+            );
           }
           if (exUser) {
             // 기존 User의 정보가 있다면 User정보를 done과 호출하고 전략을 종료
@@ -32,7 +34,7 @@ module.exports = () => {
             // 기존의 User정보가 없다면 회원가입을 진행
             const newUser = await User.create({
               email: profile._json.email,
-              nickname: profile._json.nickname,
+              nickname: 'n' + profile._json.nickname,
               snsId: profile.id,
               provider: 'naver',
             });

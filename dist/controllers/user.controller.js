@@ -114,7 +114,6 @@ exports.userDelete = async (req, res, next) => {
 // 회원복구
 exports.user_restore = async (req, res, next) => {
   const { email, password } = req.body;
-  const deletedAt = null;
 
   const user = await userService.login(email);
   const passwordck = await Bcrypt.compare(password, user.password);
@@ -126,7 +125,7 @@ exports.user_restore = async (req, res, next) => {
     });
   }
 
-  await userService.user_restore(email, deletedAt);
+  await userService.user_restore(email);
   res.status(200).send({
     result: true,
     msg: '회원복구 완료',
