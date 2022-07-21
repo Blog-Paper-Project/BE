@@ -8,7 +8,7 @@ module.exports = () => {
     new KakaoStrategy(
       {
         clientID: process.env.KAKAO_REST_API,
-        callbackURL: process.env.KAKAO_REDIRECT_URI, // 카카오로부터 인증 결과를 받을 라우터 주소
+        callbackURL: process.env.REDIRECT_URI, // 카카오로부터 인증 결과를 받을 라우터 주소
       },
       // 카카오에서는 인증 수 callbakcURL 에 적힌 주소로 accessToken, refreshToken, profile 보냄
       async (accessToken, refreshToken, profile, done) => {

@@ -44,8 +44,8 @@ exports.userDelete = async (user, deletedAt) => {
 };
 
 // 회원복구
-exports.user_restore = async (email, deletedAt) => {
-  return await User.update({ deletedAt }, { where: { email } });
+exports.user_restore = async (email) => {
+  return await User.update({ deletedAt: null }, { where: { email } });
 };
 
 // 로그인
