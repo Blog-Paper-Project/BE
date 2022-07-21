@@ -284,11 +284,12 @@ exports.emailauth = async (req, res, next) => {
 
 // 이메일 인증 체크
 exports.check_emaliauth = async (req, res, next) => {
-  const { emailAuth } = req.body;
-  const text = await userService.check_emaliauth(emailAuth);
-  await userService.delet_check_emaliauth(emailAuth);
-  console.log(text.emailAuth);
-  if (Number(emailAuth) === text.emailAuth) {
+  const { email, emailAuth } = req.body;
+  const text = await userService.check_emaliauth(email);
+
+  console.log(text, emailAuth);
+  if (emailAuth === text) {
+    await userService.delet_check_emaliauth(email);
     return res.status(200).send({
       result: true,
     });
@@ -348,7 +349,7 @@ exports.login_check_emaliauth = async (req, res, next) => {
   const { emailAuth } = req.body;
   const text = await userService.login_check_emaliauth(user);
   await userService.login_delet_check_emaliauth(user);
-  if (Number(emailAuth) === text.emailAuth) {
+  if (Number(emailAuth) === text) {
     res.status(200).send({
       result: true,
     });

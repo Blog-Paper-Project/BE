@@ -3,6 +3,10 @@ const Bcrypt = require('bcrypt');
 const { Op } = sequelize;
 const { deleteImg } = require('../modules/multer');
 const { User, Point } = require('../../models');
+const app = require('../../app');
+
+const redisCli = app.redisCli;
+const redisCliv4 = app.redisCli.v4;
 
 // 회원가입
 exports.signup = async (email, nickname, password, blogId) => {
@@ -18,7 +22,7 @@ exports.signup = async (email, nickname, password, blogId) => {
   const salt = await Bcrypt.genSalt();
   const pwhash = await Bcrypt.hash(password, salt);
 
-  await User.update({ nickname, password: pwhash, blogId }, { where: { email } });
+  await User.create({ email, nickname, password: pwhash, blogId });
 };
 // 소셜 회원가입
 exports.social_signup = async (blogId, nickname, email) => {
@@ -132,24 +136,25 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
 
 // 이메일 인증
 exports.emailauth = async (email, emailAuth) => {
-  const emailcheck = await User.findOne({ where: { email } });
+  const emailcheck = await redisCliv4.get(email);
+  console.log(emailcheck);
   if (!emailcheck) {
-    await User.create({ email });
+    return await redisCli.set(email, emailAuth);
   }
-  await User.update({ emailAuth }, { where: { email } });
+
+  await redisCli.set(email, emailAuth);
+  await redisCli.expire(email, 3600);
 };
 
 // 이메일 인증 체크
-exports.check_emaliauth = async (emailAuth) => {
-  return await User.findOne({
-    where: { emailAuth },
-    attributes: ['emailAuth'],
-  });
+exports.check_emaliauth = async (email) => {
+  return await redisCliv4.get(email);
 };
 
 // 이메일 인증 삭제
-exports.delet_check_emaliauth = async (emailAuth) => {
-  await User.update({ emailAuth: null }, { where: { emailAuth } });
+exports.delet_check_emaliauth = async (eamil) => {
+  const emailcheck = await redisCliv4.exists(eamil); // true: 1 , false: 0
+  if (emailcheck) await redisCli.del(eamil);
 };
 
 // 비밀번호 변경
@@ -161,21 +166,19 @@ exports.change_password = async (email, password) => {
 };
 
 // 이메일 인증 (로그인 시)
-exports.login_emailauth = async (user, emailAuth) => {
-  await User.update({ emailAuth }, { where: { userId: user.userId } });
+exports.login_emailauth = async (user) => {
+  return await redisCliv4.get(user.email);
 };
 
 // 이메일 인증 체크 (로그인 시)
 exports.login_check_emaliauth = async (user) => {
-  return await User.findOne({
-    where: { userId: user.userId },
-    attributes: ['emailAuth'],
-  });
+  return await redisCliv4.get(user.email);
 };
 
 // 이메일 인증 삭제
 exports.login_delet_check_emaliauth = async (user) => {
-  await User.update({ emailAuth: null }, { where: { userId: user.userId } });
+  const emailcheck = await redisCliv4.exists(user.eamil); // true: 1 , false: 0
+  if (emailcheck) await redisCli.del(user.eamil);
 };
 
 // 비밀번호 변경 (로그인 시)
