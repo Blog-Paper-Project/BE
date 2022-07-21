@@ -138,7 +138,7 @@ const updatePost = async (req, res, next) => {
     }
     const schema = (0, validate_paper_1.validatePaper)();
     await schema.validateAsync({ title, contents });
-    const paper = await PaperService.updatePost(title, contents, thumbnail, userId, postId, category || '');
+    const paper = await PaperService.updatePost(title, contents, thumbnail, userId, postId, category);
     if (!paper[0]) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
