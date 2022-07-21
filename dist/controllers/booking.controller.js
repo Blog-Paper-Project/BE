@@ -25,6 +25,7 @@ exports.patchPoint = patchPoint;
 
 //예약 신청
 const createBooking = async (req, res, next) => {
+  const guestId = res.locals.user.blogId;
   const userId = res.locals.user.userId;
 
   const { blogId, date } = req.body;
@@ -43,6 +44,17 @@ const createBooking = async (req, res, next) => {
   const endTime = dayjs(end).tz().format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
 
+  //예약 신청 횟수 제한
+  const bookingList = await bookingService.findList(guestId);
+  if (bookingList.length > 11) {
+    return res.send.status(400).send({ msg: '예약횟수를 초과하였습니다.' });
+  }
+
+  // 예약 받는 횟수 제한
+  const hostBbookingList = await bookingService.hostFindList(hostId);
+  if (hostBbookingList.length > 11) {
+    return res.send.status(400).send({ msg: '예약 받을 수 있는 횟수 초과하였습니다.' });
+  }
   //예약시간 제한
   if (time < 180) {
     return res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
@@ -107,6 +119,21 @@ const bookingList = async (req, res, next) => {
   }
 };
 exports.bookingList = bookingList;
+
+//유저 나뭇잎 보여주기
+const leafList = async (req, res, next) => {
+  const hostId = req.params.hostId;
+  try {
+    const gusetLeaf = res.locals.user.point;
+    const hostLeaf = await bookingService.findHost(hostId);
+    const pointList = { gusetLeaf, hostLeaf };
+    return res.status(200).json({ pointList });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+exports.leafList = leafList;
 
 // 호스트 예약 수락
 const acceptBooking = async (req, res, next) => {

@@ -24,4 +24,6 @@ router.delete('/host/:hostId/:bookingId', auth, bookingController.cancelReservat
 //게스트  예약 취소
 router.delete('/guest/:guestId/:bookingId', auth, bookingController.cancelBooking);
 
+router.get('/leaf/:hostId', auth, bookingController.leafList);
+
 module.exports = router;
