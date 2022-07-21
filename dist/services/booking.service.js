@@ -16,7 +16,7 @@ exports.patchPoint = patchPoint;
 
 //나뭇잎 조회
 const findLeaf = async (blogId) => {
-  return await User.findOne({
+  return await User.findAll({
     where: {
       blogId: blogId,
     },
@@ -37,38 +37,38 @@ const findRev = async (hostId, bookingTime, meetingDate) => {
 exports.findRev = findRev;
 
 //예약 신청
-const createBooking = async (blogId, guestId, leaf, bookingTime, meetingDate, hostId) => {
-  //console.log('**', blogId, guestId, leaf, bookingTime, meetingDate, hostId);
-  await User.decrement({ point: leaf }, { where: { userId: guestId } });
+const createBooking = async (blogId, leaf, bookingTime, meetingDate, hostId, userId) => {
+  console.log('**', blogId, leaf, bookingTime, meetingDate, hostId);
+  await User.decrement({ point: leaf }, { where: { userId: userId } });
   await Leaf.create({
     leaf,
     remarks: '화상채팅 예약',
-    giverId: guestId,
-    recipientId: hostId,
+    giverId: hostId,
+    recipientId: blogId,
   });
   return await Booking.create({
     hostId,
     date: meetingDate,
     time: bookingTime,
-    guestId,
+    guestId: blogId,
     leaf,
   });
 };
 exports.createBooking = createBooking;
 
 //예약한 내역
-const guestBooking = async (userId) => {
+const guestBooking = async (blogId) => {
   return await Booking.findAll({
-    where: { guestId: userId },
+    where: { guestId: blogId },
     order: [['createdAt', 'DESC']],
   });
 };
 exports.guestBooking = guestBooking;
 
 //예약받은 내역
-const hostBooking = async (userId) => {
+const hostBooking = async (blogId) => {
   return await Booking.findAll({
-    where: { hostId: userId },
+    where: { hostId: blogId },
     order: [['createdAt', 'DESC']],
   });
 };
