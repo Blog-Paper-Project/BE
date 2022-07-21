@@ -139,11 +139,10 @@ exports.emailauth = async (email, emailAuth) => {
   const emailcheck = await redisCliv4.get(email);
   console.log(emailcheck);
   if (!emailcheck) {
-    return await redisCli.set(email, emailAuth);
+    return await redisCli.setex(email, 300, emailAuth);
   }
 
-  await redisCli.set(email, emailAuth);
-  await redisCli.expire(email, 3600);
+  await redisCli.setex(email, 300, emailAuth);
 };
 
 // 이메일 인증 체크
@@ -166,8 +165,14 @@ exports.change_password = async (email, password) => {
 };
 
 // 이메일 인증 (로그인 시)
-exports.login_emailauth = async (user) => {
-  return await redisCliv4.get(user.email);
+exports.login_emailauth = async (user, emailAuth) => {
+  const emailcheck = await redisCliv4.get(user.email);
+  console.log(emailcheck);
+  if (!emailcheck) {
+    return await redisCli.setex(user.email, 300, emailAuth);
+  }
+
+  await redisCli.setex(user.email, 300, emailAuth);
 };
 
 // 이메일 인증 체크 (로그인 시)
