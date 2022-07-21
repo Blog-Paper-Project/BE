@@ -2,11 +2,12 @@ const bookingService = require('../services/booking.service');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
+const locale = require('dayjs/locale/ko');
+dayjs.locale('ko');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault('Asia/Seoul'); // date()함수 공부
-
+dayjs.tz.setDefault('Asia/Seoul');
 //나뭇잎 설정
 const patchPoint = async (req, res, next) => {
   const userId = req.params.userId;
@@ -25,13 +26,11 @@ exports.patchPoint = patchPoint;
 //예약 신청
 const createBooking = async (req, res, next) => {
   const userId = res.locals.user.userId;
-  const userBlogId = res.locals.user.blogId;
 
-  const { guestId, date } = req.body;
-  const blogId = req.params.blogId;
+  const { blogId, date } = req.body;
   const Leaf = await bookingService.findLeaf(blogId);
   const leaf = Leaf.dataValues.setPoint;
-  const hostId = Leaf.dataValues.userId;
+  const hostId = req.params.blogId;
 
   //날짜, 시간 설정
   const start = date.split('-')[0];
@@ -39,7 +38,7 @@ const createBooking = async (req, res, next) => {
   const bookingMoment = new dayjs(); //=> dayjs 사용하려면 현재시간
   const startMoment = dayjs(start); // 예약시작시간
   const time = startMoment.diff(bookingMoment, 'minute');
-  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD ddd'); //요일 한국어로 교체
+  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD dddd'); //요일 한국어로 교체
   const startTime = dayjs(start).tz().format('HH:mm:ss');
   const endTime = dayjs(end).tz().format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
@@ -51,8 +50,8 @@ const createBooking = async (req, res, next) => {
   }
 
   // 호스트id, 예약시간, 예약날짜 조회,
-  // try catch공부 날카롭다.. ㅎㄷㄷ
-  const existRev = await bookingService.findRev(blogId, bookingTime, meetingDate);
+  console.log(hostId, bookingTime, meetingDate);
+  const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
   if (existRev.length > 0) {
     return res.status(400).send({ msg: '이미 예약된 시간 입니다.' });
   }
@@ -71,22 +70,21 @@ const createBooking = async (req, res, next) => {
   }
 
   //본인 예약 차단
-  if (blogId == userBlogId) {
+  if (blogId == hostId) {
     return res.status(400).send({ result: false });
   }
   //커스텀 에러.. 공부
-  //console.log('*', blogId, guestId, leaf, bookingTime, meetingDate, userId, hostId);
+  //console.log('*', blogId, leaf, bookingTime, meetingDate, userId, hostId);
 
   //예약 신청
   try {
     const booking_result = await bookingService.createBooking(
       blogId,
-      guestId,
       leaf,
       bookingTime,
       meetingDate,
-      userId,
-      hostId
+      hostId,
+      userId
     );
     return res.status(200).json({ booking_result, result: true });
   } catch (error) {
@@ -99,10 +97,11 @@ exports.createBooking = createBooking;
 // 예약 조회
 const bookingList = async (req, res, next) => {
   const userId = res.locals.user.userId;
+  const blogId = res.locals.user.blogId;
 
   try {
-    const hostBookingList = await bookingService.hostBooking(userId);
-    const guestBookingList = await bookingService.guestBooking(userId);
+    const hostBookingList = await bookingService.hostBooking(blogId);
+    const guestBookingList = await bookingService.guestBooking(blogId);
     const totalList = { hostBookingList, guestBookingList };
     return res.status(200).json({ totalList, result: true });
   } catch (error) {
