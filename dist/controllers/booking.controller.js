@@ -113,7 +113,7 @@ exports.bookingList = bookingList;
 
 // 호스트 예약 수락
 const acceptBooking = async (req, res, next) => {
-  const blogId = req.params.blogId;
+  const hostId = req.params.hostId;
   const bookingId = req.params.bookingId;
   const guest = await bookingService.findOne(bookingId);
   const guestId = guest[0].guestId;
@@ -139,9 +139,7 @@ exports.acceptBooking = acceptBooking;
 const cancelReservation = async (req, res, next) => {
   const hostId = req.params.hostId;
   const bookingId = req.params.bookingId;
-  console.log(hostId, bookingId);
   const guest = await bookingService.findOne(bookingId);
-  console.log(guest);
   const guestId = guest[0].guestId;
   const cntLeaf = await bookingService.findOne(bookingId);
   const leaf = cntLeaf[0].leaf;
@@ -154,7 +152,7 @@ const cancelReservation = async (req, res, next) => {
       leaf,
       hostId
     );
-    res.status(200).json({ result: true });
+    //res.status(200).json({ result: true });
   } catch (error) {
     console.log(error);
     next(error);
@@ -171,13 +169,13 @@ const cancelBooking = async (req, res, next) => {
   const cntLeaf = await bookingService.findOne(bookingId);
   const leaf = cntLeaf[0].leaf;
   console.log(guestId, bookingId, hostId, leaf);
-  try {
-    const booking_result = await bookingService.recall(bookingId, guestId, leaf, hostId);
-    res.status(200).json({ result: true });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+  // try {
+  //   const booking_result = await bookingService.recall(bookingId, guestId, leaf, hostId);
+  //   res.status(200).json({ result: true });
+  // } catch (error) {
+  //   console.log(error);
+  //   next(error);
+  // }
 };
 exports.cancelBooking = cancelBooking;
 
