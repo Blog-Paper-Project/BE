@@ -20,11 +20,11 @@ module.exports = () => {
             where: { email: profile._json.email },
           });
           if (
-            existUser?.dataValues.email === profile._json.email &&
-            existUser?.dataValues.provider === 'local'
+            exUser?.dataValues.email === profile._json.email &&
+            exUser?.dataValues.provider === 'local'
           ) {
             throw new Error(
-              `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`
+              `{result : False , "${exUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`
             );
           }
           if (exUser) {
