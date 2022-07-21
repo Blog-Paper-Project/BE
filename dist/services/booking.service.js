@@ -84,7 +84,7 @@ const confirmBooking = async (hostId, bookingId, guestId, leaf) => {
     recipientId: hostId,
   });
 
-  await User.increment({ popularity: leaf }, { where: { userId: hostId } });
+  await User.increment({ popularity: leaf }, { where: { blogId: hostId } });
 
   await Booking.update(
     { accepted: true },
@@ -107,12 +107,9 @@ exports.findOne = findOne;
 
 // 화상채팅 수락 후 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
-  console.log(bookingId, guestId, hostId, leaf);
-  await Booking.destroy({
-    where: { bookingId: bookingId },
-  });
-  User.increment({ point: leaf }, { where: { userId: guestId } });
-  User.decrement({ popularity: leaf }, { where: { userId: hostId } });
+  console.log(guestId, bookingId, hostId, leaf);
+  User.increment({ point: leaf }, { where: { blogId: guestId } });
+  User.decrement({ popularity: leaf }, { where: { blogId: hostId } });
   await Leaf.create({
     leaf,
     remarks: '화상채팅 취소',
@@ -120,6 +117,9 @@ const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
     recipientId: guestId,
   });
 
+  await Booking.destroy({
+    where: { bookingId: bookingId },
+  });
   return await Booking.findByPk(bookingId);
 };
 exports.cancelBooking = cancelBooking;
