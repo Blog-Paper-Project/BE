@@ -4,7 +4,7 @@ const bookingController = require('../controllers/booking.controller');
 const router = express.Router();
 
 //나뭇잎 수정
-router.patch('/leaf/:blogId', auth, bookingController.patchPoint);
+router.patch('/leaf/:userId', auth, bookingController.patchPoint);
 
 //예약 신청
 router.post('/:blogId', auth, bookingController.createBooking);
