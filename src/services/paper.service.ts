@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
 
+import { Model } from 'sequelize/types';
 import { calcDays, calcMs } from '../modules/date';
 
 // 키워드로 게시글 검색
@@ -60,10 +61,13 @@ export const findUserInfo = async (blogId: string) => {
   const user: DTO.UserInfo = await User.findOne({
     where: { blogId },
     attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-    include: {
-      model: Paper,
-      include: { model: Tag, attributes: ['name'] },
-    },
+    include: [
+      {
+        model: Paper,
+        include: { model: Tag, attributes: ['name'] },
+      },
+      { model: User, as: 'Followers', attributes: ['blogId'] },
+    ],
     order: [[Paper, 'createdAt', 'DESC']],
   });
 
@@ -214,7 +218,10 @@ export const updateTags = async (postId: string, tags: string[]) => {
 
 // 게시글과 이미지 삭제
 export const destroyPost = async (userId: number, postId: string) => {
-  const images = await Image.findAll({ where: { postId } }, { raw: true });
+  const images: Models.Image[] = await Image.findAll(
+    { where: { postId } },
+    { raw: true }
+  );
   const paper = await Paper.findOne({ where: { userId, postId } });
 
   for (let image of images) {

@@ -57,10 +57,13 @@ const findUserInfo = async (blogId) => {
     const user = await User.findOne({
         where: { blogId },
         attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-        include: {
-            model: Paper,
-            include: { model: Tag, attributes: ['name'] },
-        },
+        include: [
+            {
+                model: Paper,
+                include: { model: Tag, attributes: ['name'] },
+            },
+            { model: User, as: 'Followers', attributes: ['blogId'] },
+        ],
         order: [[Paper, 'createdAt', 'DESC']],
     });
     let categories = user?.Papers.map((paper) => paper.category);
