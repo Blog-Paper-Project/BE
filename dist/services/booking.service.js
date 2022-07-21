@@ -38,13 +38,13 @@ exports.findRev = findRev;
 
 //예약 신청
 const createBooking = async (blogId, leaf, bookingTime, meetingDate, hostId, userId) => {
-  console.log('**', blogId, leaf, bookingTime, meetingDate, hostId);
+  console.log('**', blogId, leaf, bookingTime, meetingDate, userId, hostId);
   await User.decrement({ point: leaf }, { where: { userId: userId } });
   await Leaf.create({
     leaf,
     remarks: '화상채팅 예약',
-    giverId: hostId,
-    recipientId: blogId,
+    giverId: blogId,
+    recipientId: hostId,
   });
   return await Booking.create({
     hostId,
@@ -107,7 +107,7 @@ exports.findOne = findOne;
 
 // 화상채팅 수락 후 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
-  console.log(guestId, bookingId, hostId, leaf);
+  console.log(bookingId, guestId, hostId, leaf);
   User.increment({ point: leaf }, { where: { blogId: guestId } });
   User.decrement({ popularity: leaf }, { where: { blogId: hostId } });
   await Leaf.create({
@@ -126,11 +126,10 @@ exports.cancelBooking = cancelBooking;
 
 // 수락전 예약 취소
 const recall = async (bookingId, guestId, hostId, leaf) => {
-  console.log(bookingId, guestId, hostId, leaf);
   await Booking.destroy({
     where: { bookingId: bookingId },
   });
-  User.increment({ point: leaf }, { where: { userId: guestId } });
+  User.increment({ point: leaf }, { where: { blogId: guestId } });
   await Leaf.create({
     leaf,
     remarks: '화상채팅 수락 전 취소',
