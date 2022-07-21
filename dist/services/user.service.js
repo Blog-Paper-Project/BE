@@ -2,7 +2,8 @@ const sequelize = require('sequelize');
 const Bcrypt = require('bcrypt');
 const { Op } = sequelize;
 const { deleteImg } = require('../modules/multer');
-const { User, Point } = require('../../models');
+const { User } = require('../../models');
+const jwt = require('jsonwebtoken');
 const app = require('../../app');
 
 const redisCli = app.redisCli;
@@ -53,10 +54,8 @@ exports.user_restore = async (email) => {
 };
 
 // 로그인
-exports.login = async (email, session) => {
-  //await User.update({ snsId: session }, { where: { email } });
-
-  return await User.findOne({
+exports.login = async (email) => {
+  const user = await User.findOne({
     attributes: [
       'nickname',
       'password',
@@ -69,6 +68,26 @@ exports.login = async (email, session) => {
     ],
     where: { email },
   });
+
+  const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
+    expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+  });
+
+  const tokencheck = await redisCliv4.get(email);
+  await redisCli.setex(email, 10800, token); // true: 1 , false: 0
+
+  if (tokencheck !== token && tokencheck !== null) {
+    return false;
+  }
+
+  return [user, token];
+};
+
+// 로그아웃
+exports.logout = async (user) => {
+  console.log(user);
+  const userout = await redisCliv4.exists(user.email); // true: 1 , false: 0
+  if (userout) await redisCli.del(user.email);
 };
 
 // 블로그 아이디 중복검사
@@ -103,7 +122,7 @@ exports.duplicate = async (id) => {
 exports.myprofile = async (user) => {
   return await User.findOne({
     where: { userId: user.userId },
-    attributes: { exclude: ['password', 'email'] },
+    attributes: { exclude: ['password'] },
   });
 };
 
@@ -151,9 +170,9 @@ exports.check_emaliauth = async (email) => {
 };
 
 // 이메일 인증 삭제
-exports.delet_check_emaliauth = async (eamil) => {
-  const emailcheck = await redisCliv4.exists(eamil); // true: 1 , false: 0
-  if (emailcheck) await redisCli.del(eamil);
+exports.delet_check_emaliauth = async (email) => {
+  const emailcheck = await redisCliv4.exists(email); // true: 1 , false: 0
+  if (emailcheck) await redisCli.del(email);
 };
 
 // 비밀번호 변경
@@ -166,24 +185,24 @@ exports.change_password = async (email, password) => {
 
 // 이메일 인증 (로그인 시)
 exports.login_emailauth = async (user, emailAuth) => {
-  const emailcheck = await redisCliv4.get(user.email);
+  const emailcheck = await redisCliv4.get('login' + user.email);
   console.log(emailcheck);
   if (!emailcheck) {
-    return await redisCli.setex(user.email, 300, emailAuth);
+    return await redisCli.setex('login' + user.email, 300, emailAuth);
   }
 
-  await redisCli.setex(user.email, 300, emailAuth);
+  await redisCli.setex('login' + user.email, 300, emailAuth);
 };
 
 // 이메일 인증 체크 (로그인 시)
 exports.login_check_emaliauth = async (user) => {
-  return await redisCliv4.get(user.email);
+  return await redisCliv4.get('login' + user.email);
 };
 
 // 이메일 인증 삭제
 exports.login_delet_check_emaliauth = async (user) => {
-  const emailcheck = await redisCliv4.exists(user.dataValues.email); // true: 1 , false: 0
-  if (emailcheck) await redisCli.del(user.dataValues.email);
+  const emailcheck = await redisCliv4.exists('login' + user.dataValues.email); // true: 1 , false: 0
+  if (emailcheck) await redisCli.del('login' + user.dataValues.email);
 };
 
 // 비밀번호 변경 (로그인 시)

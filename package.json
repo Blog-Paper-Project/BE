@@ -40,6 +40,7 @@
   "dependencies": {
     "aws-sdk": "^2.1162.0",
     "bcrypt": "^5.0.1",
+    "connect-redis": "^6.1.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dayjs": "^1.11.3",

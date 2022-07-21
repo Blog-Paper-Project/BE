@@ -86,4 +86,7 @@ router.patch(
   AsyncHandler(Usercontroller.login_change_password)
 );
 
+// 로그아웃
+router.post('/logout', Authmiddle, AsyncHandler(Usercontroller.logout));
+
 module.exports = router;
