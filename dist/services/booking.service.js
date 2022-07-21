@@ -105,6 +105,30 @@ const findOne = async (bookingId) => {
 };
 exports.findOne = findOne;
 
+// 예약 신청 횟수 제한
+const findList = async (guestId) => {
+  return await Booking.findAll({
+    where: { guestId: guestId },
+  });
+};
+exports.findList = findList;
+
+//예약 신청 횟수 제한
+const hostFindList = async (hostId) => {
+  return await Booking.findAll({
+    where: { hostId: hostId },
+  });
+};
+exports.hostFindList = hostFindList;
+
+const findHost = async (hostId) => {
+  return await User.findOne({
+    attributes: ['setPoint', 'blogId', 'profileImage', 'introduction', 'popularity'],
+    where: { blogId: hostId },
+  });
+};
+exports.findHost = findHost;
+
 // 화상채팅 수락 후 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
   console.log(bookingId, guestId, hostId, leaf);
