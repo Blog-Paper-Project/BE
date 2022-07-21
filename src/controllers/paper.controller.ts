@@ -203,7 +203,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
     thumbnail,
     userId,
     postId,
-    category || ''
+    category
   );
 
   if (!paper[0]) {

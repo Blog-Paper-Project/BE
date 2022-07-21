@@ -21,7 +21,7 @@ describe('로그인 후 토큰 발급', () => {
 describe('페이지 조회 테스트', () => {
   it('메인 페이지 조회', (done) => {
     request(app)
-      .get('/api/paper/')
+      .get('/api/paper')
       .then((res) => {
         expect(res.status).toBe(200);
         done();
@@ -164,7 +164,6 @@ describe('개인 페이지 테스트', () => {
     request(app)
       .get('/api/paper/testbot')
       .then((res) => {
-        console.log(res.body);
         expect(res.status).toBe(200);
         done();
       });
@@ -274,12 +273,12 @@ describe('좋아요 & 구독 테스트', () => {
       });
   });
 
-  it('구독 400', (done) => {
+  it('구독', (done) => {
     request(app)
       .post(`/api/paper/testbot1/subscription`)
       .set('Authorization', token)
       .then((res) => {
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(200);
         done();
       });
   });
