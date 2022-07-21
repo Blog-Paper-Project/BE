@@ -20,7 +20,7 @@ module.exports = () => {
           });
           if (
             exUser?.dataValues.email === profile._json.email &&
-            exUser?.dataValues.provider === 'local'
+            exUser?.dataValues.provider !== 'google'
           ) {
             throw new Error(
               `{result : False , "${exUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`

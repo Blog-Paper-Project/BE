@@ -19,7 +19,7 @@ module.exports = () => {
           });
           if (
             existUser?.dataValues.email === profile._json.kakao_account.email &&
-            existUser?.dataValues.provider === 'local'
+            existUser?.dataValues.provider !== 'kakao'
           ) {
             throw new Error(
               `{result : False , "${existUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`
