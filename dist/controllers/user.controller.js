@@ -349,7 +349,7 @@ exports.login_check_emaliauth = async (req, res, next) => {
   const { emailAuth } = req.body;
   const text = await userService.login_check_emaliauth(user);
   await userService.login_delet_check_emaliauth(user);
-  if (Number(emailAuth) === text.emailAuth) {
+  if (Number(emailAuth) === text) {
     res.status(200).send({
       result: true,
     });

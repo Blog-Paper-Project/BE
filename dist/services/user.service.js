@@ -39,7 +39,7 @@ exports.social_signup = async (blogId, nickname, email) => {
   ) {
     return false;
   }
-  await User.create({ email, blogId, nickname });
+  await User.update({ blogId, nickname }, { where: { email } });
 };
 
 // 회원탈퇴
