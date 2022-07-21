@@ -29,8 +29,7 @@ const createBooking = async (req, res, next) => {
 
   const { blogId, date } = req.body;
   const Leaf = await bookingService.findLeaf(blogId);
-  console.log(Leaf);
-  const leaf = Leaf?.dataValues.setPoint;
+  const leaf = Leaf[0].dataValues.setPoint;
   const hostId = req.params.blogId;
 
   //날짜, 시간 설정
