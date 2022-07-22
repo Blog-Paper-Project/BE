@@ -107,7 +107,7 @@ function initSocket(server) {
 
 function getSocketIO() {
   if (!socket) {
-    throw new Error('Please call init first');
+    throw new Error('소켓 연결 안됨!');
   }
   return socket.io;
 }
