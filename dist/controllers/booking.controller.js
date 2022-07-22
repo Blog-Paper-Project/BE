@@ -53,8 +53,9 @@ const createBooking = async (req, res, next) => {
   // 예약 받는 횟수 제한
   const hostBbookingList = await bookingService.hostFindList(hostId);
   if (hostBbookingList.length > 11) {
-    return res.send.status(400).send({ msg: '예약 받을 수 있는 횟수 초과하였습니다.' });
+    return res.send.status(400).send({ msg: '예약 받을 수 있는 횟수를 초과하였습니다.' });
   }
+
   //예약시간 제한
   if (time < 180) {
     return res.status(400).send({ msg: '화상 채팅 3시간 전까지만 예약이 가능합니다.' });
@@ -82,6 +83,10 @@ const createBooking = async (req, res, next) => {
 
   //본인 예약 차단
   if (blogId == hostId) {
+    return res.status(400).send({ result: false });
+  }
+
+  if (blogId === undefined || date === undefined) {
     return res.status(400).send({ result: false });
   }
 
