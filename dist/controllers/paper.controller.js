@@ -86,7 +86,8 @@ const readPost = async (req, res, next) => {
     if (!paper || paper.Users.blogId !== blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    return res.json({ paper });
+    const count = await PaperService.addCount(postId);
+    return res.json({ count, paper });
 };
 exports.readPost = readPost;
 // 상세 페이지 작성
@@ -113,12 +114,9 @@ const createPost = async (req, res, next) => {
 };
 exports.createPost = createPost;
 // 상세 페이지 이미지 첨부
-const createImage = async (req, res, next) => {
+const createImage = async (req, res) => {
     const { file } = req;
-    if (!file?.transforms) {
-        return next((0, custom_error_1.default)(400, 'Image Not Uploaded'));
-    }
-    const imageUrl = file.transforms[0]?.key;
+    const imageUrl = file?.transforms[0]?.key;
     if (imageUrl) {
         await PaperService.createImage(imageUrl);
     }

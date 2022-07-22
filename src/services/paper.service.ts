@@ -2,8 +2,8 @@
 const { Op } = require('sequelize');
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { deleteImg } = require('../modules/multer');
+const { redisCli } = require('../../app');
 
-import { Model } from 'sequelize/types';
 import { calcDays, calcMs } from '../modules/date';
 
 // 키워드로 게시글 검색
@@ -136,6 +136,13 @@ export const findPostInfo = async (postId: string) => {
       { model: User, as: 'Likes', attributes: ['nickname'] },
     ],
   });
+};
+
+// 조회수 증가
+export const addCount = async (postId: string) => {
+  await redisCli.sadd(postId, 2);
+
+  return await redisCli.v4.sCard(postId);
 };
 
 // 게시글 작성

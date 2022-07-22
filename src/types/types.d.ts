@@ -6,7 +6,7 @@ declare namespace Types {
 
   interface MulterFile {
     file?: {
-      transforms?: { key?: string }[];
+      transforms: { key?: string }[];
     };
   }
 }
