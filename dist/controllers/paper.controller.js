@@ -76,7 +76,7 @@ exports.readMyFeed = readMyFeed;
 // 상세 페이지 조회
 const readPost = async (req, res, next) => {
     const { blogId, postId } = req.params;
-    const { userId } = req.body;
+    const { userid } = req.headers;
     if (!blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
@@ -87,7 +87,7 @@ const readPost = async (req, res, next) => {
     if (!paper || paper.Users.blogId !== blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    const count = await PaperService.addCount(postId, userId);
+    const count = await PaperService.addCount(postId, userid);
     return res.json({ count, paper });
 };
 exports.readPost = readPost;
