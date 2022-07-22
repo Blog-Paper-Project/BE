@@ -106,7 +106,7 @@ export const readMyFeed = async (req: Request, res: Response, next: NextFunction
 // 상세 페이지 조회
 export const readPost = async (req: Request, res: Response, next: NextFunction) => {
   const { blogId, postId } = req.params;
-  const { userId } = req.body;
+  const { userId } = req.headers as { userId: string };
 
   if (!blogId) {
     return next(createError(404, 'Not Found!'));

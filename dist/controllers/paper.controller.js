@@ -76,7 +76,7 @@ exports.readMyFeed = readMyFeed;
 // 상세 페이지 조회
 const readPost = async (req, res, next) => {
     const { blogId, postId } = req.params;
-    const { userId } = req.body;
+    const { userId } = req.headers;
     if (!blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
