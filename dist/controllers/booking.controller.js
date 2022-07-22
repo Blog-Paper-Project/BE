@@ -132,7 +132,7 @@ const leafList = async (req, res, next) => {
     const gusetLeaf = res.locals.user.point;
     const hostLeaf = await bookingService.findHost(hostId);
     const pointList = { gusetLeaf, hostLeaf };
-    return res.status(200).json({ pointList });
+    return res.status(200).json({ pointList, result: true });
   } catch (error) {
     console.log(error);
     next(error);
