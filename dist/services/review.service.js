@@ -30,4 +30,9 @@ const reviewById = async (reviewId) => {
   return await Review.findOne({ where: { reviewId } });
 };
 
-module.exports = { createReview, readReview, updateReview, reviewById };
+// 리뷰 삭제
+const deleteReview = async (reviewId) => {
+  return await Review.destroy({ where: { reviewId } });
+};
+
+module.exports = { createReview, readReview, updateReview, reviewById, deleteReview };

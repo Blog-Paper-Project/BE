@@ -47,8 +47,13 @@ const updateReview = async (req, res, next) => {
     const userId = res.locals.user.userId;
     const { reviewId } = req.params;
     const { review, rate } = req.body;
-    const { reviewerId } = await reviewService.reviewById(reviewId);
-    if (reviewerId !== userId) {
+    const exReview = await reviewService.reviewById(reviewId);
+    if (!exReview) {
+      return res
+        .status(400)
+        .json({ result: false, message: 'reviewId에 해당하는 리뷰가 없습니다.' });
+    }
+    if (exReview.reviewerId !== userId) {
       return res.status(400).json({ result: false });
     }
     await reviewService.updateReview(reviewId, review, rate);
@@ -60,4 +65,28 @@ const updateReview = async (req, res, next) => {
   }
 };
 
-module.exports = { postReview, readReview, updateReview };
+// 리뷰 삭제
+const deleteReview = async (req, res, next) => {
+  try {
+    const userId = res.locals.user.userId;
+    const { reviewId } = req.params;
+    const exReview = await reviewService.reviewById(reviewId);
+    if (!exReview) {
+      return res
+        .status(400)
+        .json({ result: false, message: 'reviewId에 해당하는 리뷰가 없습니다.' });
+    }
+    if (exReview.reviewerId !== userId) {
+      return res
+        .status(400)
+        .json({ result: false, message: '본인이 작성한 review만 삭제 가능합니다.' });
+    }
+    await reviewService.deleteReview(reviewId);
+    res.status(200).json({ result: true });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+module.exports = { postReview, readReview, updateReview, deleteReview };
