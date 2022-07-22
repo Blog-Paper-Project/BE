@@ -2,12 +2,12 @@ const cron = require('node-cron');
 const dayjs = require('dayjs');
 const { Op } = require('sequelize');
 const logger = require('./winston');
-const db = require('../../models');
+const { Image } = require('../../models');
 const { deleteImg } = require('./multer');
 
 export default cron.schedule('* * */3 * * *', async () => {
   try {
-    const images = await db.Image.findAll({
+    const images = await Image.findAll({
       where: {
         postId: null,
         updatedAt: { [Op.lt]: dayjs().subtract(1, 'd').format() },
