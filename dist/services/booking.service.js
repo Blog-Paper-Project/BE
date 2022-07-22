@@ -122,7 +122,7 @@ const hostFindList = async (hostId) => {
 exports.hostFindList = hostFindList;
 
 const findHost = async (hostId) => {
-  return await User.findOne({
+  return await User.findAll({
     attributes: ['setPoint', 'blogId', 'profileImage', 'introduction', 'popularity'],
     where: { blogId: hostId },
   });
