@@ -38,7 +38,6 @@ exports.findRev = findRev;
 
 //예약 신청
 const createBooking = async (blogId, leaf, bookingTime, meetingDate, hostId, userId) => {
-  console.log('**', blogId, leaf, bookingTime, meetingDate, userId, hostId);
   await User.decrement({ point: leaf }, { where: { userId: userId } });
   await Leaf.create({
     leaf,
@@ -123,7 +122,14 @@ exports.hostFindList = hostFindList;
 
 const findHost = async (hostId) => {
   return await User.findAll({
-    attributes: ['setPoint', 'blogId', 'profileImage', 'introduction', 'popularity'],
+    attributes: [
+      'setPoint',
+      'blogId',
+      'profileImage',
+      'introduction',
+      'popularity',
+      'nickname',
+    ],
     where: { blogId: hostId },
   });
 };
