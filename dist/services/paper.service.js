@@ -128,8 +128,8 @@ const findPostInfo = async (postId) => {
 };
 exports.findPostInfo = findPostInfo;
 // 조회수 증가
-const addCount = async (postId) => {
-    await redisCli.sadd(postId, 2);
+const addCount = async (postId, userId) => {
+    await redisCli.sadd(postId, userId);
     return await redisCli.v4.sCard(postId);
 };
 exports.addCount = addCount;
