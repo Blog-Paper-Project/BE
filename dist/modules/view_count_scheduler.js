@@ -4,7 +4,7 @@ const cron = require('node-cron');
 const logger = require('./winston');
 const { Paper } = require('../../models');
 const { redisCli } = require('../../app');
-exports.default = cron.schedule('*/5 * * * * *', async () => {
+exports.default = cron.schedule('0 0 * * *', async () => {
     try {
         const papers = await Paper.findAll();
         // eslint-disable-next-line

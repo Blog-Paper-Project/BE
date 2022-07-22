@@ -139,8 +139,8 @@ export const findPostInfo = async (postId: string) => {
 };
 
 // 조회수 증가
-export const addCount = async (postId: string) => {
-  await redisCli.sadd(postId, 2);
+export const addCount = async (postId: string, userId: number) => {
+  await redisCli.sadd(postId, userId);
 
   return await redisCli.v4.sCard(postId);
 };
