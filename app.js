@@ -8,9 +8,6 @@ const passportConfig = require('./dist/modules/social');
 const redis = require('redis');
 
 require('dotenv').config();
-require('./dist/modules/node_cron');
-require('./dist/modules/transfer');
-require('./dist/modules/image_scheduler');
 
 // redis 연결
 const redisClient = redis.createClient({
@@ -26,11 +23,8 @@ exports.redisCli = redisClient;
 
 require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
-
-require('./dist/modules/node_cron');
-require('./dist/modules/image_scheduler');
 require('./dist/modules/view_count_scheduler');
-require('./dist/modules/transfer');
+// require('./dist/modules/transfer');
 
 const app = express();
 
@@ -38,7 +32,6 @@ const UserRouter = require('./dist/routes/user.route');
 const PaperRouter = require('./dist/routes/paper.route');
 const BookingRouter = require('./dist/routes/booking.route');
 const ReviewRouter = require('./dist/routes/review.route');
-const { ProcessCredentials } = require('aws-sdk');
 
 passportConfig();
 
