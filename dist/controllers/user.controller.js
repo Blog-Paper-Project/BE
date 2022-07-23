@@ -115,17 +115,25 @@ exports.userDelete = async (req, res, next) => {
 exports.user_restore = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await userService.login(email);
+  const user = await userService.user_restore(email);
+
+  if (user === false) {
+    return res.status(400).send({
+      result: false,
+      msg: '이메일 또는 패스워드가 잘못됫습니다.',
+    });
+  }
+
   const passwordck = await Bcrypt.compare(password, user.password);
 
   // 이메일이 틀리거나 패스워드가 틀렸을때
   if (!user || !passwordck) {
     return res.status(400).send({
       result: false,
+      msg: '이메일 또는 패스워드가 잘못됫습니다.',
     });
   }
 
-  await userService.user_restore(email);
   res.status(200).send({
     result: true,
     msg: '회원복구 완료',
@@ -146,18 +154,26 @@ exports.login = async (req, res, next) => {
   }
 
   // 탈퇴한 회원
-  if (user[0].deletedAt) {
+  if (user !== null && user[0]?.deletedAt) {
     return res.status(400).send({
       result: false,
       msg: '탈퇴한 회원입니다',
     });
   }
-  const passwordck = await Bcrypt.compare(password, user[0].password);
+  if (user !== null) {
+    const passwordck = await Bcrypt.compare(password, user[0].password);
 
-  // 이메일이 틀리거나 패스워드가 틀렸을때
-  if (!user[0] || !passwordck) {
+    // 이메일이 틀리거나 패스워드가 틀렸을때
+    if (!user || !passwordck) {
+      return res.status(400).send({
+        result: false,
+        msg: '이메일 또는 패스워드가 잘못됫습니다.',
+      });
+    }
+  } else {
     return res.status(400).send({
       result: false,
+      msg: '이메일 또는 패스워드가 잘못됫습니다.',
     });
   }
 
@@ -174,7 +190,6 @@ exports.login = async (req, res, next) => {
 // 로그아웃
 exports.logout = async (req, res, next) => {
   const { user } = res.locals;
-  console.log(res.locals);
   await userService.logout(user);
   res.status(200).send({
     result: true,
@@ -295,7 +310,6 @@ exports.check_emaliauth = async (req, res, next) => {
   const { email, emailAuth } = req.body;
   const text = await userService.check_emaliauth(email);
 
-  console.log(text, emailAuth);
   if (emailAuth === text) {
     await userService.delet_check_emaliauth(email);
     return res.status(200).send({
@@ -322,7 +336,7 @@ exports.change_password = async (req, res, next) => {
 // 이메일 인증 (로그인 시)
 exports.login_emailauth = async (req, res, next) => {
   const { user } = res.locals;
-  console.log(res.locals);
+
   // 인증메일 (번호)
   const emailAuth = Math.floor(Math.random() * 10000);
 
