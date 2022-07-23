@@ -106,7 +106,7 @@ export const readMyFeed = async (req: Request, res: Response, next: NextFunction
 // 상세 페이지 조회
 export const readPost = async (req: Request, res: Response, next: NextFunction) => {
   const { blogId, postId } = req.params;
-  const { userid } = req.headers as { userid: string };
+  const { userid: userId } = req.headers as { userid: string };
 
   if (!blogId) {
     return next(createError(404, 'Not Found!'));
@@ -122,7 +122,7 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
     return next(createError(404, 'Not Found!'));
   }
 
-  const count = await PaperService.addCount(postId, userid);
+  const count = await PaperService.addCount(postId, userId);
 
   return res.json({ count, paper });
 };

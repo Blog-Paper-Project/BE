@@ -1,9 +1,10 @@
-const cron = require('node-cron');
-const dayjs = require('dayjs');
+import * as cron from 'node-cron';
+import * as dayjs from 'dayjs';
+import logger from './winston';
+import { deleteImg } from './multer';
+
 const { Op } = require('sequelize');
-const logger = require('./winston');
 const { Image } = require('../../models');
-const { deleteImg } = require('./multer');
 
 export default cron.schedule('* * */3 * * *', async () => {
   try {

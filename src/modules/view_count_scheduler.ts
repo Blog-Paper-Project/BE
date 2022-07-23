@@ -1,5 +1,6 @@
-const cron = require('node-cron');
-const logger = require('./winston');
+import * as cron from 'node-cron';
+import logger from './winston';
+
 const { Paper } = require('../../models');
 const { redisCli } = require('../../app');
 
@@ -14,6 +15,7 @@ export default cron.schedule('0 0 * * *', async () => {
       await redisCli.v4.del(postId);
       await paper.increment({ viewCount: +count });
     }
+
     logger.info('조회수 스케쥴러 성공');
   } catch (err) {
     logger.error('조회수 스케쥴러 에러');

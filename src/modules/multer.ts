@@ -63,4 +63,4 @@ const download = async (filename: string) => {
   fs.writeFileSync(`./static/${filename}`, Body);
 };
 
-module.exports = { upload, deleteImg, download };
+export { upload, deleteImg, download };
