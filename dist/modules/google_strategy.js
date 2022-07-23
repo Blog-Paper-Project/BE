@@ -34,7 +34,6 @@ module.exports = () => {
             const newUser = await User.create({
               email: profile._json.email,
               nickname: 'g' + profile.displayName,
-              snsId: profile.id,
               provider: 'google',
             });
             done(null, newUser); // 회원가입하고 로그인 인증 완료

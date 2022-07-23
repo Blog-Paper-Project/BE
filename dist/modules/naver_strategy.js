@@ -35,7 +35,6 @@ module.exports = () => {
             const newUser = await User.create({
               email: profile._json.email,
               nickname: 'n' + profile._json.nickname,
-              snsId: profile.id,
               provider: 'naver',
             });
             done(null, newUser); // 사용자 생성 후 done함수 호출
