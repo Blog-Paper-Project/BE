@@ -1,10 +1,10 @@
 /* eslint-disable */
-const { Op } = require('sequelize');
-const { Paper, User, Comment, Image, Tag } = require('../../models');
-const { deleteImg } = require('../modules/multer');
-const { redisCli } = require('../../app');
-
+import { Op } from 'sequelize';
+import { deleteImg } from '../modules/multer';
 import { calcDays, calcMs } from '../modules/date';
+
+const { Paper, User, Comment, Image, Tag } = require('../../models');
+const { redisCli } = require('../../app');
 
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
@@ -236,6 +236,7 @@ export const destroyPost = async (userId: number, postId: string) => {
   }
 
   await deleteImg(paper?.thumbnail);
+  await redisCli.del(postId);
 
   return await paper.destroy();
 };

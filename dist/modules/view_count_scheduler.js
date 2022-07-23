@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const cron = require('node-cron');
-const logger = require('./winston');
+const cron = require("node-cron");
+const winston_1 = require("./winston");
 const { Paper } = require('../../models');
 const { redisCli } = require('../../app');
 exports.default = cron.schedule('0 0 * * *', async () => {
@@ -14,10 +14,10 @@ exports.default = cron.schedule('0 0 * * *', async () => {
             await redisCli.v4.del(postId);
             await paper.increment({ viewCount: +count });
         }
-        logger.info('조회수 스케쥴러 성공');
+        winston_1.default.info('조회수 스케쥴러 성공');
     }
     catch (err) {
-        logger.error('조회수 스케쥴러 에러');
+        winston_1.default.error('조회수 스케쥴러 에러');
         console.log(err);
     }
 });

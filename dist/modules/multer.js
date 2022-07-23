@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.download = exports.deleteImg = exports.upload = void 0;
 const multer = require('multer');
 const fs = require('fs');
 const sharp = require('sharp');
@@ -37,6 +39,7 @@ const upload = multer({
         ],
     }),
 });
+exports.upload = upload;
 const deleteImg = async (fileName) => {
     try {
         await s3.deleteObject({ Bucket: process.env.S3_BUCKET, Key: fileName }).promise();
@@ -46,6 +49,7 @@ const deleteImg = async (fileName) => {
         return { success: false, message: '이미지 삭제 실패' };
     }
 };
+exports.deleteImg = deleteImg;
 const download = async (filename) => {
     const { Body } = await s3
         .getObject({
@@ -55,4 +59,4 @@ const download = async (filename) => {
         .promise();
     fs.writeFileSync(`./static/${filename}`, Body);
 };
-module.exports = { upload, deleteImg, download };
+exports.download = download;
