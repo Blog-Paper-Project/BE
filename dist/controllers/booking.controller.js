@@ -35,7 +35,7 @@ const createBooking = async (req, res, next) => {
 
   //날짜, 시간 설정
 
-  const bookingMoment = dayjs().tz(); //=> dayjs 사용하려면 현재시간
+  const bookingMoment = new dayjs().tz(); //=> dayjs 사용하려면 현재시간
   const startMoment = dayjs(start).tz(); // 예약시작시간
   const time = startMoment.diff(bookingMoment, 'minute');
   const meetingDate = dayjs(startMoment).format('YYYY-MM-DD dddd'); //요일 한국어로 교체
