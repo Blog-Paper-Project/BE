@@ -42,7 +42,7 @@ passportConfig();
 
 app.use(cors());
 app.use(helmet());
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb', parameterLimit: 100000 }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(
