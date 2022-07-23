@@ -28,17 +28,17 @@ const createBooking = async (req, res, next) => {
   const guestId = res.locals.user.blogId;
   const userId = res.locals.user.userId;
 
-  const { blogId, date } = req.body;
+  const { blogId, start, end } = req.body;
   const Leaf = await bookingService.findLeaf(blogId);
   const leaf = Leaf[0].dataValues.setPoint;
   const hostId = req.params.blogId;
 
   //날짜, 시간 설정
-  const start = date.split('-')[0];
-  const end = date.split('-')[1];
+
   const bookingMoment = new dayjs(); //=> dayjs 사용하려면 현재시간
   const startMoment = dayjs(start); // 예약시작시간
   const time = startMoment.diff(bookingMoment, 'minute');
+  console.log(startMoment, bookingMoment);
   const meetingDate = dayjs(startMoment).format('YYYY-MM-DD dddd'); //요일 한국어로 교체
   const startTime = dayjs(start).tz().format('HH:mm:ss');
   const endTime = dayjs(end).tz().format('HH:mm:ss');
@@ -86,7 +86,7 @@ const createBooking = async (req, res, next) => {
     return res.status(400).send({ result: false });
   }
 
-  if (blogId === undefined || date === undefined) {
+  if (blogId === undefined || start === undefined || end === undefined) {
     return res.status(400).send({ result: false });
   }
 

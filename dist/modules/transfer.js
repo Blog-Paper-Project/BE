@@ -5,7 +5,7 @@ const Booking = require('../../models/booking');
 const redisCli = app.redisCli;
 
 const trans = cron.schedule(
-  ' 0  12 1-31  * *', // 수정
+  ' * * *  * *', // 수정
   async () => {
     try {
       const booking = await Booking.findAll();
