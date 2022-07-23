@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const userService = require('../services/user.service');
 const passport = require('passport');
-const Validatorsinup = require('../middleware/signup.validator');
-const Validatorlogin = require('../middleware/login.validator');
+const Validatorsinup = require('../middlewares/signup.validator');
+const Validatorlogin = require('../middlewares/login.validator');
 
 require('dotenv').config();
 

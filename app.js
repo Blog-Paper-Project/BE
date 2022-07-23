@@ -16,9 +16,11 @@ const redisClient = redis.createClient({
 });
 
 redisClient.on('connect', () => console.info('🟢 Redis 연결 성공!'));
-redisClient.on('error', (err) => console.error('Redis Client Error', err));
+
+redisClient.on('error', (err) => console.error('Redis Client Error', err.message));
 
 redisClient.connect();
+
 exports.redisCli = redisClient;
 
 require('./dist/modules/node_cron');
@@ -37,7 +39,7 @@ passportConfig();
 
 app.use(cors());
 app.use(helmet());
-app.use(express.urlencoded({ extended: true, limit: '50mb', parameterLimit: 100000 }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(
@@ -58,7 +60,7 @@ app.use('/api/booking', BookingRouter);
 app.use('/api/review', ReviewRouter);
 
 app.get('/', (req, res) => {
-  res.send('Paper-Project 진짜 ');
+  res.send('Paper-Project 진짜');
 });
 
 app.use((req, res) => {
