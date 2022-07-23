@@ -16,6 +16,7 @@ const redisClient = redis.createClient({
 });
 
 redisClient.on('connect', () => console.info('🟢 Redis 연결 성공!'));
+
 redisClient.on('error', (err) => console.error('Redis Client Error', err.message));
 
 redisClient.connect();
@@ -25,7 +26,7 @@ exports.redisCli = redisClient;
 require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
 require('./dist/modules/view_count_scheduler');
-require('./dist/modules/transfer');
+// require('./dist/modules/transfer');
 
 const app = express();
 

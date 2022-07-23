@@ -9,7 +9,6 @@ beforeAll(async () => {
 });
 
 let token;
-let emailAuthch;
 
 describe('회원가입 테스트', () => {
   it('회원가입 성공', (done) => {
