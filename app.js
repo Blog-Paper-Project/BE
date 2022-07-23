@@ -8,6 +8,9 @@ const passportConfig = require('./dist/modules/social');
 const redis = require('redis');
 
 require('dotenv').config();
+require('./dist/modules/node_cron');
+require('./dist/modules/transfer');
+require('./dist/modules/image_scheduler');
 
 // redis 연결
 const redisClient = redis.createClient({
@@ -26,6 +29,7 @@ exports.redisCli = redisClient; //  v4버젼은 프로미스 기반이라 사용
 require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
 require('./dist/modules/view_count_scheduler');
+require('./dist/modules/transfer');
 
 const app = express();
 
