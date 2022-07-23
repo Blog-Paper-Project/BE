@@ -35,16 +35,15 @@ const createBooking = async (req, res, next) => {
 
   //날짜, 시간 설정
 
-  const bookingMoment = new dayjs(); //=> dayjs 사용하려면 현재시간
-  const startMoment = dayjs(start); // 예약시작시간
+  const bookingMoment = dayjs().tz(); //=> dayjs 사용하려면 현재시간
+  const startMoment = dayjs(start).tz(); // 예약시작시간
   const time = startMoment.diff(bookingMoment, 'minute');
-  console.log(startMoment, bookingMoment);
   const meetingDate = dayjs(startMoment).format('YYYY-MM-DD dddd'); //요일 한국어로 교체
-  const startTime = dayjs(start).tz().format('HH:mm:ss');
-  const endTime = dayjs(end).tz().format('HH:mm:ss');
+  const startTime = dayjs(start).format('HH:mm:ss');
+  const endTime = dayjs(end).format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
 
-  //예약 신청 횟수 제한
+  //  예약 신청 횟수 제한
   const bookingList = await bookingService.findList(guestId);
   if (bookingList.length > 11) {
     return res.send.status(400).send({ msg: '예약횟수를 초과하였습니다.' });
