@@ -33,7 +33,7 @@ module.exports = class Review extends Sequelize.Model {
         underscored: false,
         modelName: 'Review',
         tableName: 'reviews',
-        paranoid: true,
+        paranoid: false,
         charset: 'utf8',
         collate: 'utf8_general_ci',
       }

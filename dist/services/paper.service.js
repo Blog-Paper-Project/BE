@@ -1,18 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
 /* eslint-disable */
-const { Op } = require('sequelize');
-const { Paper, User, Comment, Image, Tag } = require('../../models');
-const { deleteImg } = require('../modules/multer');
+const sequelize_1 = require("sequelize");
+const multer_1 = require("../modules/multer");
 const date_1 = require("../modules/date");
+const { Paper, User, Comment, Image, Tag } = require('../../models');
+const { redisCli } = require('../../app');
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
     return (await Paper.findAll({
         where: {
-            [Op.or]: [
-                { title: { [Op.like]: `%${keyword}%` } },
-                { contents: { [Op.like]: `%${keyword}%` } },
+            [sequelize_1.Op.or]: [
+                { title: { [sequelize_1.Op.like]: `%${keyword}%` } },
+                { contents: { [sequelize_1.Op.like]: `%${keyword}%` } },
             ],
         },
         order: [['createdAt', 'DESC']],
@@ -126,6 +127,12 @@ const findPostInfo = async (postId) => {
     });
 };
 exports.findPostInfo = findPostInfo;
+// 조회수 증가
+const addCount = async (postId, userId) => {
+    await redisCli.sadd(postId, userId);
+    return await redisCli.v4.sCard(postId);
+};
+exports.addCount = addCount;
 // 게시글 작성
 const createPost = async (title, contents, thumbnail, userId, category) => {
     return await Paper.create({ title, contents, thumbnail, category, userId });
@@ -151,11 +158,11 @@ const updateImage = async (postId, images) => {
     if (originalImages.length) {
         const replaced = originalImages.filter((img) => !images.includes(img.url));
         for (let item of replaced) {
-            await deleteImg(item.url);
+            await (0, multer_1.deleteImg)(item.url);
             await Image.destroy({ where: { imageId: item.imageId } });
         }
     }
-    return await Image.update({ postId: postId }, { where: { url: { [Op.in]: images } } }, { updateOnDuplicate: true });
+    return await Image.update({ postId: postId }, { where: { url: { [sequelize_1.Op.in]: images } } }, { updateOnDuplicate: true });
 };
 exports.updateImage = updateImage;
 // 글 작성 포인트 지급
@@ -184,9 +191,10 @@ const destroyPost = async (userId, postId) => {
     const images = await Image.findAll({ where: { postId } }, { raw: true });
     const paper = await Paper.findOne({ where: { userId, postId } });
     for (let image of images) {
-        await deleteImg(image.url);
+        await (0, multer_1.deleteImg)(image.url);
     }
-    await deleteImg(paper?.thumbnail);
+    await (0, multer_1.deleteImg)(paper?.thumbnail);
+    await redisCli.del(postId);
     return await paper.destroy();
 };
 exports.destroyPost = destroyPost;

@@ -1,10 +1,10 @@
 /* eslint-disable */
-const { Op } = require('sequelize');
-const { Paper, User, Comment, Image, Tag } = require('../../models');
-const { deleteImg } = require('../modules/multer');
-
-import { Model } from 'sequelize/types';
+import { Op } from 'sequelize';
+import { deleteImg } from '../modules/multer';
 import { calcDays, calcMs } from '../modules/date';
+
+const { Paper, User, Comment, Image, Tag } = require('../../models');
+const { redisCli } = require('../../app');
 
 // 키워드로 게시글 검색
 export const findPostsBy = async (keyword: string) => {
@@ -138,6 +138,13 @@ export const findPostInfo = async (postId: string) => {
   });
 };
 
+// 조회수 증가
+export const addCount = async (postId: string, userId: string) => {
+  await redisCli.sadd(postId, userId);
+
+  return await redisCli.v4.sCard(postId);
+};
+
 // 게시글 작성
 export const createPost = async (
   title: string,
@@ -229,6 +236,7 @@ export const destroyPost = async (userId: number, postId: string) => {
   }
 
   await deleteImg(paper?.thumbnail);
+  await redisCli.del(postId);
 
   return await paper.destroy();
 };

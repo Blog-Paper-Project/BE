@@ -5,10 +5,12 @@ const helmet = require('helmet');
 const passport = require('passport');
 const expressSession = require('express-session');
 const passportConfig = require('./dist/modules/social');
-const apiLimiter = require('./dist/modules/api_limiter');
 const redis = require('redis');
 
 require('dotenv').config();
+require('./dist/modules/node_cron');
+require('./dist/modules/transfer');
+require('./dist/modules/image_scheduler');
 
 // redis 연결
 const redisClient = redis.createClient({
@@ -28,6 +30,11 @@ exports.redisCli = redisClient;
 require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
 
+require('./dist/modules/node_cron');
+require('./dist/modules/image_scheduler');
+require('./dist/modules/view_count_scheduler');
+require('./dist/modules/transfer');
+
 const app = express();
 
 const UserRouter = require('./dist/routes/user.route');
@@ -39,10 +46,9 @@ passportConfig();
 
 app.use(cors());
 app.use(helmet());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '50mb', parameterLimit: 100000 }));
 app.use(express.json());
 app.use(morgan('dev'));
-// app.use(apiLimiter);
 app.use(
   expressSession({
     resave: false,

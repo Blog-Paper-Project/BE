@@ -12,4 +12,7 @@ router.get('/:blogId', reviewController.readReview);
 // 리뷰 수정
 router.put('/:reviewId', auth, reviewController.updateReview);
 
+// 리뷰 삭제
+router.delete('/:reviewId', auth, reviewController.deleteReview);
+
 module.exports = router;

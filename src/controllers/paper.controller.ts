@@ -106,6 +106,7 @@ export const readMyFeed = async (req: Request, res: Response, next: NextFunction
 // 상세 페이지 조회
 export const readPost = async (req: Request, res: Response, next: NextFunction) => {
   const { blogId, postId } = req.params;
+  const { userid: userId } = req.headers as { userid: string };
 
   if (!blogId) {
     return next(createError(404, 'Not Found!'));
@@ -121,7 +122,9 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
     return next(createError(404, 'Not Found!'));
   }
 
-  return res.json({ paper });
+  const count = await PaperService.addCount(postId, userId);
+
+  return res.json({ count, paper });
 };
 
 // 상세 페이지 작성
@@ -163,14 +166,10 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 };
 
 // 상세 페이지 이미지 첨부
-export const createImage = async (req: Request, res: Response, next: NextFunction) => {
+export const createImage = async (req: Request, res: Response) => {
   const { file } = req as Types.MulterFile;
 
-  if (!file?.transforms) {
-    return next(createError(400, 'Image Not Uploaded'));
-  }
-
-  const imageUrl = file.transforms[0]?.key;
+  const imageUrl = file?.transforms[0]?.key;
 
   if (imageUrl) {
     await PaperService.createImage(imageUrl);

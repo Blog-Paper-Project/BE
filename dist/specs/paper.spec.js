@@ -46,6 +46,16 @@ describe('페이지 조회 테스트', () => {
         done();
       });
   });
+
+  it('마이 피드 조회', (done) => {
+    request(app)
+      .get('/api/paper/myfeed')
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
 });
 
 describe('게시글 테스트', () => {
@@ -127,9 +137,10 @@ describe('게시글 테스트', () => {
       });
   });
 
-  it('게시글 조회', (done) => {
+  it('게시글 조회 404', (done) => {
     request(app)
       .get(`/api/paper/testbot/999999`)
+      .set('userId', 1)
       .then((res) => {
         expect(res.status).toBe(404);
         done();
@@ -139,6 +150,7 @@ describe('게시글 테스트', () => {
   it('게시글 조회', (done) => {
     request(app)
       .get(`/api/paper/testbot/${postId}`)
+      .set('userId', 1)
       .then((res) => {
         const { title, contents } = res.body.paper;
 
@@ -153,7 +165,7 @@ describe('게시글 테스트', () => {
 describe('개인 페이지 테스트', () => {
   it('개인 페이지 조회 404', (done) => {
     request(app)
-      .get('/api/paper/testbot9999999')
+      .get('/api/paper/testbot999999')
       .then((res) => {
         expect(res.status).toBe(404);
         done();
