@@ -2,8 +2,7 @@ const bookingService = require('../services/booking.service');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
-const locale = require('dayjs/locale/ko');
-dayjs.locale('ko');
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul');
@@ -38,10 +37,11 @@ const createBooking = async (req, res, next) => {
   const bookingMoment = new dayjs().tz(); //=> dayjs 사용하려면 현재시간
   const startMoment = dayjs(start).tz(); // 예약시작시간
   const time = startMoment.diff(bookingMoment, 'minute');
-  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD dddd'); //요일 한국어로 교체
-  const startTime = dayjs(start).format('HH:mm:ss');
-  const endTime = dayjs(end).format('HH:mm:ss');
+  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD ddd'); //요일 한국어로 교체
+  const startTime = dayjs(start).format('HH:mm');
+  const endTime = dayjs(end).format('HH:mm');
   const bookingTime = `${startTime} - ${endTime}`;
+  const sqlEnd = dayjs(end).format('HH:mm');
 
   //  예약 신청 횟수 제한
   const bookingList = await bookingService.findList(guestId);
@@ -97,7 +97,8 @@ const createBooking = async (req, res, next) => {
       bookingTime,
       meetingDate,
       hostId,
-      userId
+      userId,
+      sqlEnd
     );
     return res.status(200).json({ bookingResult, result: true });
   } catch (error) {
@@ -111,16 +112,41 @@ exports.createBooking = createBooking;
 const bookingList = async (req, res, next) => {
   const userId = res.locals.user.userId;
   const blogId = res.locals.user.blogId;
+  const hostBooking = await bookingService.hostBooking(blogId);
+  const guestBooking = await bookingService.guestBooking(blogId);
 
-  try {
-    const hostBookingList = await bookingService.hostBooking(blogId);
-    const guestBookingList = await bookingService.guestBooking(blogId);
-    const totalList = { hostBookingList, guestBookingList };
-    return res.status(200).json({ totalList, result: true });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+  const start = guestBooking.map((v) => {
+    let date = v.date;
+    let time = v.time;
+    let t = time.split('-');
+    let start = date + '' + t[0];
+    new Date(start);
+    v.start = start;
+    new Date(start).toGMTString();
+    console.log(v);
+    return v;
+  });
+
+  const end = guestBooking.map((v) => {
+    let date = v.date;
+    let time = v.time;
+    let t = time.split('-');
+    let end = date + '' + t[1];
+    new Date(end);
+    v.end = end;
+    new Date(end).toGMTString();
+    console.log(v);
+    return v;
+  });
+
+  // try {
+
+  //   const totalList = { hostBookingList, guestBookingList };
+  //   return res.status(200).json({ totalList, result: true });
+  // } catch (error) {
+  //   console.log(error);
+  //   next(error);
+  // }
 };
 exports.bookingList = bookingList;
 
@@ -139,7 +165,7 @@ const leafList = async (req, res, next) => {
 };
 exports.leafList = leafList;
 
-// 호스트 예약 수락
+// // 호스트 예약 수락
 const acceptBooking = async (req, res, next) => {
   const hostId = req.params.hostId;
   const bookingId = req.params.bookingId;
