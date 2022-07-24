@@ -2,8 +2,7 @@ const bookingService = require('../services/booking.service');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
-const locale = require('dayjs/locale/ko');
-dayjs.locale('ko');
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul');
@@ -38,7 +37,7 @@ const createBooking = async (req, res, next) => {
   const bookingMoment = new dayjs().tz(); //=> dayjs 사용하려면 현재시간
   const startMoment = dayjs(start).tz(); // 예약시작시간
   const time = startMoment.diff(bookingMoment, 'minute');
-  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD dddd'); //요일 한국어로 교체
+  const meetingDate = dayjs(startMoment).format('YYYY-MM-DD ddd'); //요일 한국어로 교체
   const startTime = dayjs(start).format('HH:mm:ss');
   const endTime = dayjs(end).format('HH:mm:ss');
   const bookingTime = `${startTime} - ${endTime}`;
