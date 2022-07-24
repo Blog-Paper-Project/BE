@@ -1,11 +1,11 @@
 const express = require('express');
-const { isNotLoggedIn } = require('../middleware/loging');
-const Authmiddle = require('../middleware/auth');
+const { isNotLoggedIn } = require('../middlewares/loging');
+const Authmiddle = require('../middlewares/auth');
 const { upload } = require('../modules/multer');
 const passport = require('passport');
 const router = express.Router();
 const Usercontroller = require('../controllers/user.controller');
-const AsyncHandler = require('../middleware/async.handler');
+const AsyncHandler = require('../middlewares/async.handler');
 
 require('dotenv').config();
 
@@ -29,19 +29,19 @@ router.get(
 router.get('/login/google/callback', AsyncHandler(Usercontroller.googleCallback));
 
 // 회원가입
-router.post('/signup', AsyncHandler(Usercontroller.signup));
+router.post('/signup', isNotLoggedIn, AsyncHandler(Usercontroller.signup));
 
 // 소셜 회원가입
 router.patch('/social-signup', AsyncHandler(Usercontroller.social_signup));
 
 // 회원탈퇴
-router.patch('/', Authmiddle, AsyncHandler(Usercontroller.userDelete));
+router.patch('/delete', Authmiddle, AsyncHandler(Usercontroller.userDelete));
 
 // 회원복구
 router.patch('/restore', AsyncHandler(Usercontroller.user_restore));
 
 // 로그인
-router.post('/login', AsyncHandler(Usercontroller.login));
+router.post('/login', isNotLoggedIn, AsyncHandler(Usercontroller.login));
 
 // 유저 아이디 중복검사
 router.post('/blogid', AsyncHandler(Usercontroller.blogcheck));
@@ -85,5 +85,8 @@ router.patch(
   Authmiddle,
   AsyncHandler(Usercontroller.login_change_password)
 );
+
+// 로그아웃
+router.post('/logout', Authmiddle, AsyncHandler(Usercontroller.logout));
 
 module.exports = router;

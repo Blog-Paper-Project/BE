@@ -27,6 +27,10 @@ module.exports = class Booking extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
+        sqlEnd: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
       },
       {
         sequelize,
