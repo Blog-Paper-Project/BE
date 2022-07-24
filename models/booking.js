@@ -10,11 +10,11 @@ module.exports = class Booking extends Sequelize.Model {
           allowNull: false,
           autoIncrement: true,
         },
-        date: {
+        start: {
           type: Sequelize.STRING,
           allowNull: false,
         },
-        time: {
+        end: {
           type: Sequelize.STRING,
           allowNull: false,
         },

@@ -25,19 +25,20 @@ const findLeaf = async (blogId) => {
 exports.findLeaf = findLeaf;
 
 //예약시간 조회
-const findRev = async (hostId, bookingTime, meetingDate) => {
+const findRev = async (hostId, start, end) => {
   return await Booking.findAll({
     where: {
       hostId: hostId,
-      time: bookingTime,
-      date: meetingDate,
+      start,
+      end,
     },
   });
 };
 exports.findRev = findRev;
 
 //예약 신청
-const createBooking = async (blogId, leaf, bookingTime, meetingDate, hostId, userId) => {
+const createBooking = async (blogId, leaf, start, end, hostId, userId) => {
+  console.log(blogId, hostId);
   await User.decrement({ point: leaf }, { where: { userId: userId } });
   await Leaf.create({
     leaf,
@@ -47,8 +48,8 @@ const createBooking = async (blogId, leaf, bookingTime, meetingDate, hostId, use
   });
   return await Booking.create({
     hostId,
-    date: meetingDate,
-    time: bookingTime,
+    start,
+    end,
     guestId: blogId,
     leaf,
   });
