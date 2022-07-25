@@ -10,8 +10,9 @@ dayjs.tz.setDefault('Asia/Seoul');
 const patchPoint = async (req, res, next) => {
   const userId = req.params.userId;
   const { setPoint } = req.body;
+
   await bookingService.patchPoint(setPoint, userId);
-  return res.status(200).json({ result: true })(req, res, next);
+  return res.status(200).json({ result: true });
 };
 exports.patchPoint = patchPoint;
 
@@ -67,9 +68,17 @@ const createBooking = async (req, res, next) => {
   }
 
   //예약 신청
+  const bookingResult = await bookingService.createBooking(
+    blogId,
+    leaf,
+    start,
+    end,
+    hostId,
+    userId,
+    endTime
+  );
 
-  await bookingService.createBooking(blogId, leaf, start, end, hostId, userId, endTime);
-  return res.status(200).json({ result: true });
+  return res.status(200).json({ bookingResult, result: true });
 };
 exports.createBooking = createBooking;
 
@@ -91,6 +100,7 @@ const leafList = async (req, res, next) => {
   const gusetLeaf = res.locals.user.point;
   const hostLeaf = await bookingService.findHost(hostId);
   const pointList = { gusetLeaf, hostLeaf };
+
   return res.status(200).json({ pointList, result: true });
 };
 exports.leafList = leafList;
