@@ -46,7 +46,7 @@ router.post('/login', AsyncHandler(Usercontroller.login));
 // 유저 아이디 중복검사
 router.post('/blogid', AsyncHandler(Usercontroller.blogcheck));
 
-router.post('/refresh', Usercontroller.refresh);
+router.post('/refresh', AsyncHandler(Usercontroller.refresh));
 
 // 이메일 || 닉네임 중복검사
 router.post('/idcheck', isNotLoggedIn, AsyncHandler(Usercontroller.duplicate));

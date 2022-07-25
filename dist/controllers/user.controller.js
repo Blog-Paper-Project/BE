@@ -40,6 +40,7 @@ exports.kakaoCallback = (req, res, next) => {
 exports.naverCallback = (req, res, next) => {
   passport.authenticate('naver', (err, user, info) => {
     if (err) return next(err);
+
     const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
       expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
     });
