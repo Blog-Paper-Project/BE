@@ -128,7 +128,7 @@ const cancelReservation = async (req, res, next) => {
   const cntLeaf = await bookingService.findOne(bookingId);
   const leaf = cntLeaf[0].leaf;
 
-  await bookingService.cancelBooking(bookingId, guestId, hostId, leaf);
+  await bookingService.recall(bookingId, guestId, hostId, leaf);
   res.status(200).json({ result: true });
 };
 exports.cancelReservation = cancelReservation;
