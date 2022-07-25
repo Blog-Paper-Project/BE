@@ -7,10 +7,10 @@ export default function createError(
 ) {
   logger.error(`${userId} - ${message}`);
 
-  const error = <Types.CustomError>new Error(message);
+  const error = new Error(message) as Types.CustomError;
 
   error.status = status;
-  error.success = false;
+  error.result = false;
 
   return error;
 }

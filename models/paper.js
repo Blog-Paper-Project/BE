@@ -27,6 +27,11 @@ module.exports = class Paper extends Sequelize.Model {
           allowNull: false,
           defaultValue: 'etc',
         },
+        viewCount: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
       },
       {
         sequelize,

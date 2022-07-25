@@ -16,6 +16,10 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.STRING(40),
           allowNull: true,
         },
+        blogId: {
+          type: Sequelize.STRING(40),
+          allowNull: true,
+        },
         nickname: {
           type: Sequelize.STRING(30),
           allowNull: true,
@@ -49,10 +53,6 @@ module.exports = class User extends Sequelize.Model {
           allowNull: false,
           defaultValue: 'local',
         },
-        emailAuth: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-        },
         refreshToken: {
           type: Sequelize.TEXT,
           allowNull: true,
@@ -60,6 +60,10 @@ module.exports = class User extends Sequelize.Model {
         deletedAt: {
           type: Sequelize.DATE,
           allowNull: true,
+        },
+        setPoint: {
+          type: Sequelize.INTEGER,
+          defaultValue: 0,
         },
       },
       {
@@ -85,13 +89,13 @@ module.exports = class User extends Sequelize.Model {
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followeeId',
-      as: 'Followees',
+      as: 'Followers',
       through: 'subscriptions',
       onDelete: 'cascade',
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'followerId',
-      as: 'Followers',
+      as: 'Followees',
       through: 'subscriptions',
       onDelete: 'cascade',
     });
@@ -118,9 +122,6 @@ module.exports = class User extends Sequelize.Model {
       as: 'recipient',
       through: leafs,
       onDelete: 'cascade',
-    });
-    db.User.hasMany(db.Review, {
-      foreignKey: 'userId',
     });
     db.User.hasMany(db.Review, {
       foreignKey: 'userId',

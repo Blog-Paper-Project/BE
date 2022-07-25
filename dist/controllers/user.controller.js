@@ -3,122 +3,102 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const userService = require('../services/user.service');
 const passport = require('passport');
-const Validatorsinup = require('../middleware/signup.validator');
-const Validatorlogin = require('../middleware/login.validator');
+const Validatorsinup = require('../middlewares/signup.validator');
+const Validatorlogin = require('../middlewares/login.validator');
 
 require('dotenv').config();
 
 // 카카오 로그인
-const kakaoCallback = (req, res, next) => {
-  passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
+exports.kakaoCallback = (req, res, next) => {
+  passport.authenticate('kakao', (err, user) => {
     if (err) return next(err);
 
-    try {
-      const accessToken = jwt.sign(
-        { userId: user.userId },
-        process.env.ACCESS_TOKEN_KEY,
-        {
-          expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
-        }
-      );
-      const refreshToken = jwt.sign(
-        { userId: user.userId },
-        process.env.REFRESH_TOKEN_KEY,
-        {
-          expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
-        }
-      );
+    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+      expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+    });
+    const refreshToken = jwt.sign(
+      { userId: user.userId },
+      process.env.REFRESH_TOKEN_KEY,
+      {
+        expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+      }
+    );
 
-      res.status(200).send({
-        result: true,
-        accessToken,
-        refreshToken,
-        nickname: user.nickname,
-      });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
+    res.status(200).json({
+      result: true,
+      token,
+      nickname,
+      profileImage,
+      blogId,
+      userId,
+      email,
+    });
   })(req, res, next);
 };
-exports.kakaoCallback = kakaoCallback;
 
 // 네이버 로그인
-const naverCallback = (req, res, next) => {
-  passport.authenticate('naver', { failureRedirect: '/' }, (err, user, info) => {
+exports.naverCallback = (req, res, next) => {
+  passport.authenticate('naver', (err, user, info) => {
     if (err) return next(err);
+    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+      expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+    });
+    const refreshToken = jwt.sign(
+      { userId: user.userId },
+      process.env.REFRESH_TOKEN_KEY,
+      {
+        expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+      }
+    );
 
-    try {
-      const accessToken = jwt.sign(
-        { userId: user.userId },
-        process.env.ACCESS_TOKEN_KEY,
-        {
-          expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
-        }
-      );
-      const refreshToken = jwt.sign(
-        { userId: user.userId },
-        process.env.REFRESH_TOKEN_KEY,
-        {
-          expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
-        }
-      );
-
-      res.status(200).send({
-        result: true,
-        accessToken,
-        refreshToken,
-        nickname: user.email,
-      });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
+    res.status(200).json({
+      result: true,
+      token,
+      nickname,
+      profileImage,
+      blogId,
+      userId,
+      email,
+    });
   })(req, res, next);
 };
-exports.naverCallback = naverCallback;
 
 // 구글 로그인
-const googleCallback = (req, res, next) => {
-  passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
+exports.googleCallback = (req, res, next) => {
+  passport.authenticate('google', (err, user, info) => {
     if (err) return next(err);
-    try {
-      const accessToken = jwt.sign(
-        { userId: user.userId },
-        process.env.ACCESS_TOKEN_KEY,
-        {
-          expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
-        }
-      );
-      const refreshToken = jwt.sign(
-        { userId: user.userId },
-        process.env.REFRESH_TOKEN_KEY,
-        {
-          expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
-        }
-      );
 
-      res.status(200).send({
-        result: true,
-        accessToken,
-        refreshToken,
-        nickname: user.nickname,
-      });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
+    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+      expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+    });
+    const refreshToken = jwt.sign(
+      { userId: user.userId },
+      process.env.REFRESH_TOKEN_KEY,
+      {
+        expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
+      }
+    );
+
+    res.status(200).json({
+      result: true,
+      token,
+      nickname,
+      profileImage,
+      blogId,
+      userId,
+      email,
+    });
   })(req, res, next);
 };
-exports.googleCallback = googleCallback;
 
 //회원가입
-const signup = async (req, res, next) => {
-  const { email, nickname, password, confirmPassword } =
-    await Validatorsinup.validateAsync(req.body);
+exports.signup = async (req, res, next) => {
+  const { email, nickname, password, blogId } = await Validatorsinup.validateAsync(
+    req.body
+  );
 
-  const rows = await userService.signup(email, nickname, password);
-  if (rows === false) {
+  const duplicate = await userService.signup(email, nickname, password, blogId);
+  if (duplicate === false) {
     return res.status(400).send({
       result: false,
     });
@@ -128,351 +108,339 @@ const signup = async (req, res, next) => {
     });
   }
 };
-exports.signup = signup;
 
-// 회원탈퇴
-const userDelete = async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    const deletedAt = new Date();
-    await userService.userDelete(user, deletedAt);
+// 소셜 회원가입
+exports.social_signup = async (req, res, next) => {
+  const { blogId, nickname, email } = req.body;
 
-    res.status(200).send({
-      result: true,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
-exports.userDelete = userDelete;
+  const social_duplicate = await userService.social_signup(blogId, nickname, email);
 
-// 회원복구
-const user_restore = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    const deletedAt = null;
-
-    const user = await userService.login(email);
-    const passwordck = await Bcrypt.compare(password, user.password);
-
-    // 이메일이 틀리거나 패스워드가 틀렸을때
-    if (!user || !passwordck) {
-      return res.status(400).send({
-        result: false,
-      });
-    }
-
-    await userService.user_restore(email, deletedAt);
-    res.status(200).send({
-      result: true,
-      msg: '회원복구 완료',
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
-exports.user_restore = user_restore;
-
-// 로그인
-const login = async (req, res, next) => {
-  const { email, password } = await Validatorlogin.validateAsync(req.body);
-  const user = await userService.login(email);
-  const passwordck = await Bcrypt.compare(password, user.password);
-  const exuser = user.deletedAt;
-  console.log(user.profileImage);
-
-  // 탈퇴한 회원
-  if (exuser) {
+  if (social_duplicate === false) {
     return res.status(400).send({
       result: false,
-      msg: '탈퇴한 회원입니다',
     });
   }
+  res.status(200).send({
+    result: true,
+  });
+};
+
+// 회원탈퇴
+exports.userDelete = async (req, res, next) => {
+  const { user } = res.locals;
+  const deletedAt = new Date();
+  await userService.userDelete(user, deletedAt);
+
+  res.status(200).send({
+    result: true,
+  });
+};
+
+// 회원복구
+exports.user_restore = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const user = await userService.user_restore(email);
+
+  if (user === false) {
+    return res.status(400).send({
+      result: false,
+      msg: '이메일 또는 패스워드가 잘못됫습니다.',
+    });
+  }
+
+  const passwordck = await Bcrypt.compare(password, user.password);
 
   // 이메일이 틀리거나 패스워드가 틀렸을때
   if (!user || !passwordck) {
     return res.status(400).send({
       result: false,
+      msg: '이메일 또는 패스워드가 잘못됫습니다.',
     });
   }
-  const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
-    expiresIn: 10800, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
-  });
-  const refreshToken = jwt.sign({ userId: user.userId }, process.env.REFRESH_TOKEN_KEY, {
-    expiresIn: 86400, // 60 * 60 * 24 이므로, 하루 유효한 토큰 발급
-  });
-
-  await userService.refresh_token(email, refreshToken);
 
   res.status(200).send({
     result: true,
-    nickname: user.nickname,
-    accessToken,
-    refreshToken,
-    profileImage: user.profileImage,
-    userId: user.userId,
+    msg: '회원복구 완료',
   });
 };
-exports.login = login;
 
-// refresh 토큰을 기반으로 access 토큰
-const refresh = async (req, res, next) => {
-  try {
-    const { refreshToken } = req.body;
+// 로그인
+exports.login = async (req, res, next) => {
+  const { email, password } = await Validatorlogin.validateAsync(req.body);
 
-    if (!refreshToken) {
-      return res.sendStatus(401);
-    }
+  const user = await userService.login(email);
 
-    const user = await userService.refresh_token_check(refreshToken);
-    console.log(user.userId);
-    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
-      expiresIn: 10800,
+  if (user === false) {
+    return res.status(400).send({
+      result: false,
+      logout: '다른 곳에서 로그인을 합니다.',
     });
-
-    res.status(200).send({
-      accessToken,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
   }
+
+  // 탈퇴한 회원
+  if (user !== null && user[0]?.deletedAt) {
+    return res.status(400).send({
+      result: false,
+      msg: '탈퇴한 회원입니다',
+    });
+  }
+  if (user !== null) {
+    const passwordck = await Bcrypt.compare(password, user[0].password);
+
+    // 이메일이 틀리거나 패스워드가 틀렸을때
+    if (!user || !passwordck) {
+      return res.status(400).send({
+        result: false,
+        msg: '이메일 또는 패스워드가 잘못됫습니다.',
+      });
+    }
+  } else {
+    return res.status(400).send({
+      result: false,
+      msg: '이메일 또는 패스워드가 잘못됫습니다.',
+    });
+  }
+
+  res.status(200).send({
+    result: true,
+    nickname: user[0].nickname,
+    profileImage: user[0].profileImage,
+    token: user[1],
+    userId: user[0].userId,
+    blogId: user[0].blogId,
+  });
 };
-exports.refresh = refresh;
+// refresh 토큰을 기반으로 access 토큰
+exports.refresh = async (req, res, next) => {
+  const { email, refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.sendStatus(401);
+  }
+
+  const user = await userService.refresh_token_check(email, refreshToken);
+  if (user === false) {
+    return res.status(400).send({
+      result: false,
+      msg: '토큰값 만료되었슴니다.',
+    });
+  }
+
+  const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+    expiresIn: 10800,
+  });
+
+  res.status(200).send({
+    accessToken,
+  });
+};
+
+// 로그아웃
+exports.logout = async (req, res, next) => {
+  const { user } = res.locals;
+  await userService.logout(user);
+  res.status(200).send({
+    result: true,
+    message: '로그아웃',
+  });
+};
+
+// 블로그 아이디 중복검사
+exports.blogcheck = async (req, res, next) => {
+  const { blogId } = req.body;
+
+  const blogidch = await userService.blogcheck(blogId);
+
+  if (blogidch) {
+    return res.status(400).send({
+      result: false,
+    });
+  }
+  res.status(200).send({
+    result: true,
+  });
+};
 
 // 이메일 || 닉네임 중복검사
-const duplicate = async (req, res, next) => {
-  try {
-    const id = req.body.email || req.body.nickname;
-    const idcheck = await userService.duplicate(id);
+exports.duplicate = async (req, res, next) => {
+  const id = req.body.email || req.body.nickname;
+  const idcheck = await userService.duplicate(id);
 
-    if (idcheck[0]?.email === id || idcheck[0]?.nickname === id) {
-      return res.status(400).send({
-        result: false,
-      });
-    }
-
-    res.status(200).send({
-      result: true,
+  if (idcheck[0]?.email === id || idcheck[0]?.nickname === id) {
+    return res.status(400).send({
+      result: false,
     });
-  } catch (error) {
-    console.log(error);
-    next(error);
   }
+
+  res.status(200).send({
+    result: true,
+  });
 };
-exports.duplicate = duplicate;
 
 // 마이프로필 조회
-const myprofile = async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    const myprofile = await userService.myprofile(user);
+exports.myprofile = async (req, res, next) => {
+  const { user } = res.locals;
+  const myprofile = await userService.myprofile(user);
 
-    res.status(200).send({
-      myprofile,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+  res.status(200).send({
+    myprofile,
+  });
 };
-exports.myprofile = myprofile;
 
 // 마이프로필 수정
-const myprofile_correction = async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    const profileImage = req.file?.transforms[0].key;
-    const { nickname, introduction } = req?.body;
+exports.myprofile_correction = async (req, res, next) => {
+  const { user } = res.locals;
+  const profileImage = req.file?.transforms[0].key;
+  const { nickname, introduction } = req?.body;
 
-    // 닉네임 안에 정규식이 포함 되어 있으면 true, 없으면 false
-    const nickname_validator = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/.test(nickname);
+  // 닉네임 안에 정규식이 포함 되어 있으면 true, 없으면 false
+  const nickname_validator = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/.test(nickname);
 
-    // 닉네임 유효성 검사
-    if (3 > nickname?.length || nickname?.length > 15) {
-      return res
-        .status(400)
-        .send({ ValidationError: '3글자 ~ 15글자 이내로 작성해주세요' });
-    } else if (!nickname_validator) {
-      return res
-        .status(400)
-        .send({ ValidationError: '한글,숫자, 알파벳 대소문자로 입력해주세요' });
-    }
-    const profileimg = await userService.myprofile_correction(
-      user,
-      profileImage,
-      nickname,
-      introduction
-    );
-
-    if (profileimg === false) {
-      return res.status(400).send({
-        result: false,
-      });
-    }
-
-    res.status(200).send(profileimg);
-  } catch (error) {
-    console.log(error);
-    next(error);
+  // 닉네임 유효성 검사
+  if (3 > nickname?.length || nickname?.length > 15) {
+    return res
+      .status(400)
+      .send({ ValidationError: '3글자 ~ 15글자 이내로 작성해주세요' });
+  } else if (!nickname_validator) {
+    return res
+      .status(400)
+      .send({ ValidationError: '한글,숫자, 알파벳 대소문자로 입력해주세요' });
   }
+  const profileimg = await userService.myprofile_correction(
+    user,
+    profileImage,
+    nickname,
+    introduction
+  );
+
+  if (profileimg === false) {
+    return res.status(400).send({
+      result: false,
+    });
+  }
+
+  res.status(200).send(profileimg);
 };
-exports.myprofile_correction = myprofile_correction;
 
 // 이메일 인증
-const emailauth = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    // 인증메일 (번호)
-    const emailAuth = Math.floor(Math.random() * 10000);
+exports.emailauth = async (req, res, next) => {
+  const { email } = req.body;
+  // 인증메일 (번호)
+  const emailAuth = Math.floor(Math.random() * 10000);
 
-    await userService.emailauth(email, emailAuth);
+  await userService.emailauth(email, emailAuth);
 
-    const transporter = nodemailer.createTransport({
-      service: NODEMAILER_SERVICE,
-      host: process.env.NODEMAILER_HOST,
-      port: process.env.NODEMAILER_PORT,
-      secure: false,
-      auth: {
-        user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASS,
-      },
-    });
+  const transporter = nodemailer.createTransport({
+    service: process.env.NODEMAILER_SERVICE,
+    host: process.env.NODEMAILER_HOST,
+    port: process.env.NODEMAILER_PORT,
+    secure: false,
+    auth: {
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
 
-    let info = await transporter.sendMail({
-      from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
-      to: email,
-      subject: '[Paper] 인증번호가 도착했습니다.',
-      text: `${emailAuth}`,
-    });
+  let info = await transporter.sendMail({
+    from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
+    to: email,
+    subject: '[Paper] 인증번호가 도착했습니다.',
+    text: `${emailAuth}`,
+  });
 
-    res.status(200).json({
-      result: true,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+  res.status(200).json({
+    result: true,
+  });
 };
-exports.emailauth = emailauth;
 
 // 이메일 인증 체크
-const check_emaliauth = async (req, res, next) => {
-  try {
-    const { emailAuth } = req.body;
-    const text = await userService.check_emaliauth(emailAuth);
-    await userService.delet_check_emaliauth(emailAuth);
-    console.log(text.emailAuth);
-    if (Number(emailAuth) === text.emailAuth) {
-      return res.status(200).send({
-        result: true,
-      });
-    }
+exports.check_emaliauth = async (req, res, next) => {
+  const { email, emailAuth } = req.body;
+  const text = await userService.check_emaliauth(email);
 
-    res.status(400).send({
-      result: false,
+  if (emailAuth === text) {
+    await userService.delet_check_emaliauth(email);
+    return res.status(200).send({
+      result: true,
     });
-  } catch (error) {
-    console.log(error);
-    next(error);
   }
+
+  res.status(400).send({
+    result: false,
+  });
 };
-exports.check_emaliauth = check_emaliauth;
 
 // 비밀번호 변경
-const change_password = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
+exports.change_password = async (req, res, next) => {
+  const { email, password } = req.body;
 
-    await userService.change_password(email, password);
+  await userService.change_password(email, password);
 
-    res.status(200).send({
-      result: true,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+  res.status(200).send({
+    result: true,
+  });
 };
-exports.change_password = change_password;
 
 // 이메일 인증 (로그인 시)
-const login_emailauth = async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    // 인증메일 (번호)
-    const emailAuth = Math.floor(Math.random() * 10000);
+exports.login_emailauth = async (req, res, next) => {
+  const { user } = res.locals;
 
-    await userService.login_emailauth(user, emailAuth);
+  // 인증메일 (번호)
+  const emailAuth = Math.floor(Math.random() * 10000);
 
-    const transporter = nodemailer.createTransport({
-      service: NODEMAILER_SERVICE,
-      host: process.env.NODEMAILER_HOST,
-      port: process.env.NODEMAILER_PORT,
-      secure: false,
-      auth: {
-        user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASS,
-      },
-    });
+  await userService.login_emailauth(user, emailAuth);
 
-    let info = await transporter.sendMail({
-      from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
-      to: user.email,
-      subject: '[Paper] 인증번호가 도착했습니다.',
-      text: `${emailAuth}`,
-    });
+  const transporter = nodemailer.createTransport({
+    service: process.env.NODEMAILER_SERVICE,
+    host: process.env.NODEMAILER_HOST,
+    port: process.env.NODEMAILER_PORT,
+    secure: false,
+    auth: {
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
 
-    res.status(200).json({
-      result: true,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+  let info = await transporter.sendMail({
+    from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
+    to: user.email,
+    subject: '[Paper] 인증번호가 도착했습니다.',
+    text: `${emailAuth}`,
+  });
+
+  res.status(200).json({
+    result: true,
+  });
 };
-exports.login_emailauth = login_emailauth;
 
 // 이메일 인증 체크(로그인 시)
-const login_check_emaliauth = async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    const { emailAuth } = req.body;
-    const text = await userService.login_check_emaliauth(user);
+exports.login_check_emaliauth = async (req, res, next) => {
+  const { user } = res.locals;
+  const { emailAuth } = req.body;
+  const text = await userService.login_check_emaliauth(user);
+
+  if (emailAuth === text) {
     await userService.login_delet_check_emaliauth(user);
-    if (Number(emailAuth) === text.emailAuth) {
-      res.status(200).send({
-        result: true,
-      });
-      return;
-    }
-
-    res.status(400).send({
-      result: false,
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-};
-exports.login_check_emaliauth = login_check_emaliauth;
-
-// 비밀번호 변경(로그인 시)
-const login_change_password = async (req, res, next) => {
-  try {
-    const { user } = res.locals;
-    const { password } = req.body;
-
-    await userService.login_change_password(user, password);
-
     res.status(200).send({
       result: true,
     });
-  } catch (error) {
-    console.log(error);
-    next(error);
+    return;
   }
+
+  res.status(400).send({
+    result: false,
+  });
 };
-exports.login_change_password = login_change_password;
+
+// 비밀번호 변경(로그인 시)
+exports.login_change_password = async (req, res, next) => {
+  const { user } = res.locals;
+  const { password } = req.body;
+
+  await userService.login_change_password(user, password);
+
+  res.status(200).send({
+    result: true,
+  });
+};
