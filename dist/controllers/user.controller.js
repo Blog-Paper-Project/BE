@@ -160,7 +160,13 @@ exports.login = async (req, res, next) => {
       msg: '탈퇴한 회원입니다',
     });
   }
-  if (user !== null) {
+
+  if (user === null) {
+    return res.status(400).send({
+      result2: false,
+      msg: '이메일 또는 패스워드가 잘못됫습니다.',
+    });
+  } else {
     const passwordck = await Bcrypt.compare(password, user[0].password);
 
     // 이메일이 틀리거나 패스워드가 틀렸을때
@@ -170,11 +176,6 @@ exports.login = async (req, res, next) => {
         msg: '이메일 또는 패스워드가 잘못됫습니다.',
       });
     }
-  } else {
-    return res.status(400).send({
-      result: false,
-      msg: '이메일 또는 패스워드가 잘못됫습니다.',
-    });
   }
 
   res.status(200).send({

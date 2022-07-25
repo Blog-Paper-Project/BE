@@ -4,10 +4,9 @@ const { Op } = sequelize;
 const { deleteImg } = require('../modules/multer');
 const { User } = require('../../models');
 const jwt = require('jsonwebtoken');
-const app = require('../../app');
+const { redisCli } = require('../../app');
 
-const redisCli = app.redisCli;
-const redisCliv4 = app.redisCli.v4;
+const redisCliv4 = redisCli.v4;
 
 // 회원가입
 exports.signup = async (email, nickname, password, blogId) => {
@@ -50,7 +49,7 @@ exports.userDelete = async (user, deletedAt) => {
 };
 
 // 회원복구
-exports.user_restore = async (email, password) => {
+exports.user_restore = async (email) => {
   const user = await User.findOne({
     attributes: ['email', 'password'],
     where: { email },

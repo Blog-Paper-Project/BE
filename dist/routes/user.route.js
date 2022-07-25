@@ -10,21 +10,14 @@ const AsyncHandler = require('../middlewares/async.handler');
 require('dotenv').config();
 
 // 카카오 로그인
-router.get('/login/kakao', isNotLoggedIn, passport.authenticate('kakao'));
 
 router.get('/login/kakao/callback', AsyncHandler(Usercontroller.kakaoCallback));
 
 // 네이버 로그인
-router.get('/login/naver', isNotLoggedIn, passport.authenticate('naver'));
 
 router.get('/login/naver/callback', AsyncHandler(Usercontroller.naverCallback));
 
 //구글 로그인
-router.get(
-  '/login/google',
-  isNotLoggedIn,
-  passport.authenticate('google', { scope: ['profile', 'email'] })
-);
 
 router.get('/login/google/callback', AsyncHandler(Usercontroller.googleCallback));
 
@@ -43,7 +36,7 @@ router.patch('/restore', AsyncHandler(Usercontroller.user_restore));
 // 로그인
 router.post('/login', isNotLoggedIn, AsyncHandler(Usercontroller.login));
 
-// 유저 아이디 중복검사
+// 유저 blogId 중복검사
 router.post('/blogid', AsyncHandler(Usercontroller.blogcheck));
 
 // 이메일 || 닉네임 중복검사

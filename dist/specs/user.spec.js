@@ -60,7 +60,7 @@ describe('회원가입 테스트', () => {
 });
 
 describe('중복검사', () => {
-  it('닉네임 중복검사 성공', (done) => {
+  it('닉네임 중복검사 사용가능', (done) => {
     request(app)
       .post('/user/idcheck')
       .send({ nickname: '공백크' })
@@ -70,10 +70,30 @@ describe('중복검사', () => {
       });
   });
 
-  it('닉네임 중복검사 실패', (done) => {
+  it('닉네임 중복검사 이미 사용중', (done) => {
     request(app)
       .post('/user/idcheck')
       .send({ nickname: '공백13' })
+      .then((res) => {
+        expect(res.status).toBe(400);
+        done();
+      });
+  });
+
+  it('blogId 중복검사 사용가능', (done) => {
+    request(app)
+      .post('/user/blogid')
+      .send({ blogId: 'zxcvasd' })
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('blogId 중복검사 이미 사용중', (done) => {
+    request(app)
+      .post('/user/blogid')
+      .send({ blogId: 'serqweqwe' })
       .then((res) => {
         expect(res.status).toBe(400);
         done();
