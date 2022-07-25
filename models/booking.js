@@ -27,6 +27,10 @@ module.exports = class Booking extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
+        endTime: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
       },
       {
         sequelize,
