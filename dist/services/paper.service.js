@@ -24,7 +24,7 @@ exports.findPostsBy = findPostsBy;
 const findAllPosts = async () => {
     const papers = await Paper.findAll({
         include: [
-            { model: User, as: 'Users', attributes: ['blogId'] },
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
             { model: User, as: 'Likes' },
         ],
     });
@@ -32,8 +32,8 @@ const findAllPosts = async () => {
         .map((paper) => {
         const { postId, title, contents, thumbnail, Likes, Users } = paper;
         const likes = Likes.filter((like) => like.createdAt > (0, date_1.calcDays)(7)).length;
-        const { blogId } = Users;
-        return { postId, blogId, title, contents, thumbnail, likes };
+        const { blogId, nickname } = Users;
+        return { postId, blogId, nickname, title, contents, thumbnail, likes };
     })
         .sort((a, b) => b.likes - a.likes)
         .slice(0, 11)
@@ -49,7 +49,14 @@ const findBestUsers = async () => {
     return await User.findAll({
         order: [['popularity', 'DESC']],
         limit: 18,
-        attributes: ['userId', 'blogId', 'nickname', 'profileImage', 'popularity'],
+        attributes: [
+            'userId',
+            'blogId',
+            'nickname',
+            'introduction',
+            'profileImage',
+            'popularity',
+        ],
     });
 };
 exports.findBestUsers = findBestUsers;
