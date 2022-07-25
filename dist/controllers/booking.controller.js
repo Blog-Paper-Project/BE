@@ -32,6 +32,7 @@ const createBooking = async (req, res, next) => {
   const leaf = Leaf[0].dataValues.setPoint;
   const hostId = req.params.blogId;
 
+  // console.log(guestId, hostId);
   //날짜, 시간 설정
 
   const bookingMoment = new dayjs().tz(); //=> dayjs 사용하려면 현재시간
@@ -62,7 +63,7 @@ const createBooking = async (req, res, next) => {
 
   // 호스트id, 예약시간, 예약날짜 조회,
 
-  const existRev = await bookingService.findRev(hostId, bookingTime, meetingDate);
+  const existRev = await bookingService.findRev(hostId, start, end);
   if (existRev.length > 0) {
     return res.status(400).send({ msg: '이미 예약된 시간 입니다.' });
   }
@@ -94,8 +95,8 @@ const createBooking = async (req, res, next) => {
     const bookingResult = await bookingService.createBooking(
       blogId,
       leaf,
-      bookingTime,
-      meetingDate,
+      start,
+      end,
       hostId,
       userId,
       sqlEnd
@@ -112,8 +113,8 @@ exports.createBooking = createBooking;
 const bookingList = async (req, res, next) => {
   const userId = res.locals.user.userId;
   const blogId = res.locals.user.blogId;
-  const hostBooking = await bookingService.hostBooking(blogId);
-  const guestBooking = await bookingService.guestBooking(blogId);
+  const hostBookingList = await bookingService.hostBooking(blogId);
+  const guestBookingList = await bookingService.guestBooking(blogId);
 
   // const start = guestBooking.map((v) => {
   //   let date = v.date;
