@@ -105,7 +105,7 @@ const acceptBooking = async (req, res, next) => {
   const leaf = cntLeaf[0].leaf;
 
   await bookingService.confirmBooking(hostId, bookingId, guestId, leaf);
-  return res.status(200).json({ result: true })(req, res, next);
+  return res.status(200).json({ result: true });
 };
 exports.acceptBooking = acceptBooking;
 
