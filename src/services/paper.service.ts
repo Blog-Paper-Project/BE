@@ -19,7 +19,14 @@ export const findPostsBy = async (keyword: string) => {
   })) as Models.Paper;
 };
 
-// 1주일간 좋아요 순으로 게시글 11개 검색
+// 레디스에 저장된 메인 페이지 데이터 검색
+export const findCachePosts = async () => {
+  const papers = await redisCli.v4.get('main');
+
+  return JSON.parse(papers);
+};
+
+// 1주일간 좋아요 순으로 게시글 11개 검색 후 레디스에 저장
 export const findAllPosts = async () => {
   const papers: DTO.PaperLike[] = await Paper.findAll({
     include: [
@@ -44,6 +51,9 @@ export const findAllPosts = async () => {
       );
       return paper;
     });
+
+  await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 1800);
+
   return papersByLike;
 };
 
@@ -137,7 +147,10 @@ export const findPostInfo = async (postId: string) => {
   return await Paper.findOne({
     where: { postId },
     include: [
-      { model: Comment },
+      {
+        model: Comment,
+        include: { model: User, as: 'Users', attributes: ['blogId', 'profileImage'] },
+      },
       { model: Tag, attributes: ['name'] },
       { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
       { model: User, as: 'Likes', attributes: ['nickname'] },

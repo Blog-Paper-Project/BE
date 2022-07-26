@@ -4,7 +4,7 @@
      "phases": [
         {
            "duration": 60,
-           "arrivalRate": 30
+           "arrivalRate": 50
         }
      ]
   },
@@ -13,7 +13,7 @@
         "flow": [
            {
               "get": {
-                 "url": "/api/paper/users/1/1"
+                 "url": "/api/paper"
               }
            }
         ]
