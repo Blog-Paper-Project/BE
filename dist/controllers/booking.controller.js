@@ -70,9 +70,9 @@ const createBooking = async (req, res, next) => {
   // }
 
   //이전시간 예약 차단
-  if (startTime < now) {
-    return res.status(400).json({ result: false, msg: '현재시간보다 이전 시간입니다.' });
-  }
+  // if (startTime < now) {
+  //   return res.status(400).json({ result: false, msg: '현재시간보다 이전 시간입니다.' });
+  // }
 
   // 상대방이 나뭇잎 설정을 하지 않았을 경우
   if (leaf == null) {
