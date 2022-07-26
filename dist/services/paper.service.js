@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findCachePosts = exports.findPostsBy = void 0;
 /* eslint-disable */
 const sequelize_1 = require("sequelize");
 const multer_1 = require("../modules/multer");
@@ -20,7 +20,13 @@ const findPostsBy = async (keyword) => {
     }));
 };
 exports.findPostsBy = findPostsBy;
-// 1주일간 좋아요 순으로 게시글 11개 검색
+// 레디스에 저장된 메인 페이지 데이터 검색
+const findCachePosts = async () => {
+    const papers = await redisCli.v4.get('main');
+    return JSON.parse(papers);
+};
+exports.findCachePosts = findCachePosts;
+// 1주일간 좋아요 순으로 게시글 11개 검색 후 레디스에 저장
 const findAllPosts = async () => {
     const papers = await Paper.findAll({
         include: [
@@ -41,6 +47,7 @@ const findAllPosts = async () => {
         paper.contents = paper.contents.replace(/!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g, '');
         return paper;
     });
+    await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 1800);
     return papersByLike;
 };
 exports.findAllPosts = findAllPosts;
@@ -126,7 +133,10 @@ const findPostInfo = async (postId) => {
     return await Paper.findOne({
         where: { postId },
         include: [
-            { model: Comment },
+            {
+                model: Comment,
+                include: { model: User, as: 'Users', attributes: ['blogId', 'profileImage'] },
+            },
             { model: Tag, attributes: ['name'] },
             { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
             { model: User, as: 'Likes', attributes: ['nickname'] },

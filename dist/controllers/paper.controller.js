@@ -12,8 +12,12 @@ const readMain = async (req, res) => {
         const papers = await PaperService.findPostsBy(keyword);
         return res.json({ papers });
     }
-    const papers = await PaperService.findAllPosts();
     const popularUsers = await PaperService.findBestUsers();
+    const cache = await PaperService.findCachePosts();
+    if (cache) {
+        return res.json({ papers: cache, popularUsers });
+    }
+    const papers = await PaperService.findAllPosts();
     return res.json({ papers, popularUsers });
 };
 exports.readMain = readMain;
