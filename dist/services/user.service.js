@@ -164,14 +164,14 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
 };
 
 // 이메일 인증
-exports.emailauth = async (email, emailAuth) => {
-  const emailcheck = await redisCliv4.get(email);
+exports.emailauth = async (parmas, emailAuth) => {
+  const emailcheck = await redisCliv4.get(parmas);
 
   if (!emailcheck) {
-    return await redisCli.setex(email, 300, emailAuth);
+    return await redisCli.setex(parmas, 300, emailAuth);
   }
 
-  await redisCli.setex(email, 300, emailAuth);
+  await redisCli.setex(parmas, 300, emailAuth);
 };
 
 // 이메일 인증 체크

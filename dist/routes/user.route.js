@@ -2,6 +2,7 @@ const express = require('express');
 const { isNotLoggedIn } = require('../middlewares/user.validator');
 const Authmiddle = require('../middlewares/auth');
 const { upload } = require('../modules/multer');
+const passport = require('passport');
 const router = express.Router();
 const Usercontroller = require('../controllers/user.controller');
 const AsyncHandler = require('../middlewares/async.handler');
@@ -9,6 +10,8 @@ const AsyncHandler = require('../middlewares/async.handler');
 require('dotenv').config();
 
 // 카카오 로그인
+
+router.get('/login/kakao', isNotLoggedIn, passport.authenticate('kakao'));
 
 router.get('/login/kakao/callback', AsyncHandler(Usercontroller.kakaoCallback));
 
