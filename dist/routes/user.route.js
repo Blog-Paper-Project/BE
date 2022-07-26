@@ -1,8 +1,7 @@
 const express = require('express');
-const { isNotLoggedIn } = require('../middlewares/loging');
+const { isNotLoggedIn } = require('../middlewares/user.validator');
 const Authmiddle = require('../middlewares/auth');
 const { upload } = require('../modules/multer');
-const passport = require('passport');
 const router = express.Router();
 const Usercontroller = require('../controllers/user.controller');
 const AsyncHandler = require('../middlewares/async.handler');

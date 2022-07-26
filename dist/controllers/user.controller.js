@@ -3,8 +3,11 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const userService = require('../services/user.service');
 const passport = require('passport');
-const Validatorsinup = require('../middlewares/signup.validator');
-const Validatorlogin = require('../middlewares/login.validator');
+const {
+  signup_schma,
+  login_schma,
+  userprofile,
+} = require('../middlewares/user.validator');
 
 require('dotenv').config();
 
@@ -68,7 +71,7 @@ exports.googleCallback = (req, res, next) => {
 
 //회원가입
 exports.signup = async (req, res, next) => {
-  const { email, nickname, password, blogId } = await Validatorsinup.validateAsync(
+  const { email, nickname, password, blogId } = await signup_schma.validateAsync(
     req.body
   );
 
@@ -142,7 +145,7 @@ exports.user_restore = async (req, res, next) => {
 
 // 로그인
 exports.login = async (req, res, next) => {
-  const { email, password } = await Validatorlogin.validateAsync(req.body);
+  const { email, password } = await login_schma.validateAsync(req.body);
 
   const user = await userService.login(email);
 
@@ -244,21 +247,8 @@ exports.myprofile = async (req, res, next) => {
 exports.myprofile_correction = async (req, res, next) => {
   const { user } = res.locals;
   const profileImage = req.file?.transforms[0].key;
-  const { nickname, introduction } = req?.body;
+  const { nickname, introduction } = await userprofile.validateAsync(req.body);
 
-  // 닉네임 안에 정규식이 포함 되어 있으면 true, 없으면 false
-  const nickname_validator = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/.test(nickname);
-
-  // 닉네임 유효성 검사
-  if (3 > nickname?.length || nickname?.length > 15) {
-    return res
-      .status(400)
-      .send({ ValidationError: '3글자 ~ 15글자 이내로 작성해주세요' });
-  } else if (!nickname_validator) {
-    return res
-      .status(400)
-      .send({ ValidationError: '한글,숫자, 알파벳 대소문자로 입력해주세요' });
-  }
   const profileimg = await userService.myprofile_correction(
     user,
     profileImage,
