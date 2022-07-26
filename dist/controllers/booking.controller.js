@@ -23,10 +23,12 @@ const createBooking = async (req, res, next) => {
   const userId = res.locals.user.userId;
 
   const { blogId, start, end } = req.body;
-  const Leaf = await bookingService.findLeaf(blogId);
-  const leaf = Leaf[0].dataValues.setPoint;
   const hostId = req.params.blogId;
+  const Leaf = await bookingService.findLeaf(hostId);
+  const leaf = Leaf[0].dataValues.setPoint;
   const endTime = end;
+  const startTime = dayjs(start).tz().format('HH:mm:ss');
+  const now = dayjs().tz().format('HH:mm:ss');
 
   //  예약 신청 횟수 제한
   const bookingList = await bookingService.findList(guestId);
@@ -47,9 +49,8 @@ const createBooking = async (req, res, next) => {
   }
 
   // 유저 나뭇잎 조회
-  //나중에 바꿀것
   const userPoint = res.locals.user.point;
-  if (userPoint < 5) {
+  if (userPoint < 0) {
     return res.status(400).send({ msg: '나뭇잎이 부족합니다.' });
   }
 
@@ -66,6 +67,15 @@ const createBooking = async (req, res, next) => {
   //본인 예약 차단
   if (blogId == hostId) {
     return res.status(400).send({ result: false });
+  }
+
+  //이전시간 예약 차단
+  if (startTime < now) {
+    return res.status(400).send({ result: false });
+  }
+
+  if (leaf == null) {
+    return res.status(400).send({ msg: '상대방이 나뭇잎 설정을 하지 않았습니다.' });
   }
 
   //예약 신청
