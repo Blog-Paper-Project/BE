@@ -62,6 +62,7 @@ exports.userprofile = Joi.object({
       'string.pattern.base': '한글,숫자, 알파벳 대소문자로 입력해주세요',
     }),
   introduction: Joi.string(),
+  profileImage: Joi.string(),
 });
 
 exports.isNotLoggedIn = (req, res, next) => {
