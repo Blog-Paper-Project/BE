@@ -47,15 +47,15 @@ const findAllPosts = async () => {
         paper.contents = paper.contents.replace(/!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g, '');
         return paper;
     });
-    await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 1800);
+    await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 600);
     return papersByLike;
 };
 exports.findAllPosts = findAllPosts;
-// 인기도 순으로 유저 18명 검색
+// 인기도 순으로 유저 12명 검색
 const findBestUsers = async () => {
-    return await User.findAll({
+    const users = await User.findAll({
         order: [['popularity', 'DESC']],
-        limit: 18,
+        limit: 12,
         attributes: [
             'userId',
             'blogId',
@@ -65,6 +65,8 @@ const findBestUsers = async () => {
             'popularity',
         ],
     });
+    const bottom = [...users.splice(3, 3), ...users.splice(6, 3)];
+    return [...users, ...bottom];
 };
 exports.findBestUsers = findBestUsers;
 // 특정 유저와 게시글 검색

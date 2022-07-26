@@ -1,11 +1,48 @@
 const request = require('supertest');
+const { sequelize } = require('../../models');
 const app = require('../../app');
 
 let token;
 let postId;
 let commentId;
 
-describe('로그인 후 토큰 발급', () => {
+beforeAll(async () => {
+  await sequelize.sync({ force: true });
+});
+
+describe('회원가입 및 로그인 후 토큰 발급', () => {
+  it('회원가입 성공1', (done) => {
+    request(app)
+      .post('/user/signup')
+      .send({
+        email: 'testbot@naver.com',
+        nickname: '테스트봇',
+        blogId: 'testbot',
+        password: 'test1234',
+        confirmPassword: 'test1234',
+      })
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('회원가입 성공2', (done) => {
+    request(app)
+      .post('/user/signup')
+      .send({
+        email: 'testbot1@naver.com',
+        nickname: '테스트봇1',
+        blogId: 'testbot1',
+        password: 'test1234',
+        confirmPassword: 'test1234',
+      })
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+
   it('로그인', (done) => {
     request(app)
       .post('/user/login')
@@ -306,4 +343,8 @@ describe('게시글 삭제', () => {
         done();
       });
   });
+});
+
+afterAll(async () => {
+  await sequelize.sync({ force: true });
 });

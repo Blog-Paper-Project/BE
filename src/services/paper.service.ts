@@ -52,16 +52,16 @@ export const findAllPosts = async () => {
       return paper;
     });
 
-  await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 1800);
+  await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 600);
 
   return papersByLike;
 };
 
-// 인기도 순으로 유저 18명 검색
+// 인기도 순으로 유저 12명 검색
 export const findBestUsers = async () => {
-  return await User.findAll({
+  const users = await User.findAll({
     order: [['popularity', 'DESC']],
-    limit: 18,
+    limit: 12,
     attributes: [
       'userId',
       'blogId',
@@ -71,6 +71,10 @@ export const findBestUsers = async () => {
       'popularity',
     ],
   });
+
+  const bottom = [...users.splice(3, 3), ...users.splice(6, 3)];
+
+  return [...users, ...bottom];
 };
 
 // 특정 유저와 게시글 검색
