@@ -31,7 +31,7 @@ class Socket {
           return socket.emit('roomfull');
         }
         socket.join(room);
-        this.io.to(room).emit('me', socket.id);
+        this.io.to(room).emit('mysocket', socket.id);
         this.io.to(room).emit('update', {
           type: 'connect',
           name,
