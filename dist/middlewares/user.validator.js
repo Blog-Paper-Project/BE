@@ -51,19 +51,19 @@ exports.signup_schma = Joi.object({
   }),
 });
 
-exports.userprofile = Joi.object({
-  nickname: Joi.string()
-    .min(3)
-    .max(15)
-    .pattern(new RegExp(/^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/)) // 닉네임은 한글,알파벳 대소문자 (a~z, A~Z), 숫자(0~9)로 구성
-    .messages({
-      'string.min': '3글자 ~ 15글자 이내로 작성해주세요',
-      'string.max': '3글자 ~ 15글자 이내로 작성해주세요',
-      'string.pattern.base': '한글,숫자, 알파벳 대소문자로 입력해주세요',
-    }),
-  introduction: Joi.string(),
-  profileImage: Joi.string().label('image'),
-});
+// exports.userprofile = Joi.object({
+//   nickname: Joi.string()
+//     .min(3)
+//     .max(15)
+//     .pattern(new RegExp(/^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9]+$/)) // 닉네임은 한글,알파벳 대소문자 (a~z, A~Z), 숫자(0~9)로 구성
+//     .messages({
+//       'string.min': '3글자 ~ 15글자 이내로 작성해주세요',
+//       'string.max': '3글자 ~ 15글자 이내로 작성해주세요',
+//       'string.pattern.base': '한글,숫자, 알파벳 대소문자로 입력해주세요',
+//     }),
+//   introduction: Joi.string(),
+//   profileImage: Joi.string(),
+// });
 
 exports.isNotLoggedIn = (req, res, next) => {
   if (req.headers.authorization) {
