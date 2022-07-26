@@ -37,15 +37,7 @@ const findRev = async (hostId, start, end) => {
 exports.findRev = findRev;
 
 //예약 신청
-const createBooking = async (
-  blogId,
-  leaf,
-  startTime,
-  closeTime,
-  hostId,
-  userId,
-  endTime
-) => {
+const createBooking = async (blogId, leaf, start, end, hostId, userId, endTime) => {
   console.log(blogId, hostId);
   await User.decrement({ point: leaf }, { where: { userId: userId } });
   await Leaf.create({
@@ -56,8 +48,8 @@ const createBooking = async (
   });
   return await Booking.create({
     hostId,
-    start: startTime,
-    end: closeTime,
+    start,
+    end,
     guestId: blogId,
     leaf,
     endTime,
