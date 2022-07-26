@@ -65,15 +65,16 @@ const createBooking = async (req, res, next) => {
   }
 
   //본인 예약 차단
-  if (blogId == hostId) {
-    return res.status(400).send({ result: false });
-  }
+  // if (blogId == hostId) {
+  //   return res.status(400).send({ result: false });
+  // }
 
   //이전시간 예약 차단
   if (startTime < now) {
-    return res.status(400).send({ result: false });
+    return res.status(400).json({ result: false, msg: '현재시간보다 이전 시간입니다.' });
   }
 
+  // 상대방이 나뭇잎 설정을 하지 않았을 경우
   if (leaf == null) {
     return res.status(400).send({ msg: '상대방이 나뭇잎 설정을 하지 않았습니다.' });
   }
