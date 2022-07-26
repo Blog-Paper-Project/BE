@@ -39,7 +39,7 @@ const createBooking = async (req, res, next) => {
   // 예약 받는 횟수 제한
   const hostBbookingList = await bookingService.hostFindList(hostId);
   if (hostBbookingList.length > 11) {
-    return res.send.status(400).send({ msg: '예약 받을 수 있는 횟수를 초과하였습니다.' });
+    return res.status(400).send({ msg: '예약 받을 수 있는 횟수를 초과하였습니다.' });
   }
 
   // 호스트id, 예약시간, 예약날짜 조회,
