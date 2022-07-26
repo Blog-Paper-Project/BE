@@ -2,8 +2,7 @@ const bookingService = require('../services/booking.service');
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
 const utc = require('dayjs/plugin/utc');
-const locale = require('dayjs/locale/ko');
-dayjs.locale('ko');
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault('Asia/Seoul');
@@ -27,8 +26,6 @@ const createBooking = async (req, res, next) => {
   const Leaf = await bookingService.findLeaf(blogId);
   const leaf = Leaf[0].dataValues.setPoint;
   const hostId = req.params.blogId;
-  const startTime = dayjs(start).tz().format('YYYY-MM-DD dddd');
-  const closeTime = dayjs(end).tz().format('YYYY-MM-DD dddd');
   const endTime = end;
 
   //  예약 신청 횟수 제한
@@ -75,8 +72,8 @@ const createBooking = async (req, res, next) => {
   const bookingResult = await bookingService.createBooking(
     blogId,
     leaf,
-    startTime,
-    closeTime,
+    start,
+    end,
     hostId,
     userId,
     endTime
