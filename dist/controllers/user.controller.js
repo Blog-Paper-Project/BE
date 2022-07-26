@@ -1,8 +1,6 @@
 const Bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 const userService = require('../services/user.service');
-const passport = require('passport');
+const User = require('../modules/user.class');
 const {
   signup_schma,
   login_schma,
@@ -13,60 +11,23 @@ require('dotenv').config();
 
 // 카카오 로그인
 exports.kakaoCallback = (req, res, next) => {
-  passport.authenticate('kakao', (err, user) => {
-    if (err) return next(err);
-    const { nickname, userId, profileImage, blogId, email } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+  const user = new User('kakao');
 
-    res.status(200).json({
-      result: true,
-      token,
-      nickname,
-      profileImage,
-      blogId,
-      userId,
-      email,
-    });
-  })(req, res, next);
+  user.socials(res)(req, res, next);
 };
 
 // 네이버 로그인
 exports.naverCallback = (req, res, next) => {
-  passport.authenticate('naver', (err, user, info) => {
-    if (err) return next(err);
+  const user = new User('naver');
 
-    const { nickname, userId, profileImage, blogId, email } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
-
-    res.status(200).send({
-      result: true,
-      token,
-      nickname,
-      profileImage,
-      blogId,
-      userId,
-      email,
-    });
-  })(req, res, next);
+  user.socials(res)(req, res, next);
 };
 
 // 구글 로그인
 exports.googleCallback = (req, res, next) => {
-  passport.authenticate('google', (err, user, info) => {
-    if (err) return next(err);
-    const { nickname, userId, profileImage, blogId, email } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+  const user = new User('google');
 
-    res.status(200).send({
-      result: true,
-      token,
-      nickname,
-      profileImage,
-      blogId,
-      userId,
-      email,
-    });
-  })(req, res, next);
+  user.socials(res)(req, res, next);
 };
 
 //회원가입
@@ -268,28 +229,9 @@ exports.myprofile_correction = async (req, res, next) => {
 // 이메일 인증
 exports.emailauth = async (req, res, next) => {
   const { email } = req.body;
-  // 인증메일 (번호)
-  const emailAuth = Math.floor(Math.random() * 10000);
 
-  await userService.emailauth(email, emailAuth);
-
-  const transporter = nodemailer.createTransport({
-    service: process.env.NODEMAILER_SERVICE,
-    host: process.env.NODEMAILER_HOST,
-    port: process.env.NODEMAILER_PORT,
-    secure: false,
-    auth: {
-      user: process.env.NODEMAILER_USER,
-      pass: process.env.NODEMAILER_PASS,
-    },
-  });
-
-  let info = await transporter.sendMail({
-    from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
-    to: email,
-    subject: '[Paper] 인증번호가 도착했습니다.',
-    text: `${emailAuth}`,
-  });
+  const user = new User();
+  user.emailAuth(email);
 
   res.status(200).json({
     result: true,
@@ -328,28 +270,8 @@ exports.change_password = async (req, res, next) => {
 exports.login_emailauth = async (req, res, next) => {
   const { user } = res.locals;
 
-  // 인증메일 (번호)
-  const emailAuth = Math.floor(Math.random() * 10000);
-
-  await userService.login_emailauth(user, emailAuth);
-
-  const transporter = nodemailer.createTransport({
-    service: process.env.NODEMAILER_SERVICE,
-    host: process.env.NODEMAILER_HOST,
-    port: process.env.NODEMAILER_PORT,
-    secure: false,
-    auth: {
-      user: process.env.NODEMAILER_USER,
-      pass: process.env.NODEMAILER_PASS,
-    },
-  });
-
-  let info = await transporter.sendMail({
-    from: `"Paper 환영합니다" <${process.env.NODEMAILER_USER}>`,
-    to: user.email,
-    subject: '[Paper] 인증번호가 도착했습니다.',
-    text: `${emailAuth}`,
-  });
+  const users = new User();
+  users.emailAuth(user.email);
 
   res.status(200).json({
     result: true,
