@@ -19,8 +19,6 @@ class Socket {
         ],
       });
 
-      console.log(this.io.sockets.adapter.sids.values());
-
       // io.sockets.adapter.sids를 하면 map으로 websocket에 들어온 socket id와 참가한 방이 나온다.
       // Map은 key, value 형식이므로 value()로 접근해 id와 room에 접근
       // 1번쨰 인덱스에 내가 참가한 방이 나오므로 map을 돌면서 첫번쨰 인덱스만 다 가지고 온다. Set으로 중복 데이터를 없앤다
@@ -33,12 +31,7 @@ class Socket {
           return socket.emit('roomfull');
         }
         socket.join(room);
-        console.log([
-          ...new Set(
-            [...this.io.sockets.adapter.sids.values()].map((data) => [...data][1])
-          ),
-        ]);
-        console.log(this.io.sockets.adapter.sids.values());
+        this.io.to(room).emit('me', socket.id);
         this.io.to(room).emit('update', {
           type: 'connect',
           name,
