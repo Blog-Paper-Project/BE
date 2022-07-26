@@ -58,6 +58,7 @@ class Socket {
 
       // disconnect됐을 때 나가기가 있는데 바로 반영이 안돼서 채팅방 나가기 버튼을 누르면 room에서 내보내도록 설정
       socket.on('leaveRoom', () => {
+        console.log('leaveRoom 테스트');
         socket.leave(room);
         this.io.to(room).emit('update', {
           type: 'leavRoom',
