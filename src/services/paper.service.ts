@@ -149,7 +149,11 @@ export const findPostInfo = async (postId: string) => {
     include: [
       {
         model: Comment,
-        include: { model: User, as: 'Users', attributes: ['blogId', 'profileImage'] },
+        include: {
+          model: User,
+          as: 'Users',
+          attributes: ['userId', 'blogId', 'nickname', 'profileImage'],
+        },
       },
       { model: Tag, attributes: ['name'] },
       { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
