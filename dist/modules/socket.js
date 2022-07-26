@@ -31,7 +31,12 @@ class Socket {
           return socket.emit('roomfull');
         }
         socket.join(room);
-        this.io.to(room).emit('mysocket', socket.id);
+        this.io.to(room).emit(
+          'mysocket',
+          [...this.io.sockets.adapter.sids.values()]
+            .filter((data) => [...data].includes(room))
+            .map((data) => [...data][0])
+        );
         this.io.to(room).emit('update', {
           type: 'connect',
           name,
