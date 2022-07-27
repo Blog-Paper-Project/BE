@@ -25,7 +25,6 @@ exports.redisCli = redisClient;
 require('./dist/modules/node_cron');
 require('./dist/modules/image_scheduler');
 require('./dist/modules/view_count_scheduler');
-// require('./dist/modules/transfer');
 
 const app = express();
 
