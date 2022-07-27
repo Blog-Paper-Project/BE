@@ -16,6 +16,10 @@ export const findPostsBy = async (keyword: string) => {
       ],
     },
     order: [['createdAt', 'DESC']],
+    include: [
+      { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+      { model: User, as: 'Likes', attributes: ['blogId'] },
+    ],
   })) as Models.Paper;
 };
 
@@ -27,7 +31,7 @@ export const findCachePosts = async () => {
 };
 
 // 1주일간 좋아요 순으로 게시글 11개 검색 후 레디스에 저장
-export const findAllPosts = async () => {
+export const findBestPosts = async () => {
   const papers: DTO.PaperLike[] = await Paper.findAll({
     include: [
       { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
@@ -55,6 +59,19 @@ export const findAllPosts = async () => {
   await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 600);
 
   return papersByLike;
+};
+
+// 전체 게시글 검색
+export const findAllPosts = async () => {
+  const papers: DTO.PaperLike[] = await Paper.findAll({
+    attributes: ['postId', 'title', 'contents', 'thumbnail', 'viewCount'],
+    include: [
+      { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+      { model: User, as: 'Likes', attributes: ['blogId'] },
+    ],
+  });
+
+  return papers;
 };
 
 // 인기도 순으로 유저 12명 검색
@@ -87,7 +104,10 @@ export const findUserInfo = async (blogId: string) => {
         model: Paper,
         include: { model: Tag, attributes: ['name'] },
       },
-      { model: User, as: 'Followers', attributes: ['blogId'] },
+      {
+        model: User,
+        as: 'Followers',
+      },
     ],
     order: [[Paper, 'createdAt', 'DESC']],
   });
@@ -161,16 +181,15 @@ export const findPostInfo = async (postId: string) => {
       },
       { model: Tag, attributes: ['name'] },
       { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
-      { model: User, as: 'Likes', attributes: ['nickname'] },
+      { model: User, as: 'Likes', attributes: ['blogId'] },
     ],
   });
 };
 
 // 카테고리 검색
-export const findCategories = async (blogId: string) => {
-  const user = await User.findOne({ where: { blogId } });
+export const findCategories = async (userId: string) => {
   const papers: Models.Paper[] = await Paper.findAll({
-    where: { userId: user.userId },
+    where: { userId },
     attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('category')), 'category']],
   });
   const categories = papers.map((paper) => paper.category);
@@ -178,7 +197,7 @@ export const findCategories = async (blogId: string) => {
   return categories;
 };
 
-// 조회수 상승 및 조회
+// 조회수 증가 및 검색
 export const addCount = async (postId: string, userId: string) => {
   await redisCli.sadd(postId, userId);
 

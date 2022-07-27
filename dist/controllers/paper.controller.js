@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMyFeed = exports.readMiniProfile = exports.updateCategory = exports.readBlog = exports.readMain = void 0;
+exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMyFeed = exports.readMiniProfile = exports.updateCategory = exports.readCategories = exports.readBlog = exports.readPosts = exports.readMain = void 0;
 const custom_error_1 = require("../modules/custom_error");
 const PaperService = require("../services/paper.service");
 const validate_paper_1 = require("../modules/validate_paper");
@@ -17,10 +17,16 @@ const readMain = async (req, res) => {
     if (cache) {
         return res.json({ papers: cache, popularUsers });
     }
-    const papers = await PaperService.findAllPosts();
+    const papers = await PaperService.findBestPosts();
     return res.json({ papers, popularUsers });
 };
 exports.readMain = readMain;
+// 전체 게시글 조회
+const readPosts = async (req, res) => {
+    const papers = await PaperService.findAllPosts();
+    return res.json({ papers });
+};
+exports.readPosts = readPosts;
 // 개인 페이지 조회
 const readBlog = async (req, res, next) => {
     const { blogId } = req.params;
@@ -34,20 +40,27 @@ const readBlog = async (req, res, next) => {
     return res.json({ user, categories, tags });
 };
 exports.readBlog = readBlog;
-// 개인 페이지 카테고리 수정
-const updateCategory = async (req, res, next) => {
-    const { blogId, category } = req.params;
-    const { newCategory } = req.body;
-    const user = res.locals?.user;
-    if (!user) {
-        return next((0, custom_error_1.default)(401, 'Unauthorized!'));
+// 개인 카테고리 조회
+const readCategories = async (req, res, next) => {
+    const userId = res.locals?.user?.userId;
+    if (!+userId) {
+        return next((0, custom_error_1.default)(400, `Invalid UserId : ${userId}`));
     }
-    if (user.blogId !== blogId) {
-        return next((0, custom_error_1.default)(403, 'Access Forbidden'));
+    const categories = await PaperService.findCategories(userId);
+    return res.json({ categories });
+};
+exports.readCategories = readCategories;
+// 개인 카테고리 수정
+const updateCategory = async (req, res, next) => {
+    const { category } = req.params;
+    const { newCategory } = req.body;
+    const userId = res.locals?.user?.userId;
+    if (!userId) {
+        return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     const schema = (0, validate_paper_1.validateCategory)();
     await schema.validateAsync({ category, newCategory });
-    const result = await PaperService.updateCategory(user.userId, category, newCategory);
+    const result = await PaperService.updateCategory(userId, category, newCategory);
     if (!result[0]) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
@@ -91,9 +104,8 @@ const readPost = async (req, res, next) => {
     if (!paper || paper.Users.blogId !== blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    const categories = await PaperService.findCategories(blogId);
     const count = await PaperService.addCount(postId, userId);
-    return res.json({ count, paper, categories });
+    return res.json({ count, paper });
 };
 exports.readPost = readPost;
 // 상세 페이지 작성
