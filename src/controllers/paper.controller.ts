@@ -129,9 +129,10 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
     return next(createError(404, 'Not Found!'));
   }
 
+  const categories = await PaperService.findCategories(blogId);
   const count = await PaperService.addCount(postId, userId);
 
-  return res.json({ count, paper });
+  return res.json({ count, paper, categories });
 };
 
 // 상세 페이지 작성

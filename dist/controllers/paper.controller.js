@@ -91,8 +91,9 @@ const readPost = async (req, res, next) => {
     if (!paper || paper.Users.blogId !== blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
+    const categories = await PaperService.findCategories(blogId);
     const count = await PaperService.addCount(postId, userId);
-    return res.json({ count, paper });
+    return res.json({ count, paper, categories });
 };
 exports.readPost = readPost;
 // 상세 페이지 작성

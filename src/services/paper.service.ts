@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { Op } from 'sequelize';
-import { deleteImg, download } from '../modules/multer';
+import { Op, Sequelize } from 'sequelize';
+import { deleteImg } from '../modules/multer';
 import { calcDays, calcMs } from '../modules/date';
 
 const { Paper, User, Comment, Image, Tag } = require('../../models');
@@ -166,7 +166,19 @@ export const findPostInfo = async (postId: string) => {
   });
 };
 
-// 조회수 증가
+// 카테고리 검색
+export const findCategories = async (blogId: string) => {
+  const user = await User.findOne({ where: { blogId } });
+  const papers: Models.Paper[] = await Paper.findAll({
+    where: { userId: user.userId },
+    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('category')), 'category']],
+  });
+  const categories = papers.map((paper) => paper.category);
+
+  return categories;
+};
+
+// 조회수 상승 및 조회
 export const addCount = async (postId: string, userId: string) => {
   await redisCli.sadd(postId, userId);
 
