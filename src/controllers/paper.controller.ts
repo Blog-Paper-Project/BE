@@ -27,9 +27,16 @@ export const readMain = async (req: Request, res: Response) => {
     return res.json({ papers: cache, popularUsers });
   }
 
-  const papers = await PaperService.findAllPosts();
+  const papers = await PaperService.findBestPosts();
 
   return res.json({ papers, popularUsers });
+};
+
+// 전체 게시글 조회
+export const readPosts = async (req: Request, res: Response) => {
+  const papers = await PaperService.findAllPosts();
+
+  return res.json({ papers });
 };
 
 // 개인 페이지 조회
@@ -49,25 +56,34 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
   return res.json({ user, categories, tags });
 };
 
-// 개인 페이지 카테고리 수정
-export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
-  const { blogId, category } = req.params;
-  const { newCategory } = req.body;
-  const user = res.locals?.user as Models.User;
+// 개인 카테고리 조회
+export const readCategories = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = res.locals?.user?.userId;
 
-  if (!user) {
-    return next(createError(401, 'Unauthorized!'));
+  if (!+userId) {
+    return next(createError(400, `Invalid UserId : ${userId}`));
   }
 
-  if (user.blogId !== blogId) {
-    return next(createError(403, 'Access Forbidden'));
+  const categories = await PaperService.findCategories(userId);
+
+  return res.json({ categories });
+};
+
+// 개인 카테고리 수정
+export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
+  const { category } = req.params;
+  const { newCategory } = req.body;
+  const userId = res.locals?.user?.userId;
+
+  if (!userId) {
+    return next(createError(401, 'Unauthorized!'));
   }
 
   const schema = validateCategory();
 
   await schema.validateAsync({ category, newCategory });
 
-  const result = await PaperService.updateCategory(user.userId, category, newCategory);
+  const result = await PaperService.updateCategory(userId, category, newCategory);
 
   if (!result[0]) {
     return next(createError(404, 'Not Found!'));
@@ -129,10 +145,9 @@ export const readPost = async (req: Request, res: Response, next: NextFunction) 
     return next(createError(404, 'Not Found!'));
   }
 
-  const categories = await PaperService.findCategories(blogId);
   const count = await PaperService.addCount(postId, userId);
 
-  return res.json({ count, paper, categories });
+  return res.json({ count, paper });
 };
 
 // 상세 페이지 작성

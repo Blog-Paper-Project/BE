@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findCategories = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findCachePosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findCategories = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findBestPosts = exports.findCachePosts = exports.findPostsBy = void 0;
 /* eslint-disable */
 const sequelize_1 = require("sequelize");
 const multer_1 = require("../modules/multer");
@@ -17,6 +17,10 @@ const findPostsBy = async (keyword) => {
             ],
         },
         order: [['createdAt', 'DESC']],
+        include: [
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+            { model: User, as: 'Likes', attributes: ['blogId'] },
+        ],
     }));
 };
 exports.findPostsBy = findPostsBy;
@@ -27,7 +31,7 @@ const findCachePosts = async () => {
 };
 exports.findCachePosts = findCachePosts;
 // 1주일간 좋아요 순으로 게시글 11개 검색 후 레디스에 저장
-const findAllPosts = async () => {
+const findBestPosts = async () => {
     const papers = await Paper.findAll({
         include: [
             { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
@@ -49,6 +53,18 @@ const findAllPosts = async () => {
     });
     await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 600);
     return papersByLike;
+};
+exports.findBestPosts = findBestPosts;
+// 전체 게시글 검색
+const findAllPosts = async () => {
+    const papers = await Paper.findAll({
+        attributes: ['postId', 'title', 'contents', 'thumbnail', 'viewCount'],
+        include: [
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+            { model: User, as: 'Likes', attributes: ['blogId'] },
+        ],
+    });
+    return papers;
 };
 exports.findAllPosts = findAllPosts;
 // 인기도 순으로 유저 12명 검색
@@ -79,7 +95,10 @@ const findUserInfo = async (blogId) => {
                 model: Paper,
                 include: { model: Tag, attributes: ['name'] },
             },
-            { model: User, as: 'Followers', attributes: ['blogId'] },
+            {
+                model: User,
+                as: 'Followers',
+            },
         ],
         order: [[Paper, 'createdAt', 'DESC']],
     });
@@ -145,23 +164,22 @@ const findPostInfo = async (postId) => {
             },
             { model: Tag, attributes: ['name'] },
             { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
-            { model: User, as: 'Likes', attributes: ['nickname'] },
+            { model: User, as: 'Likes', attributes: ['blogId'] },
         ],
     });
 };
 exports.findPostInfo = findPostInfo;
 // 카테고리 검색
-const findCategories = async (blogId) => {
-    const user = await User.findOne({ where: { blogId } });
+const findCategories = async (userId) => {
     const papers = await Paper.findAll({
-        where: { userId: user.userId },
+        where: { userId },
         attributes: [[sequelize_1.Sequelize.fn('DISTINCT', sequelize_1.Sequelize.col('category')), 'category']],
     });
     const categories = papers.map((paper) => paper.category);
     return categories;
 };
 exports.findCategories = findCategories;
-// 조회수 상승 및 조회
+// 조회수 증가 및 검색
 const addCount = async (postId, userId) => {
     await redisCli.sadd(postId, userId);
     return await redisCli.v4.sCard(postId);

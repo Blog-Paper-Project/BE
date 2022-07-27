@@ -242,9 +242,19 @@ describe('개인 페이지 테스트', () => {
       });
   });
 
-  it('개인 페이지 카테고리 수정 실패 - 카테고리 없음', (done) => {
+  it('개인 카테고리 조회', (done) => {
     request(app)
-      .patch('/api/paper/testbot/categories/travel')
+      .get('/api/paper/categories')
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('개인 카테고리 수정 실패 - 카테고리 없음', (done) => {
+    request(app)
+      .patch('/api/paper/categories/travel')
       .send({ newCategory: '스포츠' })
       .set('Authorization', token)
       .then((res) => {
@@ -253,9 +263,9 @@ describe('개인 페이지 테스트', () => {
       });
   });
 
-  it('개인 페이지 카테고리 수정 실패 - 카테고리 글자수 초과', (done) => {
+  it('개인 카테고리 수정 실패 - 카테고리 글자수 초과', (done) => {
     request(app)
-      .patch('/api/paper/testbot/categories/travel')
+      .patch('/api/paper/categories/travel')
       .send({ newCategory: 'EPL PREMIER LEAGUE 2022' })
       .set('Authorization', token)
       .then((res) => {
@@ -265,9 +275,9 @@ describe('개인 페이지 테스트', () => {
       });
   });
 
-  it('개인 페이지 카테고리 수정', (done) => {
+  it('개인 카테고리 수정', (done) => {
     request(app)
-      .patch('/api/paper/testbot/categories/sports')
+      .patch('/api/paper/categories/sports')
       .send({ newCategory: '스포츠' })
       .set('Authorization', token)
       .then((res) => {

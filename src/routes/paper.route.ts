@@ -10,21 +10,23 @@ const router = express.Router();
 // 메인 페이지 조회 & 게시글 검색
 router.get('/', asyncHandler(PaperController.readMain));
 
+// 전체 게시글 조회
+router.get('/posts', asyncHandler(PaperController.readPosts));
+
 // 미니 프로필 조회
 router.get('/miniprofile', auth, asyncHandler(PaperController.readMiniProfile));
 
 // 구독 중인 최신 게시글 조회
 router.get('/myfeed', auth, asyncHandler(PaperController.readMyFeed));
 
+// 개인 카테고리 조회
+router.get('/categories', auth, asyncHandler(PaperController.readCategories));
+
+// 개인 카테고리 수정
+router.patch('/categories/:category', auth, asyncHandler(PaperController.updateCategory));
+
 // 개인 페이지 조회
 router.get('/:blogId', asyncHandler(PaperController.readBlog));
-
-// 개인 페이지 카테고리 수정
-router.patch(
-  '/:blogId/categories/:category',
-  auth,
-  asyncHandler(PaperController.updateCategory)
-);
 
 // 상세 페이지 조회
 router.get('/:blogId/:postId', asyncHandler(PaperController.readPost));
