@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findCachePosts = exports.findPostsBy = void 0;
+exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findCategories = exports.findPostInfo = exports.findPost = exports.updateCategory = exports.findNewPosts = exports.findMiniInfo = exports.findUser = exports.findUserInfo = exports.findBestUsers = exports.findAllPosts = exports.findCachePosts = exports.findPostsBy = void 0;
 /* eslint-disable */
 const sequelize_1 = require("sequelize");
 const multer_1 = require("../modules/multer");
@@ -150,7 +150,18 @@ const findPostInfo = async (postId) => {
     });
 };
 exports.findPostInfo = findPostInfo;
-// 조회수 증가
+// 카테고리 검색
+const findCategories = async (blogId) => {
+    const user = await User.findOne({ where: { blogId } });
+    const papers = await Paper.findAll({
+        where: { userId: user.userId },
+        attributes: [[sequelize_1.Sequelize.fn('DISTINCT', sequelize_1.Sequelize.col('category')), 'category']],
+    });
+    const categories = papers.map((paper) => paper.category);
+    return categories;
+};
+exports.findCategories = findCategories;
+// 조회수 상승 및 조회
 const addCount = async (postId, userId) => {
     await redisCli.sadd(postId, userId);
     return await redisCli.v4.sCard(postId);

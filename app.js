@@ -37,7 +37,7 @@ const ReviewRouter = require('./dist/routes/review.route');
 passportConfig();
 
 app.use(cors());
-// app.use(helmet());
+app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('dev'));
