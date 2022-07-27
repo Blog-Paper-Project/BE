@@ -26,8 +26,8 @@ const createBooking = async (req, res, next) => {
   const Leaf = await bookingService.findLeaf(hostId);
   const leaf = Leaf[0].dataValues.setPoint;
   const endTime = end;
-  const startTime = dayjs(start).tz().format('HH:mm:ss');
-  const now = dayjs().tz().format('HH:mm:ss');
+  const startTime = dayjs(start).tz().format('YYYY-MM-DD HH:mm:ss');
+  const now = dayjs().tz().format('YYYY-MM-DD HH:mm:ss');
 
   //  예약 신청 횟수 제한
   const bookingList = await bookingService.findList(guestId);
