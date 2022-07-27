@@ -33,29 +33,35 @@ const createBooking = async (req, res, next) => {
   //  예약 신청 횟수 제한
   const bookingList = await bookingService.findList(guestId);
   if (bookingList.length > 11) {
-    return res.send.status(400).send({ msg: '예약 가능 횟수를 초과하였습니다.' });
+    return res.send
+      .status(400)
+      .json({ result: false, msg: '예약 가능 횟수를 초과하였습니다.' });
   }
 
   // 예약 받는 횟수 제한
   const hostBbookingList = await bookingService.hostFindList(hostId);
   if (hostBbookingList.length > 11) {
-    return res.status(400).send({ msg: '예약 받을 수 있는 횟수를 초과하였습니다.' });
+    return res
+      .status(400)
+      .json({ result: false, msg: '예약 받을 수 있는 횟수를 초과하였습니다.' });
   }
 
   // 호스트id, 예약시간, 예약날짜 조회,
   const existRev = await bookingService.findRev(hostId, start, end);
   if (existRev.length > 0) {
-    return res.status(400).send({ msg: '이미 예약된 시간 입니다.' });
+    return res.status(400).json({ result: false, msg: '이미 예약된 시간 입니다.' });
   }
 
   // 유저 나뭇잎 조회
   const userPoint = res.locals.user.point;
   if (userPoint < leaf) {
-    return res.status(400).send({ msg: '나뭇잎이 부족합니다.' });
+    return res.status(400).json({ result: false, msg: '나뭇잎이 부족합니다.' });
   }
 
   if (blogId === undefined || start === undefined || end === undefined) {
-    return res.status(400).send({ msg: '시간, 날짜, 예약할 대상을 선택하세요.' });
+    return res
+      .status(400)
+      .json({ result: false, msg: '시간, 날짜, 예약할 대상을 선택하세요.' });
   }
 
   //이전시간 예약 차단
