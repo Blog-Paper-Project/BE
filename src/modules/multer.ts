@@ -45,12 +45,12 @@ const upload = multer({
   }),
 });
 
-const deleteImg = async (fileName: string) => {
+const deleteImg = async (filename: string) => {
   try {
-    await s3.deleteObject({ Bucket: S3_BUCKET, Key: fileName }).promise();
+    await s3.deleteObject({ Bucket: S3_BUCKET, Key: filename }).promise();
     return { success: true, message: '이미지 삭제 성공' };
   } catch (error) {
-    return { success: false, message: '이미지 삭제 실패' };
+    return { success: false, message: '이미지 삭제 실패', error };
   }
 };
 
@@ -62,7 +62,7 @@ const download = async (filename: string) => {
     })
     .promise();
 
-  fs.writeFileSync(`./static/${filename}`, Body);
+  fs.writeFileSync(`./${filename}`, Body);
 };
 
 export { upload, deleteImg, download };

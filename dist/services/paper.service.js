@@ -180,10 +180,10 @@ const updateImage = async (postId, images) => {
     });
     if (originalImages.length) {
         const replaced = originalImages.filter((img) => !images.includes(img.url));
-        for (let item of replaced) {
-            await (0, multer_1.deleteImg)(item.url);
-            await Image.destroy({ where: { imageId: item.imageId } });
-        }
+        await Promise.all(replaced.map(async (image) => {
+            await (0, multer_1.deleteImg)(image.url);
+            await Image.destroy({ where: { imageId: image.imageId } });
+        }));
     }
     return await Image.update({ postId: postId }, { where: { url: { [sequelize_1.Op.in]: images } } }, { updateOnDuplicate: true });
 };
@@ -213,9 +213,7 @@ exports.updateTags = updateTags;
 const destroyPost = async (userId, postId) => {
     const images = await Image.findAll({ where: { postId } }, { raw: true });
     const paper = await Paper.findOne({ where: { userId, postId } });
-    for (let image of images) {
-        await (0, multer_1.deleteImg)(image.url);
-    }
+    await Promise.all(images.map(async (image) => await (0, multer_1.deleteImg)(image.url)));
     await (0, multer_1.deleteImg)(paper?.thumbnail);
     await redisCli.del(postId);
     return paper ? await paper.destroy() : paper;

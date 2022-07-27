@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { Op } from 'sequelize';
-import { deleteImg } from '../modules/multer';
+import { deleteImg, download } from '../modules/multer';
 import { calcDays, calcMs } from '../modules/date';
 
 const { Paper, User, Comment, Image, Tag } = require('../../models');
@@ -203,13 +203,16 @@ export const updateImage = async (postId: number, images: string[]) => {
     where: { postId },
     raw: true,
   });
+
   if (originalImages.length) {
     const replaced = originalImages.filter((img) => !images.includes(img.url));
 
-    for (let item of replaced) {
-      await deleteImg(item.url);
-      await Image.destroy({ where: { imageId: item.imageId } });
-    }
+    await Promise.all(
+      replaced.map(async (image) => {
+        await deleteImg(image.url);
+        await Image.destroy({ where: { imageId: image.imageId } });
+      })
+    );
   }
 
   return await Image.update(
@@ -259,10 +262,7 @@ export const destroyPost = async (userId: number, postId: string) => {
   );
   const paper = await Paper.findOne({ where: { userId, postId } });
 
-  for (let image of images) {
-    await deleteImg(image.url);
-  }
-
+  await Promise.all(images.map(async (image) => await deleteImg(image.url)));
   await deleteImg(paper?.thumbnail);
   await redisCli.del(postId);
 
