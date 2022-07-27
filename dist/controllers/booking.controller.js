@@ -62,9 +62,12 @@ const createBooking = async (req, res, next) => {
   }
 
   //이전시간 예약 차단
-  // if (startTime < now) {
-  //   return res.status(400).json({ result: false, msg: '현재시간보다 이전 시간입니다.' });
-  // }
+  console.log(startTime, now);
+  if (startTime < now) {
+    return res
+      .status(400)
+      .json({ result: false, msg: '이미 지나간 시간대에는 예약할 수 없습니다.' });
+  }
 
   //예약 신청
   const bookingResult = await bookingService.createBooking(
