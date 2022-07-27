@@ -33,7 +33,7 @@ const createBooking = async (req, res, next) => {
   //  예약 신청 횟수 제한
   const bookingList = await bookingService.findList(guestId);
   if (bookingList.length > 11) {
-    return res.send.status(400).send({ msg: '예약횟수를 초과하였습니다.' });
+    return res.send.status(400).send({ msg: '예약 가능 횟수를 초과하였습니다.' });
   }
 
   // 예약 받는 횟수 제한
@@ -50,34 +50,18 @@ const createBooking = async (req, res, next) => {
 
   // 유저 나뭇잎 조회
   const userPoint = res.locals.user.point;
-  if (userPoint < 0) {
+  if (userPoint < leaf) {
     return res.status(400).send({ msg: '나뭇잎이 부족합니다.' });
   }
 
-  //포인트 음수 차단
-  const availablePoint = userPoint - leaf;
-  if (availablePoint < 0) {
-    return res.status(400).send({ msg: '가지고 있는 나뭇잎이 부족합니다.' });
-  }
-
   if (blogId === undefined || start === undefined || end === undefined) {
-    return res.status(400).send({ result: false });
+    return res.status(400).send({ msg: '시간, 날짜, 예약할 대상을 선택하세요.' });
   }
-
-  //본인 예약 차단
-  // if (blogId == hostId) {
-  //   return res.status(400).send({ result: false });
-  // }
 
   //이전시간 예약 차단
   // if (startTime < now) {
   //   return res.status(400).json({ result: false, msg: '현재시간보다 이전 시간입니다.' });
   // }
-
-  // 상대방이 나뭇잎 설정을 하지 않았을 경우
-  if (leaf == null) {
-    return res.status(400).send({ msg: '상대방이 나뭇잎 설정을 하지 않았습니다.' });
-  }
 
   //예약 신청
   const bookingResult = await bookingService.createBooking(
