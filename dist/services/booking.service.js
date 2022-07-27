@@ -15,10 +15,10 @@ const patchPoint = async (setPoint, userId) => {
 exports.patchPoint = patchPoint;
 
 //나뭇잎 조회
-const findLeaf = async (blogId) => {
+const findLeaf = async (hostId) => {
   return await User.findAll({
     where: {
-      blogId: blogId,
+      blogId: hostId,
     },
   });
 };
