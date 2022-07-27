@@ -266,7 +266,7 @@ export const destroyPost = async (userId: number, postId: string) => {
   await deleteImg(paper?.thumbnail);
   await redisCli.del(postId);
 
-  return await paper.destroy();
+  return paper ? await paper.destroy() : paper;
 };
 
 // 댓글 작성
