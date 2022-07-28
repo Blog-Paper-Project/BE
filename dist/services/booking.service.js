@@ -106,9 +106,9 @@ const findOne = async (bookingId) => {
 exports.findOne = findOne;
 
 // 예약 신청 횟수 제한
-const findList = async (guestId) => {
+const findList = async (blogId) => {
   return await Booking.findAll({
-    where: { guestId: guestId },
+    where: { guestId: blogId },
   });
 };
 exports.findList = findList;
