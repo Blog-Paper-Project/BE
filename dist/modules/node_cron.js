@@ -3,8 +3,8 @@ const dayjs = require('dayjs');
 
 const User = require('../../models/user');
 
-const task = cron.schedule(
-  '* 0 * * *', // 수정
+exports.task = cron.schedule(
+  '0 0 * * *', // 수정
   async () => {
     try {
       const user = await User.findAll({
@@ -34,5 +34,3 @@ const task = cron.schedule(
     scheduled: false,
   }
 );
-
-task.start();

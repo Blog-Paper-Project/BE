@@ -1,20 +1,23 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.download = exports.deleteImg = exports.upload = void 0;
 const multer = require('multer');
 const fs = require('fs');
 const sharp = require('sharp');
 const multerS3 = require('multer-s3-transform');
 const aws = require('aws-sdk');
 require('dotenv').config();
+const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, S3_BUCKET } = process.env;
 aws.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION,
+    accessKeyId: AWS_ACCESS_KEY_ID,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    region: AWS_REGION,
 });
 const s3 = new aws.S3();
 const upload = multer({
     storage: multerS3({
         s3,
-        bucket: process.env.S3_BUCKET || '',
+        bucket: S3_BUCKET,
         acl: 'public-read',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         shouldTransform: true,
@@ -37,22 +40,24 @@ const upload = multer({
         ],
     }),
 });
-const deleteImg = async (fileName) => {
+exports.upload = upload;
+const deleteImg = async (filename) => {
     try {
-        await s3.deleteObject({ Bucket: process.env.S3_BUCKET, Key: fileName }).promise();
+        await s3.deleteObject({ Bucket: S3_BUCKET, Key: filename }).promise();
         return { success: true, message: '이미지 삭제 성공' };
     }
     catch (error) {
-        return { success: false, message: '이미지 삭제 실패' };
+        return { success: false, message: '이미지 삭제 실패', error };
     }
 };
+exports.deleteImg = deleteImg;
 const download = async (filename) => {
     const { Body } = await s3
         .getObject({
         Key: filename,
-        Bucket: process.env.S3_BUCKET,
+        Bucket: S3_BUCKET,
     })
         .promise();
-    fs.writeFileSync(`./static/${filename}`, Body);
+    fs.writeFileSync(`./${filename}`, Body);
 };
-module.exports = { upload, deleteImg, download };
+exports.download = download;

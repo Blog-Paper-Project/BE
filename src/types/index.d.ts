@@ -1,6 +1,7 @@
 declare namespace Models {
   interface User {
     userId: number;
+    blogId: string;
     email: string;
     nickname: string;
     profileImage: string;
@@ -13,8 +14,8 @@ declare namespace Models {
     emailAuth: number;
     refreshToken: string;
     deletedAt: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
   }
 
   interface Paper {
@@ -23,45 +24,45 @@ declare namespace Models {
     contents: string;
     thumbnail: string;
     category: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     userId: number;
   }
 
   interface Like {
     userId: number;
     paperId: number;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
   }
 
   interface Comment {
     commentId: number;
     text: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     postId: number;
   }
 
   interface Image {
     imageId: number;
     url: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     postId: number;
   }
 
   interface Tag {
     tagId: number;
     name: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     postId: number;
   }
 
   interface Subscription {
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     followeeId: number;
     followerId: number;
   }

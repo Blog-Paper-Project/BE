@@ -9,7 +9,7 @@ module.exports = () => {
       {
         clientID: process.env.NAVER_ID, // 네이버에서 발급받을 ID
         clientSecret: process.env.NAVER_SECRET,
-        callbackURL: '/user/login/naver/callback', // 네이버로부터 인증결과를 받을 라우터 주소
+        callbackURL: process.env.NAVER_REDIRECT_URI, // 네이버로부터 인증결과를 받을 라우터 주소
       },
       async (accessToken, refreshRoken, profile, done) => {
         // 네이버에서 인증 후 Token 과 profile을 보내준다.
@@ -17,19 +17,25 @@ module.exports = () => {
         try {
           const exUser = await User.findOne({
             // 기존의 User가 있는지 조회
-            where: { email: profile.emails[0].value, provider: 'naver' },
+            where: { email: profile._json.email },
           });
+          if (
+            exUser?.dataValues.email === profile._json.email &&
+            exUser?.dataValues.provider !== 'naver'
+          ) {
+            throw new Error(
+              `{result : False , "${exUser?.dataValues.provider} : 이미 가입된 이메일 존재"}`
+            );
+          }
           if (exUser) {
             // 기존 User의 정보가 있다면 User정보를 done과 호출하고 전략을 종료
             done(null, exUser);
           } else {
             // 기존의 User정보가 없다면 회원가입을 진행
             const newUser = await User.create({
-              email: profile.id,
-              nickname: profile._json.nickname,
-              snsId: profile.id,
+              email: profile._json.email,
+              nickname: 'n' + profile._json.nickname,
               provider: 'naver',
-              profileImage: profile._json.profile_image,
             });
             done(null, newUser); // 사용자 생성 후 done함수 호출
           }

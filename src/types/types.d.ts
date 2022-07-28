@@ -1,12 +1,12 @@
 declare namespace Types {
   interface CustomError extends Error {
     status: number;
-    success: boolean;
+    result: boolean;
   }
 
   interface MulterFile {
     file?: {
-      transforms?: { key?: string }[];
+      transforms: { key?: string }[];
     };
   }
 }

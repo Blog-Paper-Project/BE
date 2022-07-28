@@ -10,11 +10,11 @@ module.exports = class Booking extends Sequelize.Model {
           allowNull: false,
           autoIncrement: true,
         },
-        date: {
+        start: {
           type: Sequelize.STRING,
           allowNull: false,
         },
-        time: {
+        end: {
           type: Sequelize.STRING,
           allowNull: false,
         },
@@ -24,7 +24,11 @@ module.exports = class Booking extends Sequelize.Model {
           defaultValue: false,
         },
         leaf: {
-          type: Sequelize.STRING,
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        endTime: {
+          type: Sequelize.DATE,
           allowNull: false,
         },
       },
@@ -40,5 +44,16 @@ module.exports = class Booking extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.Booking.belongsTo(db.User, {
+      as: 'guest',
+      foreignKey: 'guestId',
+      onDelete: 'cascade',
+    });
+    db.Booking.belongsTo(db.User, {
+      as: 'host',
+      foreignKey: 'hostId',
+      onDelete: 'cascade',
+    });
+  }
 };
