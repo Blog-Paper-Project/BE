@@ -36,9 +36,8 @@ exports.social_signup = async (blogId, nickname, email) => {
     duplicate[0]?.dataValues.nickname === nickname &&
     duplicate[0]?.dataValues.blogId === blogId &&
     duplicate[0]?.dataValues.provider === 'local'
-  ) {
+  )
     return false;
-  }
 
   await User.update({ blogId, nickname }, { where: { email } });
 };
