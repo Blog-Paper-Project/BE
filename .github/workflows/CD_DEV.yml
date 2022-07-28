@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-        redis-version: [6.x]
+        redis-version: [6.2.5]
         
 
     steps:
