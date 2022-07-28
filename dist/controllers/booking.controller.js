@@ -150,7 +150,7 @@ exports.cancelBooking = cancelBooking;
 const blogReservation = async (req, res, next) => {
   try {
     const { blogId } = req.params;
-    const bookingList = await bookingService.booking(blogId);
+    const bookingList = await bookingService.hostBooking(blogId);
     return res.status(200).json({ bookingList });
   } catch (error) {
     console.log(error);
