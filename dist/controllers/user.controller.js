@@ -1,33 +1,73 @@
 const Bcrypt = require('bcrypt');
 const userService = require('../services/user.service');
 const User = require('../modules/user.class');
-const {
-  signup_schma,
-  login_schma,
-  userprofile,
-} = require('../middlewares/user.validator');
+const passport = require('passport');
+const { signup_schma, login_schma } = require('../middlewares/user.validator');
 
 require('dotenv').config();
 
 // 카카오 로그인
 exports.kakaoCallback = (req, res, next) => {
-  const user = new User('kakao');
+  // const user = new User('kakao');
+  passport.authenticate(this.social, (err, user) => {
+    if (err) return next(err);
+    const { nickname, userId, profileImage, blogId, email } = user;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-  user.socials(res)(req, res, next);
+    res.status(200).json({
+      result: true,
+      token,
+      nickname,
+      userId,
+      profileImage,
+      blogId,
+      email,
+    });
+  });
+  req, res, next;
+  // user.socials(res)(req, res, next);
 };
 
 // 네이버 로그인
 exports.naverCallback = (req, res, next) => {
-  const user = new User('naver');
+  // const user = new User('naver');
+  passport.authenticate(this.social, (err, user) => {
+    if (err) return next(err);
+    const { nickname, userId, profileImage, blogId, email } = user;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-  user.socials(res)(req, res, next);
+    res.status(200).json({
+      result: true,
+      token,
+      nickname,
+      userId,
+      profileImage,
+      blogId,
+      email,
+    });
+  })(req, res, next);
+  // user.socials(res)(req, res, next);
 };
 
 // 구글 로그인
 exports.googleCallback = (req, res, next) => {
-  const user = new User('google');
+  // const user = new User('google');
+  passport.authenticate(this.social, (err, user) => {
+    if (err) return next(err);
+    const { nickname, userId, profileImage, blogId, email } = user;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
-  user.socials(res)(req, res, next);
+    res.status(200).json({
+      result: true,
+      token,
+      nickname,
+      userId,
+      profileImage,
+      blogId,
+      email,
+    });
+  })(req, res, next);
+  // user.socials(res)(req, res, next);
 };
 
 //회원가입
