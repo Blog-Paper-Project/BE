@@ -7,6 +7,7 @@ require('dotenv').config();
 let token;
 
 beforeAll(async () => {
+  jest.setTimeout(20000);
   await sequelize.sync({ force: true }); // 가짜 ORM 생성
 });
 
