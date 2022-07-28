@@ -9,7 +9,7 @@ require('dotenv').config();
 // 카카오 로그인
 exports.kakaoCallback = (req, res, next) => {
   // const user = new User('kakao');
-  passport.authenticate(this.social, (err, user) => {
+  passport.authenticate('kakao', (err, user) => {
     if (err) return next(err);
     const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
@@ -31,7 +31,7 @@ exports.kakaoCallback = (req, res, next) => {
 // 네이버 로그인
 exports.naverCallback = (req, res, next) => {
   // const user = new User('naver');
-  passport.authenticate(this.social, (err, user) => {
+  passport.authenticate('naver', (err, user) => {
     if (err) return next(err);
     const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
@@ -52,7 +52,7 @@ exports.naverCallback = (req, res, next) => {
 // 구글 로그인
 exports.googleCallback = (req, res, next) => {
   // const user = new User('google');
-  passport.authenticate(this.social, (err, user) => {
+  passport.authenticate('google', (err, user) => {
     if (err) return next(err);
     const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
