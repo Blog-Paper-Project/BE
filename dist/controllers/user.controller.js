@@ -13,7 +13,7 @@ exports.kakaoCallback = (req, res, next) => {
     if (err) return next(err);
 
     const { nickname, userId, profileImage, blogId, email } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+    const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY);
 
     res.status(200).json({
       result: true,
@@ -34,7 +34,7 @@ exports.naverCallback = (req, res, next) => {
   passport.authenticate('naver', (err, user) => {
     if (err) return next(err);
     const { nickname, userId, profileImage, blogId, email } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+    const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY);
 
     res.status(200).json({
       result: true,
@@ -55,7 +55,7 @@ exports.googleCallback = (req, res, next) => {
   passport.authenticate('google', (err, user) => {
     if (err) return next(err);
     const { nickname, userId, profileImage, blogId, email } = user;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY);
+    const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY);
 
     res.status(200).json({
       result: true,
