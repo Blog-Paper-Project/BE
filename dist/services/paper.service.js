@@ -76,11 +76,12 @@ exports.findBestPosts = findBestPosts;
 // 전체 게시글 검색
 const findAllPosts = async () => {
     const papers = await Paper.findAll({
-        attributes: ['postId', 'title', 'contents', 'thumbnail', 'viewCount'],
+        attributes: ['postId', 'title', 'contents', 'thumbnail', 'viewCount', 'createdAt'],
         include: [
-            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
             { model: User, as: 'Likes', attributes: ['blogId'] },
         ],
+        order: [['createdAt', 'DESC']],
     });
     return papers;
 };
