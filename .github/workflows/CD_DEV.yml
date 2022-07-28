@@ -11,16 +11,15 @@ jobs:
       - name: Use Node.js 16.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: [16.x]
+          redis-version: [6.x]
           cache: 'npm'
       - name: create env file
-          working-directory: ../BE
           run: |
           touch .env
           cat << EOF >> .env
           ${{ secrets.PAPER_SECRET }}
       - name: npm install
-        working-directory: ../BE
         run: |
           npm install 
       - run: npm ci
