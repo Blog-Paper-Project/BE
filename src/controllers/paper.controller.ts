@@ -47,7 +47,7 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
     return next(createError(404, 'Not Found!'));
   }
 
-  const [user, categories, tags] = await PaperService.findUserInfo(blogId);
+  const { user, categories, tags } = await PaperService.findUserInfo(blogId);
 
   if (!user) {
     return next(createError(404, 'Not Found!'));

@@ -38,7 +38,7 @@ const upload = multer({
         },
         // @ts-ignore
         transform: (req, file, cb) => {
-          cb(null, sharp().resize({ width: 300 }));
+          cb(null, sharp().resize({ width: 400 }));
         },
       },
     ],

@@ -28,14 +28,7 @@ export const findBestUsers = async () => {
   const users = await User.findAll({
     order: [['popularity', 'DESC']],
     limit: 12,
-    attributes: [
-      'userId',
-      'blogId',
-      'nickname',
-      'introduction',
-      'profileImage',
-      'popularity',
-    ],
+    attributes: ['userId', 'blogId', 'nickname', 'introduction', 'profileImage'],
   });
 
   const bottom = [...users.splice(3, 3), ...users.splice(6, 3)];
@@ -50,7 +43,7 @@ export const findCachePosts = async () => {
   return JSON.parse(papers);
 };
 
-// 1주일간 좋아요 순으로 게시글 11개 검색 후 레디스에 저장
+// 1주일간 좋아요 순으로 게시글 12개 검색 후 레디스에 저장
 export const findBestPosts = async () => {
   const papers: DTO.PaperLike[] = await Paper.findAll({
     include: [
@@ -67,7 +60,7 @@ export const findBestPosts = async () => {
       return { postId, blogId, nickname, title, contents, thumbnail, likes };
     })
     .sort((a, b) => b.likes - a.likes)
-    .slice(0, 11)
+    .slice(0, 12)
     .map((paper) => {
       paper.contents = paper.contents.replace(
         /!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g,
@@ -101,14 +94,8 @@ export const findUserInfo = async (blogId: string) => {
     where: { blogId },
     attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
     include: [
-      {
-        model: Paper,
-        include: { model: Tag, attributes: ['name'] },
-      },
-      {
-        model: User,
-        as: 'Followers',
-      },
+      { model: Paper, include: { model: Tag, attributes: ['name'] } },
+      { model: User, as: 'Followers' },
     ],
     order: [[Paper, 'createdAt', 'DESC']],
   });
@@ -119,7 +106,7 @@ export const findUserInfo = async (blogId: string) => {
   categories = [...new Set(categories)];
   tags = [...new Set(tags)];
 
-  return [user, categories, tags];
+  return { user, categories, tags };
 };
 
 // 카테고리 검색

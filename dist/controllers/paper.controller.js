@@ -33,7 +33,7 @@ const readBlog = async (req, res, next) => {
     if (!blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    const [user, categories, tags] = await PaperService.findUserInfo(blogId);
+    const { user, categories, tags } = await PaperService.findUserInfo(blogId);
     if (!user) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
