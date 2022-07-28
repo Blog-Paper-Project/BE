@@ -32,11 +32,14 @@ exports.social_signup = async (blogId, nickname, email) => {
 
   // 블로그 Id중복 체크 || 닉네임 중복 체크 || 로컬 회원 가입된 경우
 
-  duplicate[0]?.dataValues.nickname === nickname &&
-  duplicate[0]?.dataValues.blogId === blogId &&
-  duplicate[0]?.dataValues.provider === 'local'
-    ? false
-    : await User.update({ blogId, nickname }, { where: { email } });
+  if (
+    duplicate[0]?.dataValues.nickname === nickname &&
+    duplicate[0]?.dataValues.blogId === blogId &&
+    duplicate[0]?.dataValues.provider === 'local'
+  )
+    return false;
+
+  await User.update({ blogId, nickname }, { where: { email } });
 };
 
 // 회원탈퇴
