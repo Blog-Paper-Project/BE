@@ -27,7 +27,6 @@ class User {
   }
 
   async emailAuth(params) {
-    console.log(params);
     // 인증메일 (번호)
     const emailAuth = Math.floor(Math.random() * 10000);
 
@@ -53,10 +52,8 @@ class User {
   }
 
   async emailAuth_check(params, emailAuth) {
-    console.log(params);
     const text = await userService.check_emaliauth(params, emailAuth);
 
-    console.log(text);
     if (emailAuth === text) {
       await userService.delet_check_emaliauth(params);
       return true;
@@ -65,7 +62,7 @@ class User {
   }
 
   async password_change(params, password) {
-    await userService.login_change_password(params, password);
+    await userService.change_password(params, password);
   }
 }
 module.exports = User;

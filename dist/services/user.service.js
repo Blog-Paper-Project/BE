@@ -50,7 +50,10 @@ exports.user_restore = async (email) => {
     attributes: ['email', 'password'],
     where: { email },
   });
-  user === null ? false : await User.update({ deletedAt: null }, { where: { email } });
+  if (user === null) {
+    return false;
+  }
+  await User.update({ deletedAt: null }, { where: { email } });
   return user;
 };
 
@@ -101,16 +104,20 @@ exports.duplicate = async (id) => {
     attributes: ['blogId', 'nickname'],
   });
 
-  emailcheck[0]?.dataValues.blogId === null && emailcheck[0]?.dataValues.nickname === null
-    ? await User.destroy({ where: { email: id } })
-    : await User.findAll({
-        where: {
-          [Op.or]: {
-            email: id,
-            nickname: id,
-          },
-        },
-      });
+  if (
+    emailcheck[0]?.dataValues.blogId === null &&
+    emailcheck[0]?.dataValues.nickname === null
+  ) {
+    await User.destroy({ where: { email: id } });
+  }
+  return await User.findAll({
+    where: {
+      [Op.or]: {
+        email: id,
+        nickname: id,
+      },
+    },
+  });
 };
 
 // 마이 프로필 조회

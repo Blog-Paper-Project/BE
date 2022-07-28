@@ -4,7 +4,7 @@ on:
     branches:
       - dev
 jobs:
-  CI:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,7 +22,7 @@ jobs:
       - run: npm test /dist/specs/user.spec.js
 
   build-image:
-    needs: CI
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
