@@ -19,7 +19,6 @@ exports.patchPoint = patchPoint;
 
 //예약 신청
 const createBooking = async (req, res, next) => {
-  const guestId = res.locals.user.blogId;
   const userId = res.locals.user.userId;
   const { blogId, start, end } = req.body;
   const hostId = req.params.blogId;
@@ -30,7 +29,7 @@ const createBooking = async (req, res, next) => {
   const now = dayjs().tz().format('YYYY-MM-DD HH:mm:ss');
 
   //  예약 신청 횟수 제한
-  const bookingList = await bookingService.findList(guestId);
+  const bookingList = await bookingService.findList(blogId);
   if (bookingList.length > 11) {
     return res
       .status(400)
@@ -146,3 +145,16 @@ const cancelBooking = async (req, res, next) => {
   res.status(200).json({ result: true });
 };
 exports.cancelBooking = cancelBooking;
+
+//블로그 예약내역
+const blogReservation = async (req, res, next) => {
+  try {
+    const { blogId } = req.params;
+    const bookingList = await bookingService.hostBooking(blogId);
+    return res.status(200).json({ bookingList });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+exports.blogReservation = blogReservation;

@@ -138,7 +138,6 @@ exports.findHost = findHost;
 
 // 화상채팅 수락 후 예약 취소
 const cancelBooking = async (bookingId, guestId, hostId, leaf) => {
-  console.log(bookingId, guestId, hostId, leaf);
   User.increment({ point: leaf }, { where: { blogId: guestId } });
   User.decrement({ popularity: leaf }, { where: { blogId: hostId } });
   await Leaf.create({
@@ -171,3 +170,5 @@ const recall = async (bookingId, guestId, hostId, leaf) => {
   return await Booking.findByPk(bookingId);
 };
 exports.recall = recall;
+
+
