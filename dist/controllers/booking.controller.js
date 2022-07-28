@@ -62,7 +62,6 @@ const createBooking = async (req, res, next) => {
   }
 
   //이전시간 예약 차단
-  console.log(startTime, now);
   if (startTime < now) {
     return res
       .status(400)
