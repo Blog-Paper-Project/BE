@@ -326,7 +326,7 @@ describe('로그아웃', () => {
   });
 });
 
-// afterAll(async () => {
-//   // 테이블을 다시 만듬 -> 기존 유저를 초기화
-//   await sequelize.sync({ force: true });
-// });
+afterAll(async () => {
+  // 테이블을 다시 만듬 -> 기존 유저를 초기화
+  await sequelize.sync({ force: true });
+});
