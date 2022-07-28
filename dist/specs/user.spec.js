@@ -4,10 +4,11 @@ const app = require('../../app');
 
 require('dotenv').config();
 
+jest.setTimeout(50000);
+
 let token;
 
 beforeAll(async () => {
-  jest.setTimeout(20000);
   await sequelize.sync({ force: true }); // 가짜 ORM 생성
 });
 
