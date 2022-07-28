@@ -26,7 +26,6 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test /dist/specs/user.spec.js
-
   build-image:
     needs: build
     runs-on: ubuntu-latest
