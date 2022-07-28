@@ -33,15 +33,13 @@ exports.signup = async (req, res, next) => {
   );
 
   const duplicate = await userService.signup(email, nickname, password, blogId);
-  if (duplicate === false) {
-    return res.status(400).send({
-      result: false,
-    });
-  } else {
-    res.status(200).send({
-      result: true,
-    });
-  }
+  duplicate === false
+    ? res.status(400).send({
+        result: false,
+      })
+    : res.status(200).send({
+        result: true,
+      });
 };
 
 // 소셜 회원가입
@@ -50,14 +48,13 @@ exports.social_signup = async (req, res, next) => {
 
   const social_duplicate = await userService.social_signup(blogId, nickname, email);
 
-  if (social_duplicate === false) {
-    return res.status(400).send({
-      result: false,
-    });
-  }
-  res.status(200).send({
-    result: true,
-  });
+  social_duplicate === false
+    ? res.status(400).send({
+        result: false,
+      })
+    : res.status(200).send({
+        result: true,
+      });
 };
 
 // 회원탈퇴
@@ -77,27 +74,24 @@ exports.user_restore = async (req, res, next) => {
 
   const user = await userService.user_restore(email);
 
-  if (user === false) {
+  if (user === false)
     return res.status(400).send({
       result: false,
       msg: '이메일 또는 패스워드가 잘못됫습니다.',
     });
-  }
 
   const passwordck = await Bcrypt.compare(password, user.password);
 
   // 이메일이 틀리거나 패스워드가 틀렸을때
-  if (!user || !passwordck) {
-    return res.status(400).send({
-      result: false,
-      msg: '이메일 또는 패스워드가 잘못됫습니다.',
-    });
-  }
-
-  res.status(200).send({
-    result: true,
-    msg: '회원복구 완료',
-  });
+  !user || !passwordck
+    ? res.status(400).send({
+        result: false,
+        msg: '이메일 또는 패스워드가 잘못됫습니다.',
+      })
+    : res.status(200).send({
+        result: true,
+        msg: '회원복구 완료',
+      });
 };
 
 // 로그인
@@ -106,20 +100,18 @@ exports.login = async (req, res, next) => {
 
   const user = await userService.login(email);
 
-  if (user === false) {
+  if (user === false)
     return res.status(400).send({
       result: false,
       logout: '다른 곳에서 로그인을 합니다.',
     });
-  }
 
   // 탈퇴한 회원
-  if (user !== null && user[0]?.deletedAt) {
+  if (user !== null && user[0]?.deletedAt)
     return res.status(400).send({
       result: false,
       msg: '탈퇴한 회원입니다',
     });
-  }
 
   if (user === null) {
     return res.status(400).send({
@@ -130,12 +122,11 @@ exports.login = async (req, res, next) => {
     const passwordck = await Bcrypt.compare(password, user[0].password);
 
     // 이메일이 틀리거나 패스워드가 틀렸을때
-    if (!user || !passwordck) {
+    if (!user || !passwordck)
       return res.status(400).send({
         result: false,
         msg: '이메일 또는 패스워드가 잘못됫습니다.',
       });
-    }
   }
 
   res.status(200).send({
@@ -164,14 +155,13 @@ exports.blogcheck = async (req, res, next) => {
 
   const blogidch = await userService.blogcheck(blogId);
 
-  if (blogidch) {
-    return res.status(400).send({
-      result: false,
-    });
-  }
-  res.status(200).send({
-    result: true,
-  });
+  blogidch
+    ? res.status(400).send({
+        result: false,
+      })
+    : res.status(200).send({
+        result: true,
+      });
 };
 
 // 이메일 || 닉네임 중복검사
@@ -179,15 +169,13 @@ exports.duplicate = async (req, res, next) => {
   const id = req.body.email || req.body.nickname;
   const idcheck = await userService.duplicate(id);
 
-  if (idcheck[0]?.email === id || idcheck[0]?.nickname === id) {
-    return res.status(400).send({
-      result: false,
-    });
-  }
-
-  res.status(200).send({
-    result: true,
-  });
+  idcheck[0]?.email === id || idcheck[0]?.nickname === id
+    ? res.status(400).send({
+        result: false,
+      })
+    : res.status(200).send({
+        result: true,
+      });
 };
 
 // 마이프로필 조회
@@ -227,13 +215,11 @@ exports.myprofile_correction = async (req, res, next) => {
     introduction
   );
 
-  if (profileimg === false) {
-    return res.status(400).send({
-      result: false,
-    });
-  }
-
-  res.status(200).send(profileimg);
+  profileimg === false
+    ? res.status(400).send({
+        result: false,
+      })
+    : res.status(200).send(profileimg);
 };
 
 // 이메일 인증
@@ -251,25 +237,23 @@ exports.emailauth = async (req, res, next) => {
 // 이메일 인증 체크
 exports.check_emaliauth = async (req, res, next) => {
   const { email, emailAuth } = req.body;
-  const text = await userService.check_emaliauth(email);
 
-  if (emailAuth === text) {
-    await userService.delet_check_emaliauth(email);
-    return res.status(200).send({
-      result: true,
-    });
-  }
+  const user = new User();
+  const emailauth_check = await user.emailAuth_check(email, emailAuth);
 
-  res.status(400).send({
-    result: false,
-  });
+  emailauth_check === true
+    ? res.status(200).send({ result: true })
+    : res.status(400).send({
+        result: false,
+      });
 };
 
 // 비밀번호 변경
 exports.change_password = async (req, res, next) => {
   const { email, password } = req.body;
 
-  await userService.change_password(email, password);
+  const users = new User();
+  users.password_change(email, password);
 
   res.status(200).send({
     result: true,
@@ -292,19 +276,15 @@ exports.login_emailauth = async (req, res, next) => {
 exports.login_check_emaliauth = async (req, res, next) => {
   const { user } = res.locals;
   const { emailAuth } = req.body;
-  const text = await userService.login_check_emaliauth(user);
 
-  if (emailAuth === text) {
-    await userService.login_delet_check_emaliauth(user);
-    res.status(200).send({
-      result: true,
-    });
-    return;
-  }
+  const users = new User();
+  const emailauth_check = await users.emailAuth_check(user.email, emailAuth);
 
-  res.status(400).send({
-    result: false,
-  });
+  emailauth_check === true
+    ? res.status(200).send({ result: true })
+    : res.status(400).send({
+        result: false,
+      });
 };
 
 // 비밀번호 변경(로그인 시)
@@ -312,7 +292,8 @@ exports.login_change_password = async (req, res, next) => {
   const { user } = res.locals;
   const { password } = req.body;
 
-  await userService.login_change_password(user, password);
+  const users = new User();
+  users.password_change(user.email, password);
 
   res.status(200).send({
     result: true,

@@ -27,6 +27,7 @@ class User {
   }
 
   async emailAuth(params) {
+    console.log(params);
     // 인증메일 (번호)
     const emailAuth = Math.floor(Math.random() * 10000);
 
@@ -49,6 +50,22 @@ class User {
       subject: '[Paper] 인증번호가 도착했습니다.',
       text: `${emailAuth}`,
     });
+  }
+
+  async emailAuth_check(params, emailAuth) {
+    console.log(params);
+    const text = await userService.check_emaliauth(params, emailAuth);
+
+    console.log(text);
+    if (emailAuth === text) {
+      await userService.delet_check_emaliauth(params);
+      return true;
+    }
+    return false;
+  }
+
+  async password_change(params, password) {
+    await userService.login_change_password(params, password);
   }
 }
 module.exports = User;
