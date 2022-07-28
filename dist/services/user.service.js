@@ -140,7 +140,9 @@ exports.myprofile_correction = async (user, profileImage, nickname, introduction
     });
 
     // 닉네임 중복 체크
-    if (duplicate[0]?.dataValues.nickname === nickname) return false;
+    if (duplicate[0]?.dataValues.nickname === nickname) {
+      return false;
+    }
   }
 
   await deleteImg(user.profileImage);
