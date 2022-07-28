@@ -23,6 +23,26 @@ export const findPostsBy = async (keyword: string) => {
   })) as Models.Paper;
 };
 
+// 인기도 순으로 유저 12명 검색
+export const findBestUsers = async () => {
+  const users = await User.findAll({
+    order: [['popularity', 'DESC']],
+    limit: 12,
+    attributes: [
+      'userId',
+      'blogId',
+      'nickname',
+      'introduction',
+      'profileImage',
+      'popularity',
+    ],
+  });
+
+  const bottom = [...users.splice(3, 3), ...users.splice(6, 3)];
+
+  return [...users, ...bottom];
+};
+
 // 레디스에 저장된 메인 페이지 데이터 검색
 export const findCachePosts = async () => {
   const papers = await redisCli.v4.get('main');
@@ -74,26 +94,6 @@ export const findAllPosts = async () => {
   return papers;
 };
 
-// 인기도 순으로 유저 12명 검색
-export const findBestUsers = async () => {
-  const users = await User.findAll({
-    order: [['popularity', 'DESC']],
-    limit: 12,
-    attributes: [
-      'userId',
-      'blogId',
-      'nickname',
-      'introduction',
-      'profileImage',
-      'popularity',
-    ],
-  });
-
-  const bottom = [...users.splice(3, 3), ...users.splice(6, 3)];
-
-  return [...users, ...bottom];
-};
-
 // 특정 유저와 게시글 검색
 export const findUserInfo = async (blogId: string) => {
   const user: DTO.UserInfo = await User.findOne({
@@ -121,9 +121,24 @@ export const findUserInfo = async (blogId: string) => {
   return [user, categories, tags];
 };
 
-// 특정 유저 검색
-export const findUser = async (blogId: string) => {
-  return await User.findOne({ where: { blogId } });
+// 카테고리 검색
+export const findCategories = async (userId: string) => {
+  const papers: Models.Paper[] = await Paper.findAll({
+    where: { userId },
+    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('category')), 'category']],
+  });
+  const categories = papers.map((paper) => paper.category);
+
+  return categories;
+};
+
+// 개인 페이지 카테고리 수정
+export const updateCategory = async (
+  userId: number,
+  category: string,
+  newCategory: string
+) => {
+  return await Paper.update({ category: newCategory }, { where: { userId, category } });
 };
 
 // 특정 유저와 모든 구독 검색
@@ -133,6 +148,11 @@ export const findMiniInfo = async (userId: number) => {
     attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
     include: { model: User, as: 'Followers', attributes: ['userId'] },
   });
+};
+
+// 특정 유저 검색
+export const findUser = async (blogId: string) => {
+  return await User.findOne({ where: { blogId } });
 };
 
 // 구독 중인 최신 게시글 검색
@@ -150,15 +170,6 @@ export const findNewPosts = async (userId: number) => {
     .sort((a, b) => calcMs(b.createdAt) - calcMs(a.createdAt));
 
   return posts;
-};
-
-// 개인 페이지 카테고리 수정
-export const updateCategory = async (
-  userId: number,
-  category: string,
-  newCategory: string
-) => {
-  return await Paper.update({ category: newCategory }, { where: { userId, category } });
 };
 
 // 특정 게시글 검색
@@ -184,17 +195,6 @@ export const findPostInfo = async (postId: string) => {
       { model: User, as: 'Likes', attributes: ['blogId'] },
     ],
   });
-};
-
-// 카테고리 검색
-export const findCategories = async (userId: string) => {
-  const papers: Models.Paper[] = await Paper.findAll({
-    where: { userId },
-    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('category')), 'category']],
-  });
-  const categories = papers.map((paper) => paper.category);
-
-  return categories;
 };
 
 // 조회수 증가 및 검색
