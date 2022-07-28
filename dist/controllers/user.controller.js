@@ -296,7 +296,14 @@ exports.check_emaliauth = async (req, res, next) => {
 
 // 비밀번호 변경
 exports.change_password = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.status(400).send({
+      result: false,
+      msg: '비밀번호가 틀립니다',
+    });
+  }
 
   const users = new User();
   users.password_change(email, password);
@@ -336,7 +343,14 @@ exports.login_check_emaliauth = async (req, res, next) => {
 // 비밀번호 변경(로그인 시)
 exports.login_change_password = async (req, res, next) => {
   const { user } = res.locals;
-  const { password } = req.body;
+  const { password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.status(400).send({
+      result: false,
+      msg: '비밀번호가 틀립니다',
+    });
+  }
 
   const users = new User();
   users.password_change(user.email, password);
