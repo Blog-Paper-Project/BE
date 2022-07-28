@@ -11,6 +11,7 @@ exports.kakaoCallback = (req, res, next) => {
   // const user = new User('kakao');
   passport.authenticate('kakao', (err, user) => {
     if (err) return next(err);
+
     const { nickname, userId, profileImage, blogId, email } = user;
     const token = jwt.sign({ userId }, process.env.SECRET_KEY);
 
@@ -23,8 +24,7 @@ exports.kakaoCallback = (req, res, next) => {
       blogId,
       email,
     });
-  });
-  req, res, next;
+  })(req, res, next);
   // user.socials(res)(req, res, next);
 };
 
