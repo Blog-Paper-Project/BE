@@ -171,11 +171,4 @@ const recall = async (bookingId, guestId, hostId, leaf) => {
 };
 exports.recall = recall;
 
-//개인 예약 조회
-const booking = async (blogId) => {
-  return await Booking.findAll({
-    where: { hostId: blogId },
-    order: [['createdAt', 'DESC']],
-  });
-};
-exports.booking = booking;
+
