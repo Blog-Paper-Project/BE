@@ -3,7 +3,7 @@ const dayjs = require('dayjs');
 
 const User = require('../../models/user');
 
-const task = cron.schedule(
+exports.task = cron.schedule(
   '0 0 * * *', // 수정
   async () => {
     try {
@@ -34,5 +34,3 @@ const task = cron.schedule(
     scheduled: false,
   }
 );
-
-task.start();
