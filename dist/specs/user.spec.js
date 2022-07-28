@@ -5,7 +5,7 @@ const app = require('../../app');
 require('dotenv').config();
 
 beforeAll(async () => {
-  await sequelize.sync(); // 가짜 ORM 생성
+  await sequelize.sync({ force: true }); // 가짜 ORM 생성
 });
 
 let token;
@@ -323,9 +323,4 @@ describe('로그아웃', () => {
         done();
       });
   });
-});
-
-afterAll(async () => {
-  // 테이블을 다시 만듬 -> 기존 유저를 초기화
-  await sequelize.sync({ force: true });
 });
