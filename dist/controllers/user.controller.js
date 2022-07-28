@@ -1,7 +1,11 @@
 const Bcrypt = require('bcrypt');
 const userService = require('../services/user.service');
 const User = require('../modules/user.class');
-const { signup_schma, login_schma } = require('../middlewares/user.validator');
+const {
+  signup_schma,
+  login_schma,
+  userprofile,
+} = require('../middlewares/user.validator');
 
 require('dotenv').config();
 
