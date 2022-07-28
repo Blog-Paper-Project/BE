@@ -4,8 +4,7 @@ class Socket {
   constructor(server) {
     this.io = new Server(server, {
       cors: {
-        origin: 'https://first-sw.shop',
-        methods: ['GET', 'POST'],
+        origin: '*',
       },
     });
     this.io.on('connection', (socket) => {
