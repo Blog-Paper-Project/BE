@@ -14,13 +14,13 @@ jobs:
           node-version: 16.x
           cache: 'npm'
       - name: create env file
-          working-directory: Blog-Paper-Project/BE
+          working-directory: ../Blog-Paper-Project/BE
           run: |
           touch .env
           cat << EOF >> .env
           ${{ secrets.PAPER_SECRET }}
       - name: npm install
-        working-directory: Blog-Paper-Project/BE
+        working-directory: ../Blog-Paper-Project/BE
         run: |
           npm install 
       - run: npm ci
