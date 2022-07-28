@@ -1,13 +1,13 @@
 const Http = require('http');
 const app = require('./app');
 const db = require('./models');
-const { initSocket } = require('./dist/modules/socket');
+const webSocket = require('./dist/modules/socket');
 
 const port = process.env.PORT;
 
 const http = Http.createServer(app);
 
-initSocket(http);
+webSocket(http);
 
 db.sequelize
   .sync({ force: false, logging: false })
