@@ -12,7 +12,7 @@ module.exports = () => {
       },
       // 카카오에서는 인증 수 callbakcURL 에 적힌 주소로 accessToken, refreshToken, profile 보냄
       async (accessToken, refreshToken, profile, done) => {
-        // console.log('kakao profile: ', profile);
+        console.log('kakao profile: ', profile);
         try {
           const existUser = await User.findOne({
             where: { email: profile._json.kakao_account.email },
