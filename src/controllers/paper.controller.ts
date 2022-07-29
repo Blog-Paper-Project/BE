@@ -374,10 +374,6 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
     return next(createError(404, 'Not Found!'));
   }
 
-  if (userId === paper.userId) {
-    return next(createError(400, 'Self-Like Forbidden'));
-  }
-
   const liked = await paper.getLikes({ where: { userId } });
 
   if (liked.length) {
