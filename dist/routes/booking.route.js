@@ -33,4 +33,7 @@ router.delete(
 //나뭇잎 보기
 router.get('/leaf/:hostId', auth, asyncHandler(bookingController.leafList));
 
+//블로그 예약 내역
+router.get('/blog/:blogId', auth, bookingController.blogReservation);
+
 module.exports = router;

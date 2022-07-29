@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.destroyComment = exports.updateComment = exports.createComment = exports.destroyPost = exports.updateTags = exports.updatePost = exports.createImage = exports.updatePoint = exports.updateImage = exports.createTags = exports.createPost = exports.addCount = exports.findPostInfo = exports.findPost = exports.findNewPosts = exports.findUser = exports.findMiniInfo = exports.updateCategory = exports.findCategories = exports.findUserInfo = exports.findAllPosts = exports.findBestPosts = exports.findCachePosts = exports.findBestUsers = exports.findPostsBy = void 0;
-/* eslint-disable */
 const sequelize_1 = require("sequelize");
 const multer_1 = require("../modules/multer");
 const date_1 = require("../modules/date");
+const contents_preview_1 = require("../modules/contents_preview");
 const { Paper, User, Comment, Image, Tag } = require('../../models');
 const { redisCli } = require('../../app');
 // 키워드로 게시글 검색
 const findPostsBy = async (keyword) => {
-    return (await Paper.findAll({
+    const papers = (await Paper.findAll({
         where: {
             [sequelize_1.Op.or]: [
                 { title: { [sequelize_1.Op.like]: `%${keyword}%` } },
@@ -18,10 +18,11 @@ const findPostsBy = async (keyword) => {
         },
         order: [['createdAt', 'DESC']],
         include: [
-            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
             { model: User, as: 'Likes', attributes: ['blogId'] },
         ],
-    }));
+    })).map(contents_preview_1.default);
+    return papers;
 };
 exports.findPostsBy = findPostsBy;
 // 인기도 순으로 유저 12명 검색
@@ -29,14 +30,7 @@ const findBestUsers = async () => {
     const users = await User.findAll({
         order: [['popularity', 'DESC']],
         limit: 12,
-        attributes: [
-            'userId',
-            'blogId',
-            'nickname',
-            'introduction',
-            'profileImage',
-            'popularity',
-        ],
+        attributes: ['userId', 'blogId', 'nickname', 'introduction', 'profileImage'],
     });
     const bottom = [...users.splice(3, 3), ...users.splice(6, 3)];
     return [...users, ...bottom];
@@ -48,40 +42,48 @@ const findCachePosts = async () => {
     return JSON.parse(papers);
 };
 exports.findCachePosts = findCachePosts;
-// 1주일간 좋아요 순으로 게시글 11개 검색 후 레디스에 저장
+// 1주일간 좋아요 순으로 게시글 12개 검색 후 레디스에 저장
 const findBestPosts = async () => {
     const papers = await Paper.findAll({
         include: [
-            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
             { model: User, as: 'Likes' },
         ],
     });
     const papersByLike = papers
         .map((paper) => {
-        const { postId, title, contents, thumbnail, Likes, Users } = paper;
+        const { postId, title, contents, thumbnail, createdAt, Likes, Users } = paper;
         const likes = Likes.filter((like) => like.createdAt > (0, date_1.calcDays)(7)).length;
-        const { blogId, nickname } = Users;
-        return { postId, blogId, nickname, title, contents, thumbnail, likes };
+        const { blogId, nickname, profileImage } = Users;
+        return {
+            postId,
+            blogId,
+            nickname,
+            profileImage,
+            title,
+            contents,
+            thumbnail,
+            likes,
+            createdAt,
+        };
     })
         .sort((a, b) => b.likes - a.likes)
-        .slice(0, 11)
-        .map((paper) => {
-        paper.contents = paper.contents.replace(/!\[(.){0,50}\]\(https:\/\/hanghae-mini-project.s3.ap-northeast-2.amazonaws.com\/[0-9]{13}.[a-z]{3,4}\)/g, '');
-        return paper;
-    });
+        .slice(0, 12)
+        .map(contents_preview_1.default);
     await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 600);
     return papersByLike;
 };
 exports.findBestPosts = findBestPosts;
 // 전체 게시글 검색
 const findAllPosts = async () => {
-    const papers = await Paper.findAll({
-        attributes: ['postId', 'title', 'contents', 'thumbnail', 'viewCount'],
+    const papers = (await Paper.findAll({
+        attributes: ['postId', 'title', 'contents', 'thumbnail', 'viewCount', 'createdAt'],
         include: [
-            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
             { model: User, as: 'Likes', attributes: ['blogId'] },
         ],
-    });
+        order: [['createdAt', 'DESC']],
+    })).map(contents_preview_1.default);
     return papers;
 };
 exports.findAllPosts = findAllPosts;
@@ -91,14 +93,8 @@ const findUserInfo = async (blogId) => {
         where: { blogId },
         attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
         include: [
-            {
-                model: Paper,
-                include: { model: Tag, attributes: ['name'] },
-            },
-            {
-                model: User,
-                as: 'Followers',
-            },
+            { model: Paper, include: { model: Tag, attributes: ['name'] } },
+            { model: User, as: 'Followers', attributes: ['nickname'] },
         ],
         order: [[Paper, 'createdAt', 'DESC']],
     });
@@ -106,7 +102,7 @@ const findUserInfo = async (blogId) => {
     let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
     categories = [...new Set(categories)];
     tags = [...new Set(tags)];
-    return [user, categories, tags];
+    return { user, categories, tags };
 };
 exports.findUserInfo = findUserInfo;
 // 카테고리 검색
@@ -121,33 +117,36 @@ const findCategories = async (userId) => {
 exports.findCategories = findCategories;
 // 개인 페이지 카테고리 수정
 const updateCategory = async (userId, category, newCategory) => {
-    return await Paper.update({ category: newCategory }, { where: { userId, category } });
+    const paper = await Paper.update({ category: newCategory }, { where: { userId, category } });
+    return paper;
 };
 exports.updateCategory = updateCategory;
 // 특정 유저와 모든 구독 검색
 const findMiniInfo = async (userId) => {
-    return await User.findOne({
+    const user = await User.findOne({
         where: { userId },
         attributes: ['userId', 'nickname', 'profileImage', 'introduction', 'popularity'],
         include: { model: User, as: 'Followers', attributes: ['userId'] },
     });
+    return user;
 };
 exports.findMiniInfo = findMiniInfo;
 // 특정 유저 검색
 const findUser = async (blogId) => {
-    return await User.findOne({ where: { blogId } });
+    const user = await User.findOne({ where: { blogId } });
+    return user;
 };
 exports.findUser = findUser;
 // 구독 중인 최신 게시글 검색
 const findNewPosts = async (userId) => {
-    const user = (await User.findOne({
+    const user = await User.findOne({
         where: { userId },
         include: {
             model: User,
             as: 'Followees',
             include: { model: Paper, attributes: ['postId', 'title', 'createdAt', 'userId'] },
         },
-    }));
+    });
     const posts = user.Followees.flatMap((followee) => followee.Papers)
         .filter((paper) => paper.createdAt > (0, date_1.calcDays)(3))
         .sort((a, b) => (0, date_1.calcMs)(b.createdAt) - (0, date_1.calcMs)(a.createdAt));
@@ -156,12 +155,13 @@ const findNewPosts = async (userId) => {
 exports.findNewPosts = findNewPosts;
 // 특정 게시글 검색
 const findPost = async (postId) => {
-    return await Paper.findOne({ where: { postId } });
+    const paper = await Paper.findOne({ where: { postId } });
+    return paper;
 };
 exports.findPost = findPost;
 // 특정 게시글과 유저, 댓글, 좋아요 검색
 const findPostInfo = async (postId) => {
-    return await Paper.findOne({
+    const paper = await Paper.findOne({
         where: { postId },
         include: [
             {
@@ -177,17 +177,20 @@ const findPostInfo = async (postId) => {
             { model: User, as: 'Likes', attributes: ['blogId'] },
         ],
     });
+    return paper;
 };
 exports.findPostInfo = findPostInfo;
 // 조회수 증가 및 검색
 const addCount = async (postId, userId) => {
     await redisCli.sadd(postId, userId);
-    return await redisCli.v4.sCard(postId);
+    const count = await redisCli.v4.sCard(postId);
+    return count;
 };
 exports.addCount = addCount;
 // 게시글 작성
 const createPost = async (title, contents, thumbnail, userId, category) => {
-    return await Paper.create({ title, contents, thumbnail, category, userId });
+    const paper = await Paper.create({ title, contents, thumbnail, category, userId });
+    return paper;
 };
 exports.createPost = createPost;
 // 태그 추가
@@ -201,7 +204,7 @@ const createTags = async (postId, tags) => {
     await Tag.bulkCreate(items);
 };
 exports.createTags = createTags;
-// 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
+// 미사용 이미지 삭제 & 추가 이미지 게시글 번호 등록
 const updateImage = async (postId, images) => {
     const originalImages = await Image.findAll({
         where: { postId },
@@ -214,7 +217,8 @@ const updateImage = async (postId, images) => {
             await Image.destroy({ where: { imageId: image.imageId } });
         }));
     }
-    return await Image.update({ postId: postId }, { where: { url: { [sequelize_1.Op.in]: images } } }, { updateOnDuplicate: true });
+    const image = await Image.update({ postId }, { where: { url: { [sequelize_1.Op.in]: images } } }, { updateOnDuplicate: true });
+    return image;
 };
 exports.updateImage = updateImage;
 // 글 작성 포인트 지급
@@ -229,23 +233,29 @@ const createImage = async (url) => {
 exports.createImage = createImage;
 // 게시글 수정
 const updatePost = async (title, contents, thumbnail, userId, postId, category) => {
-    return await Paper.update({ title, contents, thumbnail, category }, { where: { userId, postId } });
+    const paper = await Paper.update({ title, contents, thumbnail, category }, { where: { userId, postId } });
+    return paper;
 };
 exports.updatePost = updatePost;
 // 태그 수정
 const updateTags = async (postId, tags) => {
     await Tag.destroy({ where: { postId } });
-    return await (0, exports.createTags)(postId, tags);
+    const updatedTags = await (0, exports.createTags)(postId, tags);
+    return updatedTags;
 };
 exports.updateTags = updateTags;
 // 게시글과 이미지 삭제
 const destroyPost = async (userId, postId) => {
     const images = await Image.findAll({ where: { postId } }, { raw: true });
     const paper = await Paper.findOne({ where: { userId, postId } });
-    await Promise.all(images.map(async (image) => await (0, multer_1.deleteImg)(image.url)));
+    await Promise.all(images.map(async (image) => (0, multer_1.deleteImg)(image.url)));
     await (0, multer_1.deleteImg)(paper?.thumbnail);
     await redisCli.del(postId);
-    return paper ? await paper.destroy() : paper;
+    if (paper) {
+        const deleted = await paper.destroy();
+        return deleted;
+    }
+    return paper;
 };
 exports.destroyPost = destroyPost;
 // 댓글 작성
@@ -259,11 +269,13 @@ const createComment = async (text, userId, postId) => {
 exports.createComment = createComment;
 // 댓글 수정
 const updateComment = async (text, commentId, userId, postId) => {
-    return await Comment.update({ text }, { where: { commentId, userId, postId } });
+    const comment = await Comment.update({ text }, { where: { commentId, userId, postId } });
+    return comment;
 };
 exports.updateComment = updateComment;
 // 댓글 삭제
 const destroyComment = async (commentId, userId, postId) => {
-    return await Comment.destroy({ where: { userId, commentId, postId } });
+    const deleted = await Comment.destroy({ where: { userId, commentId, postId } });
+    return deleted;
 };
 exports.destroyComment = destroyComment;

@@ -5,7 +5,7 @@ import {
   validatePaper,
   validateComment,
   validateCategory,
-} from '../modules/validate_paper';
+} from '../modules/paper_validater';
 
 const { Paper } = require('../../models');
 
@@ -47,7 +47,7 @@ export const readBlog = async (req: Request, res: Response, next: NextFunction) 
     return next(createError(404, 'Not Found!'));
   }
 
-  const [user, categories, tags] = await PaperService.findUserInfo(blogId);
+  const { user, categories, tags } = await PaperService.findUserInfo(blogId);
 
   if (!user) {
     return next(createError(404, 'Not Found!'));
@@ -372,10 +372,6 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
 
   if (!paper) {
     return next(createError(404, 'Not Found!'));
-  }
-
-  if (userId === paper.userId) {
-    return next(createError(400, 'Self-Like Forbidden'));
   }
 
   const liked = await paper.getLikes({ where: { userId } });

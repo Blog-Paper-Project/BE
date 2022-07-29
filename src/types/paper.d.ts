@@ -4,6 +4,16 @@ declare namespace DTO {
     Users: Models.User;
   }
 
+  interface PaperByLike {
+    postId: number;
+    blogId: string;
+    nickname: string;
+    title: string;
+    contents: string;
+    thumbnail: string;
+    likes: number;
+  }
+
   interface PaperTag extends Models.Paper {
     Tags: Models.Tag[];
   }
