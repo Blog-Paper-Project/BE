@@ -170,5 +170,3 @@ const recall = async (bookingId, guestId, hostId, leaf) => {
   return await Booking.findByPk(bookingId);
 };
 exports.recall = recall;
-
-
