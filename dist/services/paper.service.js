@@ -94,7 +94,7 @@ const findUserInfo = async (blogId) => {
         attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
         include: [
             { model: Paper, include: { model: Tag, attributes: ['name'] } },
-            { model: User, as: 'Followers', attributes: ['nickname'] },
+            { model: User, as: 'Followers', attributes: ['blogId'] },
         ],
         order: [[Paper, 'createdAt', 'DESC']],
     });
