@@ -262,7 +262,11 @@ describe('비로그인시 이메일 인증', () => {
   it('비밀 번호 재설정', (done) => {
     request(app)
       .patch('/user/change-password')
-      .send({ email: 'mna800@naver.com', password: '1234567890' })
+      .send({
+        email: 'mna800@naver.com',
+        password: '1234567890',
+        confirmPassword: '1234567890',
+      })
       .then((res) => {
         expect(res.status).toBe(200);
         done();
@@ -307,7 +311,7 @@ describe('로그인시 이메일 인증', () => {
     request(app)
       .patch('/user/login/change-password')
       .set('Authorization', token)
-      .send({ password: '1234567890' })
+      .send({ password: '1234567890', confirmPassword: '1234567890' })
       .then((res) => {
         expect(res.status).toBe(200);
         done();
