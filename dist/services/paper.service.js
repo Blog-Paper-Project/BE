@@ -18,7 +18,7 @@ const findPostsBy = async (keyword) => {
         },
         order: [['createdAt', 'DESC']],
         include: [
-            { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+            { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
             { model: User, as: 'Likes', attributes: ['blogId'] },
         ],
     })).map(contents_preview_1.default);
