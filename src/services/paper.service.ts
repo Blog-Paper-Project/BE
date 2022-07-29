@@ -51,17 +51,27 @@ export const findCachePosts = async () => {
 export const findBestPosts = async () => {
   const papers: DTO.PaperLike[] = await Paper.findAll({
     include: [
-      { model: User, as: 'Users', attributes: ['blogId', 'nickname'] },
+      { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
       { model: User, as: 'Likes' },
     ],
   });
   const papersByLike = papers
     .map((paper) => {
-      const { postId, title, contents, thumbnail, Likes, Users } = paper;
+      const { postId, title, contents, thumbnail, createdAt, Likes, Users } = paper;
       const likes = Likes.filter((like) => like.createdAt > calcDays(7)).length;
-      const { blogId, nickname } = Users;
+      const { blogId, nickname, profileImage } = Users;
 
-      return { postId, blogId, nickname, title, contents, thumbnail, likes };
+      return {
+        postId,
+        blogId,
+        nickname,
+        profileImage,
+        title,
+        contents,
+        thumbnail,
+        likes,
+        createdAt,
+      };
     })
     .sort((a, b) => b.likes - a.likes)
     .slice(0, 12)

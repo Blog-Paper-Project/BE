@@ -381,12 +381,12 @@ describe('댓글 테스트', () => {
 });
 
 describe('좋아요 & 구독 테스트', () => {
-  it('좋아요 실패 - 자추 금지', (done) => {
+  it('좋아요 실패 - 게시글 없음', (done) => {
     request(app)
-      .post(`/api/paper/${postId}/likes`)
+      .post(`/api/paper/999999/likes`)
       .set('Authorization', token)
       .then((res) => {
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(404);
         done();
       });
   });
