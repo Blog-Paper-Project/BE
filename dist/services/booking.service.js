@@ -28,7 +28,7 @@ exports.findLeaf = findLeaf;
 const findRev = async (hostId, start, end) => {
   return await Booking.findAll({
     where: {
-      hostId: hostId,
+      hostId,
       start,
       end,
     },
@@ -76,7 +76,6 @@ exports.hostBooking = hostBooking;
 
 //예약 수락
 const confirmBooking = async (hostId, bookingId, guestId, leaf) => {
-  console.log(hostId, bookingId, guestId, leaf);
   await Leaf.create({
     leaf,
     remarks: '화상채팅 예약',

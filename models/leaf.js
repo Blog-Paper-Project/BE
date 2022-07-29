@@ -10,6 +10,14 @@ module.exports = class Leaf extends Sequelize.Model {
           allowNull: false,
           autoIncrement: true,
         },
+        giverId: {
+          type: Sequelize.STRING(40),
+          allowNull: false,
+        },
+        recipientId: {
+          type: Sequelize.STRING(40),
+          allowNull: false,
+        },
         leaf: {
           type: Sequelize.INTEGER,
           allowNull: false,
