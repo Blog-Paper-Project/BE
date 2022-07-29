@@ -71,7 +71,6 @@ exports.login = async (email) => {
       'deletedAt',
       'profileImage',
       'blogId',
-      'snsId',
     ],
     where: { email },
   });
