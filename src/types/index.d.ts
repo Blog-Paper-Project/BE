@@ -9,10 +9,7 @@ declare namespace Models {
     introduction: string;
     point: number;
     popularity: number;
-    snsId: string;
     provider: string;
-    emailAuth: number;
-    refreshToken: string;
     deletedAt: string;
     createdAt: string;
     updatedAt: string;
