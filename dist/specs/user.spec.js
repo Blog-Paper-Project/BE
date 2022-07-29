@@ -232,7 +232,7 @@ describe('비로그인시 이메일 인증', () => {
   it('이메일 인증', (done) => {
     request(app)
       .post('/user/emailauth')
-      .send({ email: 'mna800@naver.com' })
+      .send({ email: 'mna800@test.com' })
       .then((res) => {
         expect(res.status).toBe(200);
         done();
