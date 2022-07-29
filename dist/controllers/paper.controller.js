@@ -260,9 +260,6 @@ const createLike = async (req, res, next) => {
     if (!paper) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    if (userId === paper.userId) {
-        return next((0, custom_error_1.default)(400, 'Self-Like Forbidden'));
-    }
     const liked = await paper.getLikes({ where: { userId } });
     if (liked.length) {
         await paper.removeLikes(userId);
