@@ -45,18 +45,10 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.INTEGER,
           defaultValue: 0,
         },
-        snsId: {
-          type: Sequelize.STRING(30),
-          allowNull: true,
-        },
         provider: {
           type: Sequelize.STRING(10),
           allowNull: false,
           defaultValue: 'local',
-        },
-        refreshToken: {
-          type: Sequelize.TEXT,
-          allowNull: true,
         },
         deletedAt: {
           type: Sequelize.DATE,
