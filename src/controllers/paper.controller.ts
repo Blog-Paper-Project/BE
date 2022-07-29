@@ -5,7 +5,7 @@ import {
   validatePaper,
   validateComment,
   validateCategory,
-} from '../modules/validate_paper';
+} from '../modules/paper_validater';
 
 const { Paper } = require('../../models');
 

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createSubs = exports.createLike = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createImage = exports.createPost = exports.readPost = exports.readMyFeed = exports.readMiniProfile = exports.updateCategory = exports.readCategories = exports.readBlog = exports.readPosts = exports.readMain = void 0;
 const custom_error_1 = require("../modules/custom_error");
 const PaperService = require("../services/paper.service");
-const validate_paper_1 = require("../modules/validate_paper");
+const paper_validater_1 = require("../modules/paper_validater");
 const { Paper } = require('../../models');
 // 메인 페이지 조회 & 게시글 검색
 const readMain = async (req, res) => {
@@ -58,7 +58,7 @@ const updateCategory = async (req, res, next) => {
     if (!userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
-    const schema = (0, validate_paper_1.validateCategory)();
+    const schema = (0, paper_validater_1.validateCategory)();
     await schema.validateAsync({ category, newCategory });
     const result = await PaperService.updateCategory(userId, category, newCategory);
     if (!result[0]) {
@@ -115,7 +115,7 @@ const createPost = async (req, res, next) => {
     if (!userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
-    const schema = (0, validate_paper_1.validatePaper)();
+    const schema = (0, paper_validater_1.validatePaper)();
     await schema.validateAsync({ title, contents });
     const paper = await PaperService.createPost(title, contents, thumbnail, userId, category);
     if (!paper) {
@@ -152,7 +152,7 @@ const updatePost = async (req, res, next) => {
     if (!+postId) {
         return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
     }
-    const schema = (0, validate_paper_1.validatePaper)();
+    const schema = (0, paper_validater_1.validatePaper)();
     await schema.validateAsync({ title, contents });
     const paper = await PaperService.updatePost(title, contents, thumbnail, userId, postId, category);
     if (!paper[0]) {
@@ -195,7 +195,7 @@ const createComment = async (req, res, next) => {
     if (!+postId) {
         return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
     }
-    const schema = (0, validate_paper_1.validateComment)();
+    const schema = (0, paper_validater_1.validateComment)();
     await schema.validateAsync({ text });
     const paper = await Paper.findOne({ where: { postId } });
     if (!paper) {
@@ -216,7 +216,7 @@ const updateComment = async (req, res, next) => {
     if (!+postId || !+commentId) {
         return next((0, custom_error_1.default)(400, 'Invalid PostId or CommentId'));
     }
-    const schema = (0, validate_paper_1.validateComment)();
+    const schema = (0, paper_validater_1.validateComment)();
     await schema.validateAsync({ text });
     const paper = await PaperService.findPost(postId);
     if (!paper) {
