@@ -39,6 +39,7 @@ module.exports = class User extends Sequelize.Model {
         point: {
           type: Sequelize.INTEGER,
           defaultValue: 10,
+          allowNull: false,
         },
         popularity: {
           type: Sequelize.INTEGER,
@@ -104,24 +105,28 @@ module.exports = class User extends Sequelize.Model {
       as: 'host',
       through: bookings,
       onDelete: 'cascade',
+      unique: false,
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'guestId',
       as: 'guest',
       through: bookings,
       onDelete: 'cascade',
+      unique: false,
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'giverId',
       as: 'giver',
       through: leafs,
       onDelete: 'cascade',
+      unique: false,
     });
     db.User.belongsToMany(db.User, {
       foreignKey: 'recipientId',
       as: 'recipient',
       through: leafs,
       onDelete: 'cascade',
+      unique: false,
     });
     db.User.hasMany(db.Review, {
       foreignKey: 'userId',
