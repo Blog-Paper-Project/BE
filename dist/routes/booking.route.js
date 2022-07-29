@@ -34,6 +34,6 @@ router.delete(
 router.get('/leaf/:hostId', auth, asyncHandler(bookingController.leafList));
 
 //블로그 예약 내역
-router.get('/blog/:blogId', auth, bookingController.blogReservation);
+router.get('/blog/:blogId', auth, asyncHandler(bookingController.blogReservation));
 
 module.exports = router;
