@@ -104,7 +104,7 @@ const leafList = async (req, res, next) => {
 };
 exports.leafList = leafList;
 
-// // 호스트 예약 수락
+//  호스트 예약 수락
 const acceptBooking = async (req, res, next) => {
   const hostId = req.params.hostId;
   const bookingId = req.params.bookingId;
