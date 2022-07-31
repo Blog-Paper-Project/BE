@@ -1,6 +1,7 @@
 const request = require('supertest');
 const { sequelize } = require('../../models');
 const app = require('../../app');
+//const { describe } = require('../../models/booking');
 
 //require('dotenv').config();
 
@@ -25,26 +26,10 @@ describe('회원가입 테스트', () => {
       });
   });
 
-  it('회원가입2', (done) => {
-    request(app)
-      .post('/user/signup')
-      .send({
-        email: 'b@b.com',
-        nickname: 'mincho1',
-        blogId: 'mincho1',
-        password: 'asdf1234',
-        confirmPassword: 'asdf1234',
-      })
-      .then((res) => {
-        expect(res.status).toBe(200);
-        done();
-      });
-  });
-
   it('로그인', (done) => {
     request(app)
       .post('/user/login')
-      .send({ email: 'b@b.com', password: 'asdf1234' })
+      .send({ email: 'a@a.com', password: 'asdf1234' })
       .then((res) => {
         token = 'Bearer ' + res.body.token;
         userId = res.body.userId;
@@ -72,32 +57,47 @@ describe('나뭇잎 수정', () => {
 });
 
 describe('예약신청', () => {
-  it('로그인', (done) => {
-    request(app)
-      .post('/user/login')
-      .send({ email: 'a@a.com', password: 'asdf1234' })
-      .then((res) => {
-        token = 'Bearer ' + res.body.token;
-        userId = res.body.userId;
-        expect(res.status).toBe(200);
-        done();
-      });
-  });
-
   it('신청 성공', (done) => {
     request(app)
       .post(`/api/booking/${blogId}`)
       .send({
-        blogId: 'mincho',
-        start: 'Tue Jul 29 2022 17:00:00 GMT+0900',
-        end: 'Tue Jul 29 2022 18:00:00 GMT+0900',
+        blogId: 'mincho1',
+        start: 'Tue Aug 01 2022 09:00:00 GMT+0900',
+        end: 'Tue Aug 01 2022 09:00:00 GMT+0900',
       })
       .set('Authorization', token)
       .then((res) => {
-        console.log(res);
-        // expect(res.body.result).toBe(true);
-        // expect(res.status).toBe(200);
-        // done();
+        hostId = res.body.bookingResult.hostId;
+        bookingId = res.body.bookingResult.bookingId;
+        expect(res.body.result).toBe(true);
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('예약조회', () => {
+  it('조회 성공', (done) => {
+    request(app)
+      .get('/api/booking')
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.body.result).toBe(true);
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('호스트 예약 수락', () => {
+  it('수락 성공', (done) => {
+    request(app)
+      .patch(`/api/booking/${hostId}/${bookingId}`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.body.result).toBe(true);
+        expect(res.status).toBe(200);
+        done();
       });
   });
 });
