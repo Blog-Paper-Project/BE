@@ -86,7 +86,6 @@ export const findBestPosts = async () => {
 export const findAllPosts = async () => {
   const papers: DTO.PaperLike[] = (
     await Paper.findAll({
-      attributes: ['postId', 'title', 'contents', 'thumbnail', 'viewCount', 'createdAt'],
       include: [
         { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
         { model: User, as: 'Likes', attributes: ['blogId'] },
