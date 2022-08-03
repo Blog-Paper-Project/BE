@@ -6,7 +6,7 @@ export default function deleteImgUrl(paper: DTO.PaperByLike | Models.Paper) {
     )
     .replace(/[#*`(<br></br>)]/g, '')
     .replace(/[\s]+/g, ' ')
-    .slice(0, 120)
+    .slice(0, 240)
     .trim();
 
   return Object.assign(paper, { contents });
