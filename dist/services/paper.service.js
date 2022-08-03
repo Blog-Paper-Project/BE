@@ -42,7 +42,7 @@ const findCachePosts = async () => {
     return JSON.parse(papers);
 };
 exports.findCachePosts = findCachePosts;
-// 1주일간 좋아요 순으로 게시글 12개 검색 후 레디스에 저장
+// 1주일간 좋아요 순으로 게시글 7개 검색 후 레디스에 저장
 const findBestPosts = async () => {
     const papers = await Paper.findAll({
         include: [
@@ -68,7 +68,7 @@ const findBestPosts = async () => {
         };
     })
         .sort((a, b) => b.likes - a.likes)
-        .slice(0, 12)
+        .slice(0, 7)
         .map(contents_preview_1.default);
     await redisCli.set('main', JSON.stringify(papersByLike), 'EX', 600);
     return papersByLike;
