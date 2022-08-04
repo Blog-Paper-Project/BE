@@ -64,6 +64,11 @@
 <br/>
 <br/>
 
+## ERD
+
+![화면 캡처 2022-08-04 153736](https://user-images.githubusercontent.com/105111888/182780028-11c16add-1471-4d1e-976c-65f1e9edbacf.png)
+
+
 ## 🛠 Tools 🛠
 
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=white)
@@ -87,7 +92,6 @@
 ![Docker](https://img.shields.io/badge/Docker-2496ED.svg?style=for-the-badge&logo=Docker&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639.svg?style=for-the-badge&logo=Nginx&logoColor=white)
 <br>
-
 
 ## 🔥 Trouble Shooting 🔥
 
