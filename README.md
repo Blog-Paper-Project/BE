@@ -12,31 +12,27 @@
 
 자신만의 이야기로 소통할 수 있는 블로그 **PAPER**
 
-<br />
+<br/>
 
-## 📆 개발기간
+## 📆 프로젝트 기간
 
 - 2022.06.24 - 2022.08.06
 
-<br />
-
-## 내용
-
-## Architecture
-
-<img src="https://user-images.githubusercontent.com/98739079/182773287-a1ef2b4e-84cb-4b11-8c9c-1a3d51f5ded4.png" width="700"/>
-
-<br/>
 <br/>
 
-## ERD
+## 🧱 아키택처
 
-<img src="https://user-images.githubusercontent.com/105111888/182780028-11c16add-1471-4d1e-976c-65f1e9edbacf.png" width="700"/>
+<img src="https://user-images.githubusercontent.com/98739079/182773287-a1ef2b4e-84cb-4b11-8c9c-1a3d51f5ded4.png" width="600"/>
 
 <br/>
+
+## 🐜 ERD
+
+<img src="https://user-images.githubusercontent.com/105111888/182780028-11c16add-1471-4d1e-976c-65f1e9edbacf.png" width="600"/>
+
 <br/>
 
-## 🛠 Tools
+## 🛠 기술 스택
 
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-3178C6.svg?style=for-the-badge&logo=typescript&logoColor=white)
@@ -61,71 +57,70 @@
 <br>
 
 <br/>
-<br/>
 
-## 주요 기능
+## 🕹️ 주요 기능
 
 1. 로그인/회원가입
 - 카카오 소셜 로그인
 - 비밀번호 변경
 2. 블로그
-- 글, 댓글, 좋아요, 구독
+- 게시글(+이미지), 댓글 조회, 작성, 수정, 삭제
+- 검색하기
+- 좋아요, 구독
+- 카테고리, 태그
 3. 예약하기
 - 예약 신청 및 취소
 4. 화상 통화 및 채팅
 - 방 입장을 통한 블로거와 1대1 대화
 
 <br/>
-<br/>
 
-## 라이브러리
+## 📖 라이브러리
 
 | Name                | Appliance               | Version  |
 | :-----------------: | :---------------------: | :------: |
-| sequelize           | MYSQL ORM              |6.21.1|
-| redis               | 토큰용 DB                  |4.2.0|
-| mysql2              | DB                        |2.3.3|
-| bcrypt              | 핸드폰 암호화              |5.0.1|
-| jsonwebtoken        | JWT토큰 발급            |8.5.1|
-| passport            | node.js authentication  |0.6.0|
-| passport-kakao      | 카카오 소셜 로그인     |1.0.1|
-| nodemailer          | DB                        |6.7.5|
-| multer              | 파일 업로드             |1.4.5-lts.1|
-| multer-s3-transform | AWS S3 파일 업로드      |2.10.3|
-| sharp               | 이미지 편집      |0.30.7|
-| dayjs               | 환경변수 설정              |1.11.3|
-| joi                 | validator                 |17.6.0|
-| node-cron	          |  알림/문자전송 자동화     |3.0.1|
+| sequelize           | MYSQL ORM               |6.21.1|
+| redis               | 인메모리 DB               |4.2.0|
+| mysql2              | 관계형 DB                 |2.3.3|
+| bcrypt              | 비밀번호 암호화             |5.0.1|
+| jsonwebtoken        | JWT 토큰 발급             |8.5.1|
+| passport            | 소셜 로그인                |0.6.0|
+| passport-kakao      | 카카오 소셜 로그인           |1.0.1|
+| nodemailer          | 이메일 인증                |6.7.5|
+| multer              | 파일 업로드               |1.4.5-lts.1|
+| multer-s3-transform | AWS S3 파일 업로드        |2.10.3|
+| sharp               | 이미지 편집                |0.30.7|
+| dayjs               | 날짜, 시간 관리              |1.11.3|
+| joi                 | 유효성 검사                 |17.6.0|
+| node-cron	          | 스케쥴러                  |3.0.1|
+| eslint              | 코드 분석                 |8.19.0|
 | dotenv              | 환경변수 설정              |16.0.1|
 | cors                | CORS 핸들링              |2.8.5|
 | helmet              | HTTP header 보안         |5.1.0|
-| morgan              | HTTP 요청 로그 관리     |1.10.0|
-| winston             | 전체 서비스 로그 관리   |3.8.0|
-| socket.io	          |  스트레스 테스트     |4.5.1|
-| artillery	          |  스트레스 테스트     |2.0.0-20|
-| jest                |  코드 테스트            |28.1.2|
-| supertest           |  코드 테스트             |6.2.3|
-
-
-<br/>
-<br/>
-
-## 커밋 메세지 규칙
-
-- feat : 새로운 기능에 대한 커밋
-- fix : build 빌드 관련 파일 수정에 대한 커밋
-- build : 빌드 관련 파일 수정에 대한 커밋
-- chore : 그 외 자잘한 수정에 대한 커밋
-- ci : CI 관련 설정 수정에 대한 커밋
-- docs : 문서 수정에 대한 커밋
-- style : 코드 스타일 혹은 포맷 등에 관한 커밋
-- refactor : 코드 리팩토링에 대한 커밋
-- test : 테스트 코드 수정에 대한 커밋
+| morgan              | 개발 로그 관리             |1.10.0|
+| winston             | 서버 로그 관리             |3.8.0|
+| socket.io	          | 실시간 화상 통화 및 채팅     |4.5.1|
+| artillery	          | 스트레스 테스트             |2.0.0-20|
+| jest                | 코드 테스트              |28.1.2|
+| supertest           | 코드 테스트               |6.2.3|
 
 <br/>
+
+## ✍ 커밋 메세지 규칙
+
+- feat : 새로운 기능 추가
+- fix : 빌드 관련 파일 수정
+- build : 빌드 관련 파일 수정
+- chore : 그 외 자잘한 수정
+- ci : CI 관련 설정 수정
+- docs : 문서 수정
+- style : 코드 스타일 혹은 포맷 수정
+- refactor : 코드 리팩토링
+- test : 테스트 코드 수정
+
 <br/>
 
-## 🔥 Trouble Shooting
+## 🔥 트러블 슈팅
 
 <details>
 <summary><b> ✔️ 메인페이지 로딩 속도 개선</b></summary>
@@ -144,11 +139,11 @@
 
 **`결과`**
 
-Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이 활용했을 때 응답 속도가 70% 가량 단축되었다.
-
 <img src="https://user-images.githubusercontent.com/98739079/182777495-d018f9b5-0bcb-4428-9a0c-9492915dd495.png" width="200"/>
-<img src="https://user-images.githubusercontent.com/98739079/182777501-7f81f386-33aa-42e0-9c5d-35a4884a9c5c.png" width="200" />
-
+<img src="https://user-images.githubusercontent.com/98739079/182777501-7f81f386-33aa-42e0-9c5d-35a4884a9c5c.png" width="200"/>
+ 
+Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이 활용했을 때 응답 속도가 70% 가량 단축되었다.
+  
 **`아쉬운점`**
 
 10분마다 인기 게시글을 업데이트 해주기 때문에 실시간으로 업데이트된 데이터를 제공할 수 없다는 한계점이 있다.
@@ -200,47 +195,42 @@ Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이
 </details>
 
 <br/>
-<br/>
 
-## Members
+## 🧑‍💻 팀 구성
 <table>
+   <tr>
+     <td colspan='4' align="center">
+       <b>Backend</b>
+     </td>
+   </tr>
    <tr>
     <td align="center"><b><a href="https://github.com/KwangMin-Moon">문광민</a></b></td>
     <td align="center"><b><a href="https://github.com/mj-song00">송민지</a></b></td>
     <td align="center"><b><a href="https://github.com/sounwoo">박선우</a></b></td>
     <td align="center"><b><a href="https://github.com/alltimeno1">김성준</a></b></td>
   </tr>
-  <tr></td>
-    <td align="center"><a href="https://github.com/KwangMin-Moon"><img src="https://avatars.githubusercontent.com/u/97036088?v=4" width="100px" /></a></td>
-    <td align="center"><a href="https://github.com/mj-song00"><img src="https://avatars.githubusercontent.com/u/104669297?v=4" width="100px" /></a></td>
-    <td align="center"><a href="https://github.com/sounwoo"><img src="https://avatars.githubusercontent.com/u/105111888?v=4" width="100px" /></a></td>
-    <td align="center"><a href="https://github.com/alltimeno1"><img src="https://avatars.githubusercontent.com/u/98739079?v=4" width="100px" /></a></td>
-  </tr>
   <tr>
-    <td align="center"><b>Backend</b></td>
-    <td align="center"><b>Backend</b></td>
-    <td align="center"><b>Backend</b></td>
-    <td align="center"><b>Backend</b></td>
+    <td align="center"><a href="https://github.com/KwangMin-Moon"><img src="https://avatars.githubusercontent.com/u/97036088?v=4" width="80px" /></a>
+    <td align="center"><a href="https://github.com/mj-song00"><img src="https://avatars.githubusercontent.com/u/104669297?v=4" width="80px" /></a></td>
+    <td align="center"><a href="https://github.com/sounwoo"><img src="https://avatars.githubusercontent.com/u/105111888?v=4" width="80px" /></a></td>
+    <td align="center"><a href="https://github.com/alltimeno1"><img src="https://avatars.githubusercontent.com/u/98739079?v=4" width="80px" /></a></td>
   </tr>
 </table>
 
 <table>
+   <tr>
+     <td colspan='3' align="center">
+       <b>Frontend</b>
+     </td>
+   </tr>
    <tr>
     <td align="center"><b><a href="https://github.com/ted-jv">구자덕</a></b></td>
     <td align="center"><b><a href="https://github.com/unchul">임운철</a></b></td>
     <td align="center"><b><a href="https://github.com/daegyu-jeong">정대규</a></b></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/ted-jv"><img src="https://avatars.githubusercontent.com/u/105185055?v=4" width="100px" /></a></td>
-    <td align="center"><a href="https://github.com/unchul"><img src="https://avatars.githubusercontent.com/u/105141025?v=4" width="100px" /></a></td>
-    <td align="center"><a href="https://github.com/daegyu-jeong"><img src="https://avatars.githubusercontent.com/u/105157997?v=4" width="100px" /></a></td></td>
-  </tr>
-  <tr>
-    <td align="center"><b>Frontend</b></td>
-    <td align="center"><b>Frontend</b></td>
-    <td align="center"><b>Frontend</b></td>
+    <td align="center"><a href="https://github.com/ted-jv"><img src="https://avatars.githubusercontent.com/u/105185055?v=4" width="80px" /></a></td>
+    <td align="center"><a href="https://github.com/unchul"><img src="https://avatars.githubusercontent.com/u/105141025?v=4" width="80px" /></a></td>
+    <td align="center"><a href="https://github.com/daegyu-jeong"><img src="https://avatars.githubusercontent.com/u/105157997?v=4" width="80px" /></a>
   </tr>
 </table>
-
-<br/>
-<br/>
