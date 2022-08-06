@@ -42,7 +42,6 @@
 ![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=Jest&logoColor=white)
 ![Eslint](https://img.shields.io/badge/Eslint-4B32C3?style=for-the-badge&logo=Eslint&logoColor=white)
 ![Passport](https://img.shields.io/badge/Passport-34E27A?style=for-the-badge&logo=Passport&logoColor=white)
-![JWT](https://img.shields.io/badge/JSONWebTokens-000000?style=for-the-badge&logo=JSONWebTokens&logoColor=white)
 ![WebRTC](https://img.shields.io/badge/WebRTC-333333?style=for-the-badge&logo=WebRTC&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=Socket.io&logoColor=white)
 <br>
@@ -123,7 +122,6 @@
 
 ## 🔥 트러블 슈팅
 
-<details>
 <summary><b> ✔️ 메인페이지 로딩 속도 개선</b></summary>
 <br>
 
@@ -140,8 +138,10 @@
 
 **`결과`**
 
+<div>
 <img src="https://user-images.githubusercontent.com/98739079/182777495-d018f9b5-0bcb-4428-9a0c-9492915dd495.png" width="200"/>
 <img src="https://user-images.githubusercontent.com/98739079/182777501-7f81f386-33aa-42e0-9c5d-35a4884a9c5c.png" width="200"/>
+</div>
  
 Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이 활용했을 때 응답 속도가 70% 가량 단축되었다.
   
@@ -154,9 +154,8 @@ Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이
 1. 일일 조회수를 레디스에 저장하고 오전 12시에 합산하여 DB에 업데이트한다. 레디스의 데이터 타입 set을 활용하여 중복 집계를 방지한다.
 2. 레디스를 세션 저장소로 활용하여 JWT 토큰을 저장하고 중복 로그인을 방지한다.
   
-</details>
-
-<details>
+<br>  
+  
 <summary><b> ✔️ 도커 도입</b></summary>
 <br>
 
@@ -175,9 +174,8 @@ Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이
 
 로컬에 작업한 걸 이미지로 빌드해 실행하니 배포환경에서 버전 이슈 등으로 인한 에러를 걱정하지 않고 배포 가능
   
-</details>
-
-<details>
+<br>
+  
 <summary><b> ✔️ S3 미사용 이미지 관리 문제</b></summary>
 <br>
 
@@ -192,8 +190,6 @@ Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이
 2. 이미지 업로드 시 image 테이블에 postId가 null인 상태로 추가
 3. 게시글 동록 시 본문에 정규식으로 이미지 url들을 필터링하고 배열에 저장 배열 내 값들과 일치하는 row들은 postId를 부여
 4. node-cron으로 postId가 null이고 updateAt이 하루 전 이상인 데이터를 주기적으로 삭제
-
-</details>
 
 <br/>
 
