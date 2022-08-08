@@ -74,12 +74,32 @@ describe('페이지 조회 테스트', () => {
       });
   });
 
+  it('미니 프로필 조회 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .get('/api/paper/miniprofile')
+      .set('Authorization', 'Bearer abc')
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
   it('미니 프로필 조회', (done) => {
     request(app)
       .get('/api/paper/miniprofile')
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('마이 피드 조회 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .get('/api/paper/myfeed')
+      .set('Authorization', 'Bearer abc')
+      .then((res) => {
+        expect(res.status).toBe(401);
         done();
       });
   });
@@ -96,18 +116,18 @@ describe('페이지 조회 테스트', () => {
 });
 
 describe('게시글 테스트', () => {
-  it('게시글 작성 실패 - 제목 없음', (done) => {
+  it('게시글 작성 실패 - 유저 인증 실패', (done) => {
     request(app)
       .post('/api/paper')
-      .set('Authorization', token)
+      .set('Authorization', 'Bearer abc')
       .send({
+        title: 'Jest 테스트 중',
         contents: '성공인가?',
         category: 'sports',
         tags: ['tag1', 'tag2'],
       })
       .then((res) => {
-        expect(res.text).toContain('제목을 입력해주세요');
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(401);
         done();
       });
   });
@@ -136,6 +156,7 @@ describe('게시글 테스트', () => {
         contents: '성공인가?',
         category: 'sports',
         tags: ['tag1', 'tag2'],
+        thumbnail: 'https://test.com',
       })
       .set('Authorization', token)
       .then((res) => {
@@ -149,11 +170,22 @@ describe('게시글 테스트', () => {
       });
   });
 
+  it('게시글 수정 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .patch(`/api/paper/${postId}`)
+      .set('Authorization', 'Bearer abc')
+      .send({ title: 'Jest 수정 중', contents: '수정 성공?' })
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
   it('게시글 수정 실패 - 잘못된 게시글 번호', (done) => {
     request(app)
       .patch('/api/paper/abc')
-      .send({ title: 'Jest 수정 중', contents: '수정 성공?' })
       .set('Authorization', token)
+      .send({ title: 'Jest 수정 중', contents: '수정 성공?' })
       .then((res) => {
         expect(res.status).toBe(400);
         done();
@@ -186,7 +218,11 @@ describe('게시글 테스트', () => {
   it('게시글 수정', (done) => {
     request(app)
       .patch(`/api/paper/${postId}`)
-      .send({ title: 'Jest 수정 중', contents: '수정 성공?' })
+      .send({
+        title: 'Jest 수정 중',
+        contents: '수정 성공?',
+        thumbnail: 'https://test.com',
+      })
       .set('Authorization', token)
       .then((res) => {
         const { title, contents } = res.body;
@@ -194,6 +230,16 @@ describe('게시글 테스트', () => {
         expect(title).toBe('Jest 수정 중');
         expect(contents).toBe('수정 성공?');
         expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('게시글 조회 실패 - 잘못된 게시글 번호', (done) => {
+    request(app)
+      .get('/api/paper/testbot/abc1')
+      .set('userId', 1)
+      .then((res) => {
+        expect(res.status).toBe(400);
         done();
       });
   });
@@ -242,12 +288,33 @@ describe('개인 페이지 테스트', () => {
       });
   });
 
+  it('개인 카테고리 조회 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .get('/api/paper/categories')
+      .set('Authorization', 'Bearer abc')
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
   it('개인 카테고리 조회', (done) => {
     request(app)
       .get('/api/paper/categories')
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('개인 카테고리 수정 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .patch('/api/paper/categories/travel')
+      .set('Authorization', 'Bearer abc')
+      .send({ newCategory: 'EPL PREMIER LEAGUE 2022' })
+      .then((res) => {
+        expect(res.status).toBe(401);
         done();
       });
   });
@@ -288,6 +355,17 @@ describe('개인 페이지 테스트', () => {
 });
 
 describe('댓글 테스트', () => {
+  it('댓글 작성 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .post(`/api/paper/${postId}/comments`)
+      .set('Authorization', 'Bearer abc')
+      .send({ text: '성공인가?' })
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
   it('댓글 작성 실패 - 게시글 없음', (done) => {
     request(app)
       .post('/api/paper/999999/comments')
@@ -336,11 +414,33 @@ describe('댓글 테스트', () => {
       });
   });
 
+  it('댓글 수정 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .patch(`/api/paper/${postId}/comments/${commentId}`)
+      .set('Authorization', 'Bearer abc')
+      .send({ text: '수정 성공?' })
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
+  it('댓글 수정 실패 - 잘못된 댓글 번호', (done) => {
+    request(app)
+      .patch(`/api/paper/${postId}/comments/abc1`)
+      .set('Authorization', token)
+      .send({ text: '수정 성공?' })
+      .then((res) => {
+        expect(res.status).toBe(400);
+        done();
+      });
+  });
+
   it('댓글 수정 실패 - 댓글 없음', (done) => {
     request(app)
       .patch(`/api/paper/${postId}/comments/9999999`)
-      .send({ text: '수정 성공?' })
       .set('Authorization', token)
+      .send({ text: '수정 성공?' })
       .then((res) => {
         expect(res.status).toBe(404);
         done();
@@ -355,6 +455,16 @@ describe('댓글 테스트', () => {
       .then((res) => {
         expect(res.body.text).toBe('수정 성공?');
         expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('댓글 삭제 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .delete(`/api/paper/${postId}/comments/${commentId}`)
+      .set('Authorization', 'Bearer abc')
+      .then((res) => {
+        expect(res.status).toBe(401);
         done();
       });
   });
@@ -381,12 +491,72 @@ describe('댓글 테스트', () => {
 });
 
 describe('좋아요 & 구독 테스트', () => {
+  it('좋아요 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .post(`/api/paper/${postId}/likes`)
+      .set('Authorization', 'Bearer abc')
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
+  it('좋아요 실패 - 잘못된 게시글 번호', (done) => {
+    request(app)
+      .post('/api/paper/abc1/likes')
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        done();
+      });
+  });
+
   it('좋아요 실패 - 게시글 없음', (done) => {
     request(app)
-      .post(`/api/paper/999999/likes`)
+      .post('/api/paper/999999/likes')
       .set('Authorization', token)
       .then((res) => {
         expect(res.status).toBe(404);
+        done();
+      });
+  });
+
+  it('좋아요', (done) => {
+    request(app)
+      .post(`/api/paper/${postId}/likes`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('좋아요 취소', (done) => {
+    request(app)
+      .post(`/api/paper/${postId}/likes`)
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
+
+  it('구독 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .post('/api/paper/testbot1/subscription')
+      .set('Authorization', 'Bearer abc')
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
+  it('구독 실패 - 본인 구독 불가', (done) => {
+    request(app)
+      .post('/api/paper/testbot/subscription')
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(400);
         done();
       });
   });
@@ -410,9 +580,29 @@ describe('좋아요 & 구독 테스트', () => {
         done();
       });
   });
+
+  it('구독 취소', (done) => {
+    request(app)
+      .post('/api/paper/testbot1/subscription')
+      .set('Authorization', token)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        done();
+      });
+  });
 });
 
 describe('게시글 삭제', () => {
+  it('게시글 삭제 실패 - 유저 인증 실패', (done) => {
+    request(app)
+      .delete(`/api/paper/${postId}`)
+      .set('Authorization', 'Bearer abc')
+      .then((res) => {
+        expect(res.status).toBe(401);
+        done();
+      });
+  });
+
   it('게시글 삭제 실패 - 게시글 없음', (done) => {
     request(app)
       .delete('/api/paper/999999')
