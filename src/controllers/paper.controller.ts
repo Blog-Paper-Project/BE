@@ -43,10 +43,6 @@ export const readPosts = async (req: Request, res: Response) => {
 export const readBlog = async (req: Request, res: Response, next: NextFunction) => {
   const { blogId } = req.params;
 
-  if (!blogId) {
-    return next(createError(404, 'Not Found!'));
-  }
-
   const { user, categories, tags } = await PaperService.findUserInfo(blogId);
 
   if (!user) {
@@ -61,7 +57,7 @@ export const readCategories = async (req: Request, res: Response, next: NextFunc
   const userId = res.locals?.user?.userId;
 
   if (!+userId) {
-    return next(createError(400, `Invalid UserId : ${userId}`));
+    return next(createError(401, `Invalid UserId : ${userId}`));
   }
 
   const categories = await PaperService.findCategories(userId);
@@ -75,7 +71,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
   const { newCategory } = req.body;
   const userId = res.locals?.user?.userId;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -100,7 +96,7 @@ export const readMiniProfile = async (
 ) => {
   const userId = res.locals?.user?.userId;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -117,7 +113,7 @@ export const readMiniProfile = async (
 export const readMyFeed = async (req: Request, res: Response, next: NextFunction) => {
   const userId = res.locals?.user?.userId;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -130,10 +126,6 @@ export const readMyFeed = async (req: Request, res: Response, next: NextFunction
 export const readPost = async (req: Request, res: Response, next: NextFunction) => {
   const { blogId, postId } = req.params;
   const { userid: userId } = req.headers as { userid: string };
-
-  if (!blogId) {
-    return next(createError(404, 'Not Found!'));
-  }
 
   if (!+postId) {
     return next(createError(400, `Invalid PostId : ${postId}`));
@@ -155,7 +147,7 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
   const userId = res.locals?.user?.userId;
   const { title, contents, thumbnail, tags, category } = req.body;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -207,7 +199,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
   const { title, contents, thumbnail, tags, category } = req.body;
   const { postId } = req.params;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -249,7 +241,7 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
   const userId = res.locals?.user?.userId;
   const { postId } = req.params;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -272,7 +264,7 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
   const { postId } = req.params;
   const { text } = req.body;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -338,7 +330,7 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
   const userId = res.locals?.user?.userId;
   const { postId, commentId } = req.params;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -360,7 +352,7 @@ export const createLike = async (req: Request, res: Response, next: NextFunction
   const userId = res.locals?.user?.userId;
   const { postId } = req.params;
 
-  if (!userId) {
+  if (!+userId) {
     return next(createError(401, 'Unauthorized!'));
   }
 
@@ -394,10 +386,6 @@ export const createSubs = async (req: Request, res: Response, next: NextFunction
 
   if (!user) {
     return next(createError(401, 'Unauthorized!'));
-  }
-
-  if (!blogId) {
-    return next(createError(404, 'Not Found!'));
   }
 
   if (user.blogId === blogId) {

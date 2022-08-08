@@ -30,9 +30,6 @@ exports.readPosts = readPosts;
 // 개인 페이지 조회
 const readBlog = async (req, res, next) => {
     const { blogId } = req.params;
-    if (!blogId) {
-        return next((0, custom_error_1.default)(404, 'Not Found!'));
-    }
     const { user, categories, tags } = await PaperService.findUserInfo(blogId);
     if (!user) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
@@ -44,7 +41,7 @@ exports.readBlog = readBlog;
 const readCategories = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
     if (!+userId) {
-        return next((0, custom_error_1.default)(400, `Invalid UserId : ${userId}`));
+        return next((0, custom_error_1.default)(401, `Invalid UserId : ${userId}`));
     }
     const categories = await PaperService.findCategories(userId);
     return res.json({ categories });
@@ -55,7 +52,7 @@ const updateCategory = async (req, res, next) => {
     const { category } = req.params;
     const { newCategory } = req.body;
     const userId = res.locals?.user?.userId;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     const schema = (0, paper_validater_1.validateCategory)();
@@ -70,7 +67,7 @@ exports.updateCategory = updateCategory;
 // 미니 프로필 조회
 const readMiniProfile = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     const user = await PaperService.findMiniInfo(userId);
@@ -83,7 +80,7 @@ exports.readMiniProfile = readMiniProfile;
 // 구독 중인 최신 게시글 조회
 const readMyFeed = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     const posts = await PaperService.findNewPosts(userId);
@@ -94,9 +91,6 @@ exports.readMyFeed = readMyFeed;
 const readPost = async (req, res, next) => {
     const { blogId, postId } = req.params;
     const { userid: userId } = req.headers;
-    if (!blogId) {
-        return next((0, custom_error_1.default)(404, 'Not Found!'));
-    }
     if (!+postId) {
         return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
     }
@@ -112,7 +106,7 @@ exports.readPost = readPost;
 const createPost = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
     const { title, contents, thumbnail, tags, category } = req.body;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     const schema = (0, paper_validater_1.validatePaper)();
@@ -146,7 +140,7 @@ const updatePost = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
     const { title, contents, thumbnail, tags, category } = req.body;
     const { postId } = req.params;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     if (!+postId) {
@@ -171,7 +165,7 @@ exports.updatePost = updatePost;
 const deletePost = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
     const { postId } = req.params;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     if (!+postId) {
@@ -189,7 +183,7 @@ const createComment = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
     const { postId } = req.params;
     const { text } = req.body;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     if (!+postId) {
@@ -233,7 +227,7 @@ exports.updateComment = updateComment;
 const deleteComment = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
     const { postId, commentId } = req.params;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     if (!+postId || !+commentId) {
@@ -250,7 +244,7 @@ exports.deleteComment = deleteComment;
 const createLike = async (req, res, next) => {
     const userId = res.locals?.user?.userId;
     const { postId } = req.params;
-    if (!userId) {
+    if (!+userId) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
     }
     if (!+postId) {
@@ -275,9 +269,6 @@ const createSubs = async (req, res, next) => {
     const { blogId } = req.params;
     if (!user) {
         return next((0, custom_error_1.default)(401, 'Unauthorized!'));
-    }
-    if (!blogId) {
-        return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
     if (user.blogId === blogId) {
         return next((0, custom_error_1.default)(400, 'Self-Subs Forbidden'));
