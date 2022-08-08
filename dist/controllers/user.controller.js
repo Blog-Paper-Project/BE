@@ -184,6 +184,30 @@ exports.login = async (req, res, next) => {
     blogId: user[0].blogId,
   });
 };
+// refresh 토큰을 기반으로 access 토큰
+exports.refresh = async (req, res, next) => {
+  const { email, refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.sendStatus(401);
+  }
+
+  const user = await userService.refresh_token_check(email, refreshToken);
+  if (user === false) {
+    return res.status(400).send({
+      result: false,
+      msg: '토큰값 만료되었슴니다.',
+    });
+  }
+
+  const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+    expiresIn: 10800,
+  });
+
+  res.status(200).send({
+    accessToken,
+  });
+};
 
 // 로그아웃
 exports.logout = async (req, res, next) => {

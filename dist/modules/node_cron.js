@@ -1,4 +1,6 @@
 const cron = require('node-cron');
+const sequelize = require('sequelize');
+const { Op } = sequelize;
 const dayjs = require('dayjs');
 
 const User = require('../../models/user');
