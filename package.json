@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --forceExit",
-    "start": "tsc-watch --onSuccess \"nodemon sever.js\""
+    "start": "tsc-watch --onSuccess \"nodemon sever.js\"",
+    "coverage" : "jest --coverage"
   },
   "repository": {
     "type": "git",
