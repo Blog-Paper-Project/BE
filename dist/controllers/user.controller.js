@@ -148,7 +148,7 @@ exports.login = async (req, res, next) => {
   const { email, password } = await login_schma.validateAsync(req.body);
 
   const user = await userService.login(email);
-  console.log(user[1]);
+
   if (user === false)
     return res.status(400).send({
       result: false,
