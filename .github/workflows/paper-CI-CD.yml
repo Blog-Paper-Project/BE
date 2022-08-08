@@ -60,6 +60,7 @@ jobs:
           tags: ${{ secrets.DOCKER_NAME }}/paper:test
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
   cd-pipeline:
     needs: build-image
     name: continuos deploy

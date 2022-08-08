@@ -5,7 +5,7 @@ const { upload } = require('../modules/multer');
 const passport = require('passport');
 const router = express.Router();
 const Usercontroller = require('../controllers/user.controller');
-const AsyncHandler = require('../middlewares/async.handler');
+const AsyncHandler = require('../middleware/async.handler');
 
 require('dotenv').config();
 
@@ -36,10 +36,12 @@ router.patch('/delete', Authmiddle, AsyncHandler(Usercontroller.userDelete));
 router.patch('/restore', AsyncHandler(Usercontroller.user_restore));
 
 // 로그인
-router.post('/login', isNotLoggedIn, AsyncHandler(Usercontroller.login));
+router.post('/login', AsyncHandler(Usercontroller.login));
 
 // 유저 blogId 중복검사
 router.post('/blogid', AsyncHandler(Usercontroller.blogcheck));
+
+router.post('/refresh', AsyncHandler(Usercontroller.refresh));
 
 // 이메일 || 닉네임 중복검사
 router.post('/idcheck', isNotLoggedIn, AsyncHandler(Usercontroller.duplicate));

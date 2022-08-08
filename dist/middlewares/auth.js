@@ -13,12 +13,13 @@ module.exports = (req, res, next) => {
     return;
   }
   try {
-    const { userId } = jwt.verify(tokenValue, process.env.SECRET_KEY);
+    const { userId } = jwt.verify(tokenValue, process.env.ACCESS_TOKEN_KEY);
     User.findByPk(userId).then((user) => {
       res.locals.user = user;
       next();
     });
   } catch (err) {
+    console.log(err);
     res.status(401).send({
       errorMessage: '로그인 후 이용 가능한 기능입니다.',
     });
