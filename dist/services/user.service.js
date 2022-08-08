@@ -76,7 +76,7 @@ exports.login = async (email) => {
   });
   if (user === null) return user;
 
-  const accsetoken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_KEY, {
+  const accsetoken = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
     expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
   });
 
