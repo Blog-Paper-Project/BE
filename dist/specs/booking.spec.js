@@ -4,7 +4,7 @@ const app = require('../../app');
 
 //require('dotenv').config();
 
-//날짜를 2주뒤로 바꿔주세요
+//연도 변경 필수!
 beforeAll(async () => {
   await sequelize.sync({ force: true }); // 가짜 ORM 생성
 });
@@ -120,8 +120,8 @@ describe('예약신청', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 05 2022 13:00:00 GMT+0900',
-        end: 'Tue Aug 05 2022 14:00:00 GMT+0900',
+        start: 'Tue Aug 05 2023 13:00:00 GMT+0900',
+        end: 'Tue Aug 05 2023 14:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -138,8 +138,8 @@ describe('예약신청', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 01 2022 08:00:00 GMT+0900',
-        end: 'Tue Aug 01 2022 09:00:00 GMT+0900',
+        start: 'Tue Aug 01 2023 08:00:00 GMT+0900',
+        end: 'Tue Aug 01 2023 09:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -166,8 +166,8 @@ describe('예약신청', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 04 2022 08:00:00 GMT+0900',
-        end: 'Tue Aug 04 2022 09:00:00 GMT+0900',
+        start: 'Tue Aug 04 2023 08:00:00 GMT+0900',
+        end: 'Tue Aug 04 2023 09:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -197,8 +197,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 03 2022 08:00:00 GMT+0900',
-        end: 'Tue Aug 03 2022 09:00:00 GMT+0900',
+        start: 'Tue Aug 03 2023 08:00:00 GMT+0900',
+        end: 'Tue Aug 03 2023 09:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -215,8 +215,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 04 2022 15:00:00 GMT+0900',
-        end: 'Tue Aug 04 2022 16:00:00 GMT+0900',
+        start: 'Tue Aug 04 2023 15:00:00 GMT+0900',
+        end: 'Tue Aug 04 2023 16:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -233,8 +233,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 04 2022 16:00:00 GMT+0900',
-        end: 'Tue Aug 04 2022 17:00:00 GMT+0900',
+        start: 'Tue Aug 04 2023 16:00:00 GMT+0900',
+        end: 'Tue Aug 04 2023 17:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -252,8 +252,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 04 2022 17:00:00 GMT+0900',
-        end: 'Tue Aug 04 2022 18:00:00 GMT+0900',
+        start: 'Tue Aug 04 2023 17:00:00 GMT+0900',
+        end: 'Tue Aug 04 2023 18:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -270,8 +270,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 04 2022 18:00:00 GMT+0900',
-        end: 'Tue Aug 04 2022 19:00:00 GMT+0900',
+        start: 'Tue Aug 04 2023 18:00:00 GMT+0900',
+        end: 'Tue Aug 04 2023 19:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -288,8 +288,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 04 2022 19:00:00 GMT+0900',
-        end: 'Tue Aug 04 2022 20:00:00 GMT+0900',
+        start: 'Tue Aug 04 2023 19:00:00 GMT+0900',
+        end: 'Tue Aug 04 2023 20:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -306,8 +306,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 02 2022 09:00:00 GMT+0900',
-        end: 'Tue Aug 02 2022 10:00:00 GMT+0900',
+        start: 'Tue Aug 02 2023 09:00:00 GMT+0900',
+        end: 'Tue Aug 02 2023 10:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -324,8 +324,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 02 2022 10:00:00 GMT+0900',
-        end: 'Tue Aug 02 2022 11:00:00 GMT+0900',
+        start: 'Tue Aug 02 2023 10:00:00 GMT+0900',
+        end: 'Tue Aug 02 2023 11:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -342,8 +342,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 02 2022 12:00:00 GMT+0900',
-        end: 'Tue Aug 02 2022 13:00:00 GMT+0900',
+        start: 'Tue Aug 02 2023 12:00:00 GMT+0900',
+        end: 'Tue Aug 02 2023 13:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -360,8 +360,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 02 2022 13:00:00 GMT+0900',
-        end: 'Tue Aug 02 2022 14:00:00 GMT+0900',
+        start: 'Tue Aug 02 2023 13:00:00 GMT+0900',
+        end: 'Tue Aug 02 2023 14:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -378,8 +378,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 02 2022 14:00:00 GMT+0900',
-        end: 'Tue Aug 02 2022 15:00:00 GMT+0900',
+        start: 'Tue Aug 02 2023 14:00:00 GMT+0900',
+        end: 'Tue Aug 02 2023 15:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -397,8 +397,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 03 2022 16:00:00 GMT+0900',
-        end: 'Tue Aug 03 2022 17:00:00 GMT+0900',
+        start: 'Tue Aug 03 2023 16:00:00 GMT+0900',
+        end: 'Tue Aug 03 2023 17:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
@@ -413,8 +413,8 @@ describe('예약신청 실패 - 신청횟수 10개 초과', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'yaya',
-        start: 'Tue Aug 07 2022 08:00:00 GMT+0900',
-        end: 'Tue Aug 07 2022 09:00:00 GMT+0900',
+        start: 'Tue Aug 07 2023 08:00:00 GMT+0900',
+        end: 'Tue Aug 07 2023 09:00:00 GMT+0900',
       })
       .set('Authorization', btoken)
       .then((res) => {
@@ -470,8 +470,8 @@ describe('게스트 예약 취소', () => {
       .post(`/api/booking/${blogId}`)
       .send({
         blogId: 'mincho1',
-        start: 'Tue Aug 09 2022 13:00:00 GMT+0900',
-        end: 'Tue Aug 09 2022 14:00:00 GMT+0900',
+        start: 'Tue Aug 09 2023 13:00:00 GMT+0900',
+        end: 'Tue Aug 09 2023 14:00:00 GMT+0900',
       })
       .set('Authorization', atoken)
       .then((res) => {
