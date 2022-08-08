@@ -96,8 +96,11 @@ exports.login = async (email) => {
 
 // 로그아웃
 exports.logout = async (user) => {
-  const userout = await redisCliv4.exists('acc_token ' + user.email); // true: 1 , false: 0
-  if (userout) await redisCli.del('acc_token ' + user.email);
+  const acc_userout = await redisCliv4.exists('acc_token ' + user.email); // true: 1 , false: 0
+  if (acc_userout) await redisCli.del('acc_token ' + user.email);
+
+  const ref_userout = await redisCliv4.exists('ref_token ' + user.email); // true: 1 , false: 0
+  if (ref_userout) await redisCli.del('ref_token ' + user.email);
 };
 
 // 블로그 아이디 중복검사
