@@ -4,3 +4,4 @@ logs
 test.http
 db
 .dockerignore
+coverage

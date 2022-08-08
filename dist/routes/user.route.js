@@ -5,7 +5,7 @@ const { upload } = require('../modules/multer');
 const passport = require('passport');
 const router = express.Router();
 const Usercontroller = require('../controllers/user.controller');
-const AsyncHandler = require('../middleware/async.handler');
+const AsyncHandler = require('../middlewares/async.handler');
 
 require('dotenv').config();
 
