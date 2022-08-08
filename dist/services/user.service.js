@@ -80,18 +80,27 @@ exports.login = async (email) => {
     expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
   });
 
-  const tokencheck = await redisCliv4.get(email);
-  await redisCli.setex('acc_token : ' + email, 10800, accsetoken); // true: 1 , false: 0
+  const refreshtoken = jwt.sign({ userId: user.userId }, process.env.REFRESH_TOKEN_KEY, {
+    expiresIn: 60 * 60 * 3, //60초 * 60분 * 3시 이므로, 3시간 유효한 토큰 발급
+  });
 
-  // if (tokencheck !== token && tokencheck !== null) return false;
+  const acc_tokencheck = await redisCliv4.get('acc_token ' + email);
+  const ref_tokencheck = await redisCliv4.get('ref_token ' + email);
+  await redisCli.setex('acc_token ' + email, 10800, accsetoken); // true: 1 , false: 0
+  await redisCli.setex('ref_token ' + email, 10800, refreshtoken);
+
+  // if (acc_tokencheck !== token && acc_tokencheck !== null || ref_tokencheck !== refreshtoken && ref_tokencheck !== null) return false;
 
   return [user, accsetoken, refreshtoken];
 };
 
 // 로그아웃
 exports.logout = async (user) => {
-  const userout = await redisCliv4.exists(user.email); // true: 1 , false: 0
-  if (userout) await redisCli.del(user.email);
+  const acc_userout = await redisCliv4.exists('acc_token ' + user.email); // true: 1 , false: 0
+  if (acc_userout) await redisCli.del('acc_token ' + user.email);
+
+  const ref_userout = await redisCliv4.exists('ref_token ' + user.email); // true: 1 , false: 0
+  if (ref_userout) await redisCli.del('ref_token ' + user.email);
 };
 
 // 블로그 아이디 중복검사
@@ -99,14 +108,9 @@ exports.blogcheck = async (blogId) => {
   return await User.findOne({ attributes: ['blogId'], where: { blogId } });
 };
 
-// refresh_token 저장
-exports.refresh_token = async (email, refreshToken) => {
-  await redisCli.setex('ref_token : ' + email, 10800, refreshToken);
-};
-
 // refresh_token 으로 아이디 찾기
 exports.refresh_token_check = async (email, refreshToken) => {
-  const tokencheck = await redisCliv4.get('ref_token :' + email);
+  const tokencheck = await redisCliv4.get('ref_token ' + email);
 
   if (tokencheck !== refreshToken) {
     return false;
