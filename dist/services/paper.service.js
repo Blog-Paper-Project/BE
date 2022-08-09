@@ -90,18 +90,26 @@ exports.findAllPosts = findAllPosts;
 const findUserInfo = async (blogId) => {
     const user = await User.findOne({
         where: { blogId },
-        attributes: ['blogId', 'nickname', 'profileImage', 'introduction', 'popularity'],
-        include: [
-            { model: Paper, include: { model: Tag, attributes: ['name'] } },
-            { model: User, as: 'Followers', attributes: ['blogId'] },
+        attributes: [
+            'userId',
+            'blogId',
+            'nickname',
+            'profileImage',
+            'introduction',
+            'popularity',
         ],
-        order: [[Paper, 'createdAt', 'DESC']],
     });
-    let categories = user?.Papers.map((paper) => paper.category);
-    let tags = user?.Papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
+    const papers = await Paper.findAll({
+        where: { userId: user?.userId },
+        include: { model: Tag, attributes: ['name'] },
+        order: [['createdAt', 'DESC']],
+    });
+    const followers = await user.getFollowers();
+    let categories = papers.map((paper) => paper.category);
+    let tags = papers.flatMap((paper) => paper.Tags).map((tag) => tag.name);
     categories = [...new Set(categories)];
     tags = [...new Set(tags)];
-    return { user, categories, tags };
+    return { user, papers, followers, categories, tags };
 };
 exports.findUserInfo = findUserInfo;
 // 카테고리 검색
@@ -162,21 +170,19 @@ exports.findPost = findPost;
 const findPostInfo = async (postId) => {
     const paper = await Paper.findOne({
         where: { postId },
-        include: [
-            {
-                model: Comment,
-                include: {
-                    model: User,
-                    as: 'Users',
-                    attributes: ['userId', 'blogId', 'nickname', 'profileImage'],
-                },
-            },
-            { model: Tag, attributes: ['name'] },
-            { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
-            { model: User, as: 'Likes', attributes: ['blogId'] },
-        ],
     });
-    return paper;
+    const comments = await Comment.findAll({
+        where: { postId },
+        include: {
+            model: User,
+            as: 'Users',
+            attributes: ['userId', 'blogId', 'nickname', 'profileImage'],
+        },
+    });
+    const tags = await paper.getTags();
+    const user = await paper.getUsers();
+    const likes = await paper.getLikes();
+    return { paper, comments, tags, user, likes };
 };
 exports.findPostInfo = findPostInfo;
 // 조회수 증가 및 검색

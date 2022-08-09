@@ -13,7 +13,7 @@
         "flow": [
            {
               "get": {
-                 "url": "/api/paper"
+                 "url": "/api/paper/testbot2/1"
               }
            }
         ]

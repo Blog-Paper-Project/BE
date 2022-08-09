@@ -30,11 +30,11 @@ exports.readPosts = readPosts;
 // 개인 페이지 조회
 const readBlog = async (req, res, next) => {
     const { blogId } = req.params;
-    const { user, categories, tags } = await PaperService.findUserInfo(blogId);
-    if (!user) {
+    const userInfo = await PaperService.findUserInfo(blogId);
+    if (!userInfo?.user) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
-    return res.json({ user, categories, tags });
+    return res.json(userInfo);
 };
 exports.readBlog = readBlog;
 // 개인 카테고리 조회
@@ -94,12 +94,12 @@ const readPost = async (req, res, next) => {
     if (!+postId) {
         return next((0, custom_error_1.default)(400, `Invalid PostId : ${postId}`));
     }
-    const paper = await PaperService.findPostInfo(postId);
-    if (!paper || paper.Users.blogId !== blogId) {
+    const { paper, comments, tags, user, likes } = await PaperService.findPostInfo(postId);
+    if (!paper || user?.blogId !== blogId) {
         return next((0, custom_error_1.default)(404, 'Not Found!'));
     }
     const count = await PaperService.addCount(postId, userId);
-    return res.json({ count, paper });
+    return res.json({ paper, comments, tags, user, likes, count });
 };
 exports.readPost = readPost;
 // 상세 페이지 작성
