@@ -146,7 +146,7 @@
 <img src="https://user-images.githubusercontent.com/98739079/182777501-7f81f386-33aa-42e0-9c5d-35a4884a9c5c.png" width="200"/>
 </div>
  
-Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이 활용했을 때 응답 속도가 70% 가량 단축되었다.
+Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이 활용했을 때 서버 응답 속도가 70% 가량 단축되었다.
   
 **`아쉬운점`**
 
@@ -156,6 +156,65 @@ Artillery로 테스트해본 결과, 기존 방식에 비해 레디스를 같이
 
 1. 일일 조회수를 레디스에 저장하고 오전 12시에 합산하여 DB에 업데이트한다. 레디스의 데이터 타입 set을 활용하여 중복 집계를 방지한다.
 2. 레디스를 세션 저장소로 활용하여 JWT 토큰을 저장하고 중복 로그인을 방지한다.
+  
+<br>  
+  
+<summary><b> ✔️ 상세페이지 로딩 속도 개선 </b></summary>
+<br>
+
+**`문제점`**
+
+1. 1:N의 관계를 갖는 데이터(게시글 : 댓글, 좋아요, 태그 등) 조회에 Eager Loading을 활용한다.
+2. 여러 번의 테이블 Join으로 성능 저하된다.
+
+**`해결방안`**
+
+1. Lazy Loading을 활용하여 데이터를 각각 테이블에서 조회한다.
+
+**`결과`**
+
+1. 코드 가독성이 좋아졌다.
+```Javascript
+// Eager Loading
+const paper = await Paper.findOne({
+    where: { postId },
+    include: [
+        {
+            model: Comment,
+            include: {
+                model: User,
+                as: 'Users',
+                attributes: ['userId', 'blogId', 'nickname', 'profileImage'],
+            },
+        },
+        { model: Tag, attributes: ['name'] },
+        { model: User, as: 'Users', attributes: ['blogId', 'nickname', 'profileImage'] },
+        { model: User, as: 'Likes', attributes: ['blogId'] },
+    ],
+});
+```
+```Javascript
+// Lazy Loading
+const paper = await Paper.findOne({ where: { postId } })
+const comments = await Comment.findAll({
+    where: { postId },
+    include: {
+        model: User,
+        as: 'Users',
+        attributes: ['userId', 'blogId', 'nickname', 'profileImage'],
+    },
+});
+const tags = await paper.getTags({ attributes: ['name'] });
+const user = await paper.getUsers({ attributes: ['blogId', 'nickname', 'profileImage'] });
+const likes = await paper.getLikes({ attributes: ['blogId'] });
+```
+
+2. 기존 방식에 비해 서버 응답 속도가 50% 가량 단축되었다.
+
+<div>
+<img src="https://user-images.githubusercontent.com/98739079/183558639-f4ce605d-2afd-45ca-b848-c6627a9381a8.png" width="200"/>
+<img src="https://user-images.githubusercontent.com/98739079/183558649-217b62e1-7252-4573-b4bd-20f880931d91.png" width="200"/>
+</div>
   
 <br>  
   
