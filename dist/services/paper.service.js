@@ -168,9 +168,7 @@ const findPost = async (postId) => {
 exports.findPost = findPost;
 // 특정 게시글과 유저, 댓글, 좋아요 검색
 const findPostInfo = async (postId) => {
-    const paper = await Paper.findOne({
-        where: { postId },
-    });
+    const paper = await Paper.findOne({ where: { postId } });
     const comments = await Comment.findAll({
         where: { postId },
         include: {
@@ -179,9 +177,11 @@ const findPostInfo = async (postId) => {
             attributes: ['userId', 'blogId', 'nickname', 'profileImage'],
         },
     });
-    const tags = await paper.getTags();
-    const user = await paper.getUsers();
-    const likes = await paper.getLikes();
+    const tags = await paper.getTags({ attributes: ['name'] });
+    const user = await paper.getUsers({
+        attributes: ['blogId', 'nickname', 'profileImage'],
+    });
+    const likes = await paper.getLikes({ attributes: ['blogId'] });
     return { paper, comments, tags, user, likes };
 };
 exports.findPostInfo = findPostInfo;
